@@ -503,11 +503,12 @@ button, label, p, span, a, input, textarea, select {
   font-size: 9px;
 }
 
-/* Gold accent line at top of cards */
+/* Gold accent line at top of cards — uses ::after to avoid collision with
+   deco-corners-4::before when both are applied to the same element */
 .deco-top-line {
   position: relative;
 }
-.deco-top-line::before {
+.deco-top-line::after {
   content: '';
   position: absolute;
   top: 0;
@@ -515,10 +516,11 @@ button, label, p, span, a, input, textarea, select {
   right: 15%;
   height: 1px;
   background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  pointer-events: none;
 }
 
 /* Rose gold accent line variant */
-.deco-top-line-rose::before {
+.deco-top-line-rose::after {
   content: '';
   position: absolute;
   top: 0;
@@ -526,6 +528,7 @@ button, label, p, span, a, input, textarea, select {
   right: 15%;
   height: 1px;
   background: linear-gradient(90deg, transparent, var(--rose-gold), transparent);
+  pointer-events: none;
 }
 
 /* ============================================
