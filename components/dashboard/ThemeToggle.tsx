@@ -22,30 +22,23 @@ export function ThemeToggle({ userId }: ThemeToggleProps) {
     const newTheme = theme === 'dark' ? 'light' : 'dark'
     setTheme(newTheme)
 
-    if (userId) {
-      const supabase = createClient()
+    const supabase = createClient()
+
+    let uid = userId
+    if (!uid) {
+      const { data: { user } } = await supabase.auth.getUser()
+      uid = user?.id
+    }
+
+    if (uid) {
       await supabase
         .from('landlords')
         .update({ theme_preference: newTheme })
-        .eq('auth_user_id', userId)
+        .eq('auth_user_id', uid)
     }
   }, [theme, setTheme, userId])
 
-  if (!mounted) {
-    return (
-      <div
-        className={cn(
-          'flex items-center gap-3 px-5 py-[11px] uppercase',
-          'font-sans font-light text-[11px] tracking-[0.14em]',
-          'text-dynasty-gray-500'
-        )}
-        aria-hidden
-      >
-        <Moon className="h-[14px] w-[14px] shrink-0" strokeWidth={1.2} />
-        <span>Light Mode</span>
-      </div>
-    )
-  }
+  if (!mounted) return null
 
   const isDark = theme === 'dark'
 
@@ -61,9 +54,9 @@ export function ThemeToggle({ userId }: ThemeToggleProps) {
       aria-label="Toggle theme"
     >
       {isDark ? (
-        <Sun className="h-[14px] w-[14px] shrink-0" strokeWidth={1.2} />
+        <Sun className="h-[15px] w-[15px] shrink-0" strokeWidth={1.2} />
       ) : (
-        <Moon className="h-[14px] w-[14px] shrink-0" strokeWidth={1.2} />
+        <Moon className="h-[15px] w-[15px] shrink-0" strokeWidth={1.2} />
       )}
       <span>{isDark ? 'Light Mode' : 'Dark Mode'}</span>
     </button>

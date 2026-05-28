@@ -73,14 +73,22 @@
   --accent-top:          linear-gradient(90deg, transparent 0%, #C9A84C 50%, transparent 100%);
   --accent-corner-tl:    linear-gradient(135deg, rgba(201,168,76,0.4) 0%, transparent 30%);
 
-  /* Subtle Art Deco hatching pattern (no image) */
-  --deco-hatching: repeating-linear-gradient(
-    45deg,
-    transparent,
-    transparent 40px,
-    rgba(201, 168, 76, 0.012) 40px,
-    rgba(201, 168, 76, 0.012) 41px
-  );
+  /* Subtle Art Deco crosshatch pattern for sidebar (no image) */
+  --deco-hatching:
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 28px,
+      rgba(201, 168, 76, 0.018) 28px,
+      rgba(201, 168, 76, 0.018) 29px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 28px,
+      rgba(201, 168, 76, 0.018) 28px,
+      rgba(201, 168, 76, 0.018) 29px
+    );
 }
 
 /* ─────────────────────────────────────────────
@@ -331,6 +339,58 @@ button, label, p, span, a, input, textarea, select {
 }
 
 /* ─────────────────────────────────────────────
+   Stat card — Art Deco corner marks
+   Applied via .stat-card class on the card div.
+   ───────────────────────────────────────────── */
+.stat-card {
+  position: relative;
+}
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  width: 14px;
+  height: 14px;
+  border-top: 1px solid rgba(201, 168, 76, 0.5);
+  border-left: 1px solid rgba(201, 168, 76, 0.5);
+  pointer-events: none;
+}
+.stat-card::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  width: 14px;
+  height: 14px;
+  border-bottom: 1px solid rgba(201, 168, 76, 0.5);
+  border-right: 1px solid rgba(201, 168, 76, 0.5);
+  pointer-events: none;
+}
+
+/* ─────────────────────────────────────────────
+   Financial amount coloring
+   income = gold, expense = rose gold
+   ───────────────────────────────────────────── */
+.amount-income {
+  font-family: var(--font-jetbrains), ui-monospace, monospace;
+  color: #C9A84C;
+}
+.amount-expense {
+  font-family: var(--font-jetbrains), ui-monospace, monospace;
+  color: #B76E79;
+}
+
+/* ─────────────────────────────────────────────
+   Sidebar nav items — ensure content is above
+   the ::before hatching overlay (z-index: 0)
+   ───────────────────────────────────────────── */
+.deco-hatching > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ─────────────────────────────────────────────
    Scrollbar — thin, gold accent
    ───────────────────────────────────────────── */
 ::-webkit-scrollbar {
@@ -365,6 +425,128 @@ input:-webkit-autofill:focus {
   -webkit-text-fill-color: #FAF7F2;
   -webkit-box-shadow: 0 0 0px 1000px #111111 inset;
   transition: background-color 5000s ease-in-out 0s;
+}
+
+/* ─────────────────────────────────────────────
+   Light mode — full overrides
+   Sidebar stays dark. Main content inverts.
+   ───────────────────────────────────────────── */
+
+/* Page background and text */
+.light .main-content,
+.light main {
+  background-color: #FAF7F2;
+  color: #1C1A17;
+}
+
+/* Stat cards */
+.light .stat-card {
+  background-color: #FFFFFF;
+  border-color: rgba(154, 122, 46, 0.2);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+.light .stat-card:hover {
+  border-color: rgba(154, 122, 46, 0.4);
+}
+.light .stat-card::before {
+  border-top-color: rgba(154, 122, 46, 0.4);
+  border-left-color: rgba(154, 122, 46, 0.4);
+}
+.light .stat-card::after {
+  border-bottom-color: rgba(154, 122, 46, 0.4);
+  border-right-color: rgba(154, 122, 46, 0.4);
+}
+
+/* Data tables */
+.light table,
+.light [class*="bg-dynasty-gray-900"],
+.light [class*="bg-[#0F0F0F]"] {
+  background-color: #FFFFFF;
+}
+.light thead,
+.light [class*="bg-dynasty-black"] thead {
+  background-color: #F5F0E8;
+}
+.light th {
+  color: #8A8A82;
+}
+.light td {
+  color: #4A4A45;
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+.light tr:hover td {
+  background-color: rgba(154, 122, 46, 0.04);
+}
+
+/* Inputs, selects, textareas */
+.light input:not([type="checkbox"]):not([type="radio"]),
+.light select,
+.light textarea {
+  background-color: #FFFFFF;
+  border-color: rgba(154, 122, 46, 0.2);
+  color: #1C1A17;
+}
+.light input:not([type="checkbox"]):not([type="radio"]):focus,
+.light select:focus,
+.light textarea:focus {
+  border-color: rgba(154, 122, 46, 0.45);
+  box-shadow: 0 0 0 3px rgba(154, 122, 46, 0.06);
+}
+
+/* Cards / panels */
+.light [class*="bg-[#111111]"],
+.light [class*="bg-dynasty-black-soft"] {
+  background-color: #FFFFFF;
+}
+.light [class*="bg-[#161616]"],
+.light [class*="bg-dynasty-black-card"] {
+  background-color: #F5F0E8;
+}
+.light [class*="bg-[#0F0F0F]"] {
+  background-color: #F0EBE3;
+}
+
+/* Text */
+.light [class*="text-dynasty-warm-white"] {
+  color: #1C1A17;
+}
+.light [class*="text-dynasty-gray-300"] {
+  color: #4A4A45;
+}
+.light [class*="text-dynasty-gray-400"] {
+  color: #6B6B65;
+}
+.light [class*="text-dynasty-gray-500"] {
+  color: #8A8A82;
+}
+
+/* Page titles */
+.light h1,
+.light h2 {
+  color: #1C1A17;
+}
+.light h3,
+.light h4 {
+  color: #1C1A17;
+}
+
+/* Borders */
+.light [class*="border-[rgba(201,168,76,0.08)"] {
+  border-color: rgba(154, 122, 46, 0.12);
+}
+.light [class*="border-[rgba(201,168,76,0.1)"] {
+  border-color: rgba(154, 122, 46, 0.18);
+}
+
+/* Chart background */
+.light [class*="bg-[#0F0F0F]"] {
+  background-color: #FFFFFF;
+}
+
+/* Form section backgrounds */
+.light form [class*="bg-"],
+.light [class*="form-card"] {
+  background-color: #FFFFFF;
 }
 
 /* ─────────────────────────────────────────────

@@ -62,16 +62,14 @@ export default async function SignupPage({
       <div className="w-full max-w-[420px]">
         {/* Logo + tagline outside card */}
         <div className="mb-6 flex flex-col items-center">
-          <div className="relative h-[72px] w-[180px]">
-            <Image
-              src="/images/dynasty_logo.jpg"
-              alt="DYNASTY"
-              fill
-              priority
-              sizes="180px"
-              className="object-contain"
-            />
-          </div>
+          <Image
+            src="/images/dynasty_logo.jpg"
+            alt="DYNASTY"
+            width={180}
+            height={72}
+            priority
+            style={{ objectFit: 'contain', display: 'block', borderRadius: 0 }}
+          />
           <p className="mt-3 text-center font-sans text-[8px] font-light uppercase tracking-[0.35em] text-[rgba(201,168,76,0.4)]">
             <span className="inline-block mr-2">◆</span>
             Legacy &middot; Luxury &middot; Timeless

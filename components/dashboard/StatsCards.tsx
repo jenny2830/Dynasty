@@ -14,22 +14,16 @@ function StatCard({ label, value, subtext, trend, icon, highlight }: StatCardPro
   return (
     <div
       className={cn(
-        'group relative overflow-hidden rounded-[2px]',
-        'border border-[rgba(201,168,76,0.1)]',
-        'bg-[linear-gradient(135deg,#161616_0%,#1C1A17_100%)]',
-        'shadow-[var(--shadow-card)]',
-        'transition-all duration-300 ease-out',
-        'hover:border-[rgba(201,168,76,0.35)] hover:shadow-[var(--shadow-card-hover)]',
+        'stat-card group relative rounded-[2px]',
+        'border border-[rgba(201,168,76,0.12)]',
+        'bg-[#111111]',
+        'shadow-[0_4px_24px_rgba(0,0,0,0.4)]',
+        'transition-[border-color] duration-300 ease-out',
+        'hover:border-[rgba(201,168,76,0.3)]',
         'px-7 pt-7 pb-6'
       )}
     >
-      {/* Art Deco top-left corner glow */}
-      <div
-        className="pointer-events-none absolute top-0 left-0 h-[60px] w-[60px]"
-        style={{ background: 'var(--accent-corner-tl)' }}
-        aria-hidden
-      />
-      {/* Gold top accent line */}
+      {/* Gold top accent line — thin radiating gradient */}
       <div
         className="pointer-events-none absolute top-0 left-[10%] right-[10%] h-px"
         style={{ background: 'var(--accent-top)' }}
@@ -64,7 +58,7 @@ function StatCard({ label, value, subtext, trend, icon, highlight }: StatCardPro
             <p
               className={cn(
                 'mt-2 font-sans font-light text-[11px] tracking-[0.04em]',
-                'text-dynasty-gray-500'
+                'text-dynasty-gray-600'
               )}
             >
               {subtext}
@@ -79,12 +73,12 @@ function StatCard({ label, value, subtext, trend, icon, highlight }: StatCardPro
               )}
             >
               {trend.value >= 0 ? '↑' : '↓'} {Math.abs(trend.value)}%{' '}
-              <span className="text-dynasty-gray-500">{trend.label}</span>
+              <span className="text-dynasty-gray-600">{trend.label}</span>
             </p>
           )}
         </div>
 
-        {/* Icon — thin elegant, rose accent on muted, gold on highlight */}
+        {/* Icon box */}
         <div
           className={cn(
             'flex h-9 w-9 shrink-0 items-center justify-center rounded-[1px]',

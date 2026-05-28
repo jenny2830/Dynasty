@@ -122,18 +122,14 @@ export function Sidebar({ userId, initialTheme }: SidebarProps) {
             'flex flex-col items-center'
           )}
         >
-          <div className="relative h-20 w-full flex items-center justify-center">
+          <div className="flex items-center justify-center py-1">
             <Image
               src="/images/dynasty_logo.jpg"
               alt="DYNASTY"
-              fill
+              width={200}
+              height={72}
               priority
-              sizes="200px"
-              className="object-contain"
-              style={{
-                objectFit: 'contain',
-                mixBlendMode: 'normal',
-              }}
+              style={{ objectFit: 'contain', display: 'block', borderRadius: 0 }}
             />
           </div>
           <p

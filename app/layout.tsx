@@ -53,7 +53,12 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="bg-dynasty-black text-dynasty-warm-white antialiased">
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem={false}
+          storageKey="dynasty-theme"
+        >
           {children}
         </ThemeProvider>
       </body>
