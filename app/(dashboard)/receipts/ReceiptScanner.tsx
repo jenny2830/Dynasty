@@ -61,7 +61,7 @@ export function ReceiptScanner({ properties, recentReceipts }: ReceiptScannerPro
 
   // Form state for confirmation
   const [editData, setEditData] = useState<ExtractedData | null>(null)
-  const [selectedProperty, setSelectedProperty] = useState<string>('')
+  const [selectedProperty, setSelectedProperty] = useState<string>('none')
 
   const processFile = useCallback(async (file: File) => {
     if (!file.type.match(/^image\/(jpeg|png|webp|gif)$/)) {
@@ -138,7 +138,7 @@ export function ReceiptScanner({ properties, recentReceipts }: ReceiptScannerPro
         receiptDate: editData.receipt_date!,
         category: editData.category!,
         description: editData.description,
-        propertyId: selectedProperty || null,
+        propertyId: selectedProperty === 'none' || !selectedProperty ? null : selectedProperty,
       })
 
       if (result.error) {
@@ -330,7 +330,7 @@ export function ReceiptScanner({ properties, recentReceipts }: ReceiptScannerPro
                       <SelectValue placeholder="Select property (optional)" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">No property</SelectItem>
+                      <SelectItem value="none">No property</SelectItem>
                       {properties.map((p) => (
                         <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
                       ))}

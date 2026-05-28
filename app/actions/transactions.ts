@@ -51,9 +51,12 @@ export async function createTransaction(
     return { errors: { _form: [(e as Error).message] } }
   }
 
+  const nullIfNone = (v: FormDataEntryValue | null) =>
+    !v || v === 'none' ? null : String(v)
+
   const raw = {
-    property_id: formData.get('property_id') || null,
-    unit_id: formData.get('unit_id') || null,
+    property_id: nullIfNone(formData.get('property_id')),
+    unit_id: nullIfNone(formData.get('unit_id')),
     type: formData.get('type'),
     category: formData.get('category'),
     amount: formData.get('amount'),
@@ -93,9 +96,12 @@ export async function updateTransaction(
     return { errors: { _form: [(e as Error).message] } }
   }
 
+  const nullIfNone = (v: FormDataEntryValue | null) =>
+    !v || v === 'none' ? null : String(v)
+
   const raw = {
-    property_id: formData.get('property_id') || null,
-    unit_id: formData.get('unit_id') || null,
+    property_id: nullIfNone(formData.get('property_id')),
+    unit_id: nullIfNone(formData.get('unit_id')),
     type: formData.get('type'),
     category: formData.get('category'),
     amount: formData.get('amount'),

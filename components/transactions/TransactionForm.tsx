@@ -55,7 +55,7 @@ export function TransactionForm({
     transaction?.type ?? 'expense'
   )
   const [selectedProperty, setSelectedProperty] = useState<string>(
-    transaction?.property_id ?? defaultPropertyId ?? ''
+    transaction?.property_id ?? defaultPropertyId ?? 'none'
   )
   const [units, setUnits] = useState<Unit[]>([])
   const [taxDeductible, setTaxDeductible] = useState(
@@ -190,7 +190,7 @@ export function TransactionForm({
               <SelectValue placeholder="Select property" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">No property</SelectItem>
+              <SelectItem value="none">No property</SelectItem>
               {properties.map((p) => (
                 <SelectItem key={p.id} value={p.id}>
                   {p.name}
@@ -204,12 +204,12 @@ export function TransactionForm({
         {units.length > 0 && (
           <div className="space-y-1.5">
             <Label htmlFor="unit_id">Unit</Label>
-            <Select name="unit_id" defaultValue={transaction?.unit_id ?? ''}>
+            <Select name="unit_id" defaultValue={transaction?.unit_id ?? 'none'}>
               <SelectTrigger id="unit_id">
                 <SelectValue placeholder="Select unit (optional)" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">No specific unit</SelectItem>
+                <SelectItem value="none">No specific unit</SelectItem>
                 {units.map((u) => (
                   <SelectItem key={u.id} value={u.id}>
                     Unit {u.unit_number}
