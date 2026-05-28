@@ -39,12 +39,17 @@ export function TransactionFilters({ properties }: TransactionFiltersProps) {
   )
 
   return (
-    <div className="flex flex-wrap gap-3">
+    <div className="flex flex-wrap items-center gap-3">
+      <p className="mr-1 font-sans text-[9px] font-light uppercase tracking-[0.22em] text-dynasty-gray-500">
+        <span className="mr-2 text-[6px] text-[rgba(201,168,76,0.5)] leading-none">◆</span>
+        Filter
+      </p>
+
       <Select
         value={searchParams.get('property_id') ?? 'all'}
         onValueChange={(v) => setFilter('property_id', v)}
       >
-        <SelectTrigger className="w-44">
+        <SelectTrigger className="w-48">
           <SelectValue placeholder="All properties" />
         </SelectTrigger>
         <SelectContent>
@@ -61,7 +66,7 @@ export function TransactionFilters({ properties }: TransactionFiltersProps) {
         value={searchParams.get('type') ?? 'all'}
         onValueChange={(v) => setFilter('type', v)}
       >
-        <SelectTrigger className="w-36">
+        <SelectTrigger className="w-40">
           <SelectValue placeholder="All types" />
         </SelectTrigger>
         <SelectContent>
@@ -75,7 +80,7 @@ export function TransactionFilters({ properties }: TransactionFiltersProps) {
         value={searchParams.get('category') ?? 'all'}
         onValueChange={(v) => setFilter('category', v)}
       >
-        <SelectTrigger className="w-48">
+        <SelectTrigger className="w-52">
           <SelectValue placeholder="All categories" />
         </SelectTrigger>
         <SelectContent>
@@ -92,7 +97,7 @@ export function TransactionFilters({ properties }: TransactionFiltersProps) {
         value={searchParams.get('period') ?? 'all'}
         onValueChange={(v) => setFilter('period', v)}
       >
-        <SelectTrigger className="w-36">
+        <SelectTrigger className="w-40">
           <SelectValue placeholder="All time" />
         </SelectTrigger>
         <SelectContent>

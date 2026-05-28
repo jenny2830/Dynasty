@@ -33,18 +33,23 @@ const CustomTooltip = ({
   if (!active || !payload?.length) return null
 
   return (
-    <div className="rounded-lg border border-dynasty-gray-700 bg-dynasty-gray-800 p-3 shadow-xl">
-      <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-dynasty-gray-400">
+    <div
+      className="rounded-[1px] border bg-dynasty-black-card px-4 py-3 shadow-[var(--shadow-card)]"
+      style={{ borderColor: 'rgba(201, 168, 76, 0.2)' }}
+    >
+      <p className="mb-2 font-sans text-[9px] font-light uppercase tracking-[0.2em] text-dynasty-gray-400">
         {label}
       </p>
       {payload.map((entry) => (
-        <div key={entry.name} className="flex items-center gap-2 text-sm">
+        <div key={entry.name} className="flex items-center gap-2 text-[12px]">
           <span
-            className="h-2 w-2 rounded-full"
+            className="h-2 w-2 rounded-[1px]"
             style={{ backgroundColor: entry.color }}
           />
-          <span className="text-dynasty-gray-200 capitalize">{entry.name}:</span>
-          <span className="font-mono font-semibold text-dynasty-cream">
+          <span className="font-light text-dynasty-gray-300 capitalize">
+            {entry.name}:
+          </span>
+          <span className="font-mono font-medium text-dynasty-warm-white">
             ${entry.value.toLocaleString('en-CA', { minimumFractionDigits: 0 })}
           </span>
         </div>
@@ -57,27 +62,30 @@ export function IncomeExpenseChart({ data }: IncomeExpenseChartProps) {
   if (data.length === 0) {
     return (
       <div className="flex h-48 items-center justify-center">
-        <p className="text-sm text-dynasty-gray-400">No transaction data yet</p>
+        <p className="font-sans text-[12px] font-light tracking-[0.06em] text-dynasty-gray-500">
+          No transaction data yet
+        </p>
       </div>
     )
   }
 
   return (
-    <ResponsiveContainer width="100%" height={220}>
-      <BarChart data={data} barGap={4} barCategoryGap="30%">
+    <ResponsiveContainer width="100%" height={240}>
+      <BarChart data={data} barGap={6} barCategoryGap="30%">
         <CartesianGrid
-          strokeDasharray="3 3"
-          stroke="#2A2A2A"
+          strokeDasharray="2 4"
+          stroke="rgba(255,255,255,0.03)"
           vertical={false}
         />
         <XAxis
           dataKey="month"
-          tick={{ fill: '#888888', fontSize: 11 }}
+          tick={{ fill: '#333330', fontSize: 10, fontFamily: 'var(--font-jost)', letterSpacing: '0.1em' }}
           axisLine={false}
           tickLine={false}
+          tickMargin={8}
         />
         <YAxis
-          tick={{ fill: '#888888', fontSize: 11 }}
+          tick={{ fill: '#333330', fontSize: 10, fontFamily: 'var(--font-jost)' }}
           axisLine={false}
           tickLine={false}
           tickFormatter={(v: number) =>
@@ -85,17 +93,26 @@ export function IncomeExpenseChart({ data }: IncomeExpenseChartProps) {
           }
           width={48}
         />
-        <Tooltip content={<CustomTooltip />} cursor={{ fill: '#2A2A2A' }} />
+        <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(201,168,76,0.04)' }} />
         <Legend
-          wrapperStyle={{ fontSize: 12, color: '#888888', paddingTop: 8 }}
+          wrapperStyle={{
+            fontSize: 10,
+            color: '#6B6B65',
+            paddingTop: 12,
+            fontFamily: 'var(--font-jost)',
+            letterSpacing: '0.18em',
+            textTransform: 'uppercase',
+          }}
+          iconType="square"
+          iconSize={8}
           formatter={(value: string) => (
-            <span style={{ color: '#CCCCCC', textTransform: 'capitalize' }}>
+            <span style={{ color: '#8A8A82', textTransform: 'uppercase', letterSpacing: '0.18em', fontSize: 10 }}>
               {value}
             </span>
           )}
         />
-        <Bar dataKey="income" fill="#C9A84C" radius={[4, 4, 0, 0]} name="income" />
-        <Bar dataKey="expenses" fill="#3A3A3A" radius={[4, 4, 0, 0]} name="expenses" />
+        <Bar dataKey="income" fill="#C9A84C" radius={[1, 1, 0, 0]} name="income" />
+        <Bar dataKey="expenses" fill="#B76E79" radius={[1, 1, 0, 0]} name="expenses" />
       </BarChart>
     </ResponsiveContainer>
   )

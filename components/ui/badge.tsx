@@ -3,22 +3,39 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
 
 const badgeVariants = cva(
-  'inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors',
+  [
+    'inline-flex items-center rounded-[1px] px-2.5 py-[3px]',
+    'font-sans font-light uppercase',
+    'text-[9px] tracking-[0.15em] leading-none',
+    'border transition-colors',
+  ].join(' '),
   {
     variants: {
       variant: {
-        default:
-          'border-dynasty-gold/30 bg-dynasty-gold/10 text-dynasty-gold',
-        secondary:
-          'border-dynasty-gray-600 bg-dynasty-gray-800 text-dynasty-gray-200',
-        destructive:
-          'border-red-500/30 bg-red-500/10 text-red-400',
-        outline:
-          'border-dynasty-gray-600 text-dynasty-gray-200',
-        success:
-          'border-emerald-500/30 bg-emerald-500/10 text-emerald-400',
-        warning:
-          'border-amber-500/30 bg-amber-500/10 text-amber-400',
+        default: [
+          'bg-[rgba(201,168,76,0.06)] text-dynasty-gold-muted',
+          'border-[rgba(201,168,76,0.18)]',
+        ].join(' '),
+        secondary: [
+          'bg-[rgba(74,74,69,0.15)] text-dynasty-gray-400',
+          'border-[rgba(74,74,69,0.25)]',
+        ].join(' '),
+        destructive: [
+          'bg-[rgba(183,110,121,0.07)] text-dynasty-rose-gold',
+          'border-[rgba(183,110,121,0.18)]',
+        ].join(' '),
+        outline: [
+          'bg-transparent text-dynasty-gray-300',
+          'border-[rgba(201,168,76,0.12)]',
+        ].join(' '),
+        success: [
+          'bg-[rgba(201,168,76,0.07)] text-dynasty-gold',
+          'border-[rgba(201,168,76,0.18)]',
+        ].join(' '),
+        warning: [
+          'bg-[rgba(183,110,121,0.07)] text-dynasty-rose-gold',
+          'border-[rgba(183,110,121,0.18)]',
+        ].join(' '),
       },
     },
     defaultVariants: {

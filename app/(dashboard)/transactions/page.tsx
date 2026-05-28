@@ -3,6 +3,7 @@ import { Plus, ArrowUpRight, ArrowDownRight } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { PageHeader } from '@/components/ui/page-header'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import { TransactionFilters } from '@/components/transactions/TransactionFilters'
 import { startOfMonth, endOfMonth, startOfQuarter, endOfQuarter, startOfYear, endOfYear, subMonths, format } from 'date-fns'
@@ -73,7 +74,6 @@ export default async function TransactionsPage({
       .order('name'),
   ])
 
-  // Build query with filters
   let query = supabase
     .from('transactions')
     .select('id, type, amount, category, transaction_date, description, property_id, properties(name)')
@@ -99,119 +99,126 @@ export default async function TransactionsPage({
   const totalExpenses = txList.filter((t) => t.type === 'expense').reduce((s, t) => s + t.amount, 0)
   const netIncome = totalIncome - totalExpenses
 
+  const totals = [
+    { label: 'Total Income', value: totalIncome, color: 'text-dynasty-gold' },
+    { label: 'Total Expenses', value: totalExpenses, color: 'text-dynasty-rose-gold' },
+    {
+      label: 'Net Income',
+      value: netIncome,
+      color: netIncome >= 0 ? 'text-dynasty-gold' : 'text-dynasty-rose-gold',
+    },
+  ]
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="font-serif text-3xl font-semibold text-dynasty-cream">Transactions</h1>
-          <p className="mt-1 text-sm text-dynasty-gray-400">
-            {txList.length} transaction{txList.length !== 1 ? 's' : ''}
-          </p>
-        </div>
+    <div className="space-y-7">
+      <PageHeader
+        title="Transactions"
+        subtitle={`${txList.length} ${txList.length === 1 ? 'transaction' : 'transactions'}`}
+      >
         <Button asChild>
           <Link href="/transactions/new">
-            <Plus className="h-4 w-4" /> Add Transaction
+            <Plus /> Add Transaction
           </Link>
         </Button>
-      </div>
+      </PageHeader>
 
       {/* Running totals */}
-      <div className="grid grid-cols-3 gap-4">
-        <div className="rounded-xl border border-dynasty-gray-700 bg-dynasty-gray-900 p-4">
-          <p className="text-xs uppercase tracking-wider text-dynasty-gray-400">Total Income</p>
-          <p className="font-mono text-xl font-semibold text-emerald-400 mt-1">
-            {formatCurrency(totalIncome)}
-          </p>
-        </div>
-        <div className="rounded-xl border border-dynasty-gray-700 bg-dynasty-gray-900 p-4">
-          <p className="text-xs uppercase tracking-wider text-dynasty-gray-400">Total Expenses</p>
-          <p className="font-mono text-xl font-semibold text-red-400 mt-1">
-            {formatCurrency(totalExpenses)}
-          </p>
-        </div>
-        <div className="rounded-xl border border-dynasty-gray-700 bg-dynasty-gray-900 p-4">
-          <p className="text-xs uppercase tracking-wider text-dynasty-gray-400">Net Income</p>
-          <p className={`font-mono text-xl font-semibold mt-1 ${netIncome >= 0 ? 'text-dynasty-gold' : 'text-red-400'}`}>
-            {formatCurrency(netIncome)}
-          </p>
-        </div>
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
+        {totals.map((t) => (
+          <div
+            key={t.label}
+            className="relative overflow-hidden rounded-[2px] border border-[rgba(201,168,76,0.1)] bg-[linear-gradient(135deg,#161616_0%,#1C1A17_100%)] px-6 py-5 shadow-[var(--shadow-card)]"
+          >
+            <div
+              className="pointer-events-none absolute top-0 left-[10%] right-[10%] h-px"
+              style={{ background: 'var(--accent-top)' }}
+              aria-hidden
+            />
+            <p className="flex items-center gap-2 font-sans text-[9px] font-light uppercase tracking-[0.22em] text-dynasty-gray-500">
+              <span className="text-[6px] text-[rgba(201,168,76,0.5)] leading-none">◆</span>
+              {t.label}
+            </p>
+            <p className={`mt-2.5 font-mono text-[22px] font-medium tracking-tight ${t.color}`}>
+              {formatCurrency(t.value)}
+            </p>
+          </div>
+        ))}
       </div>
 
       {/* Filters */}
       <TransactionFilters properties={propertiesResult.data ?? []} />
 
       {/* Table */}
-      <div className="rounded-xl border border-dynasty-gray-700 bg-dynasty-gray-900 overflow-hidden">
+      <div className="overflow-hidden rounded-[2px] border border-[rgba(201,168,76,0.08)] bg-dynasty-gray-900 shadow-[var(--shadow-card)]">
         {txList.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 text-center">
-            <p className="text-sm text-dynasty-gray-400 mb-4">No transactions found</p>
-            <Button asChild size="sm">
+          <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
+            <p className="font-sans text-[12px] font-light text-dynasty-gray-500">
+              No transactions found
+            </p>
+            <Button asChild variant="outline" size="sm" className="mt-4">
               <Link href="/transactions/new">
-                <Plus className="h-4 w-4" /> Add transaction
+                <Plus /> Add Transaction
               </Link>
             </Button>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-dynasty-gray-700">
-                  <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-dynasty-gray-400">
-                    Date
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-dynasty-gray-400">
-                    Description
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-dynasty-gray-400 hidden sm:table-cell">
-                    Property
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-dynasty-gray-400">
-                    Category
-                  </th>
-                  <th className="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-dynasty-gray-400">
-                    Amount
-                  </th>
-                  <th className="px-6 py-3 w-16" />
+            <table className="w-full">
+              <thead className="bg-dynasty-black border-b border-[rgba(201,168,76,0.1)]">
+                <tr>
+                  {['Date', 'Description', 'Property', 'Category', 'Amount', ''].map((h, i) => (
+                    <th
+                      key={i}
+                      className={`px-6 py-3.5 font-sans text-[9px] font-light uppercase tracking-[0.2em] text-dynasty-gray-500 ${
+                        h === 'Amount' ? 'text-right' : 'text-left'
+                      } ${h === 'Property' ? 'hidden sm:table-cell' : ''}`}
+                    >
+                      {h}
+                    </th>
+                  ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-dynasty-gray-800">
+              <tbody>
                 {txList.map((tx) => (
                   <tr
                     key={tx.id}
-                    className="hover:bg-dynasty-gray-800/50 transition-colors"
+                    className="border-b border-[rgba(255,255,255,0.025)] transition-colors hover:bg-[rgba(201,168,76,0.025)]"
                   >
-                    <td className="px-6 py-3.5 text-dynasty-gray-400 whitespace-nowrap">
+                    <td className="whitespace-nowrap px-6 py-3.5 font-sans text-[12px] font-light text-dynasty-gray-400">
                       {formatDate(tx.transaction_date)}
                     </td>
                     <td className="px-6 py-3.5">
                       <div className="flex items-center gap-2">
                         {tx.type === 'income' ? (
-                          <ArrowUpRight className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
+                          <ArrowUpRight className="h-3.5 w-3.5 shrink-0 text-dynasty-gold" strokeWidth={1.2} />
                         ) : (
-                          <ArrowDownRight className="h-3.5 w-3.5 text-red-400 shrink-0" />
+                          <ArrowDownRight className="h-3.5 w-3.5 shrink-0 text-dynasty-rose-gold" strokeWidth={1.2} />
                         )}
-                        <span className="text-dynasty-cream truncate max-w-48">
+                        <span className="max-w-[16rem] truncate font-sans text-[13px] text-dynasty-warm-white">
                           {tx.description ?? tx.category}
                         </span>
                       </div>
                     </td>
-                    <td className="px-6 py-3.5 text-dynasty-gray-400 hidden sm:table-cell whitespace-nowrap">
+                    <td className="hidden whitespace-nowrap px-6 py-3.5 font-sans text-[12px] font-light text-dynasty-gray-400 sm:table-cell">
                       {(tx.properties as unknown as { name: string } | null)?.name ?? '—'}
                     </td>
                     <td className="px-6 py-3.5">
-                      <Badge variant="secondary">{tx.category}</Badge>
+                      <Badge>{tx.category}</Badge>
                     </td>
-                    <td className="px-6 py-3.5 text-right whitespace-nowrap">
+                    <td className="whitespace-nowrap px-6 py-3.5 text-right">
                       <span
-                        className={`font-mono font-semibold ${tx.type === 'income' ? 'text-emerald-400' : 'text-red-400'}`}
+                        className={`font-mono text-[13px] font-medium tracking-tight ${
+                          tx.type === 'income' ? 'text-dynasty-gold' : 'text-dynasty-rose-gold'
+                        }`}
                       >
-                        {tx.type === 'income' ? '+' : '-'}{formatCurrency(tx.amount)}
+                        {tx.type === 'income' ? '+' : '−'}
+                        {formatCurrency(tx.amount)}
                       </span>
                     </td>
                     <td className="px-6 py-3.5 text-right">
                       <Link
                         href={`/transactions/${tx.id}/edit`}
-                        className="text-xs text-dynasty-gray-400 hover:text-dynasty-gold transition-colors"
+                        className="font-sans text-[10px] font-light uppercase tracking-[0.18em] text-dynasty-gray-500 transition-colors hover:text-dynasty-gold"
                       >
                         Edit
                       </Link>

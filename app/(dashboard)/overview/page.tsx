@@ -6,6 +6,8 @@ import { Building2, Plus, ArrowRight, Bell } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { PageHeader } from '@/components/ui/page-header'
+import { Section, SectionHeader } from '@/components/ui/section'
 import { subMonths, format, startOfMonth, endOfMonth } from 'date-fns'
 
 export const metadata = { title: 'Overview' }
@@ -46,11 +48,19 @@ export default async function OverviewPage() {
 
   if (!landlord) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
-        <h1 className="font-serif text-3xl text-dynasty-cream mb-2">Welcome to DYNASTY</h1>
-        <p className="text-dynasty-gray-400 mb-6">Complete your profile to get started.</p>
-        <Button asChild>
-          <Link href="/settings">Set up profile</Link>
+      <div className="flex min-h-[60vh] flex-col items-center justify-center text-center">
+        <p className="font-sans text-[9px] font-light uppercase tracking-[0.3em] text-dynasty-gold/60">
+          Welcome
+        </p>
+        <h1 className="mt-3 font-serif text-[40px] font-medium tracking-[0.04em] text-dynasty-warm-white">
+          To Your Dynasty
+        </h1>
+        <div className="mx-auto mt-4 h-px w-12 bg-dynasty-gold/50" />
+        <p className="mt-5 max-w-md font-sans text-[13px] font-light text-dynasty-gray-400">
+          Complete your profile to begin managing your portfolio.
+        </p>
+        <Button asChild className="mt-7">
+          <Link href="/settings">Set Up Profile</Link>
         </Button>
       </div>
     )
@@ -108,12 +118,6 @@ export default async function OverviewPage() {
   const chartTx = chartTxResult.data ?? []
   const reminders = remindersResult.data ?? []
 
-  const totalPortfolioValue = (propertiesResult.data ?? []).reduce(
-    (s, p) => s + (p.current_value ?? 0),
-    0
-  )
-
-  // Fetch all active properties for total count and portfolio value
   const { data: allActiveProps } = await supabase
     .from('properties')
     .select('current_value')
@@ -131,45 +135,37 @@ export default async function OverviewPage() {
     .reduce((s, t) => s + t.amount, 0)
   const monthlyNetIncome = monthlyIncome - monthlyExpenses
 
-  // Build 6-month chart data
   const months = Array.from({ length: 6 }, (_, i) => subMonths(now, 5 - i))
   const chartData = buildChartData(chartTx, months)
 
   const firstName = landlord.full_name.split(' ')[0]
   const hour = now.getHours()
   const greeting =
-    hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
+    hour < 12 ? 'Good Morning' : hour < 17 ? 'Good Afternoon' : 'Good Evening'
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-9">
       {/* Header */}
-      <div className="flex items-start justify-between">
-        <div>
-          <h1 className="font-serif text-3xl font-semibold text-dynasty-cream">
-            {greeting}, {firstName}
-          </h1>
-          <p className="mt-1 text-sm text-dynasty-gray-400">
-            {now.toLocaleDateString('en-CA', {
-              weekday: 'long',
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-            })}
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Button asChild variant="outline" size="sm">
-            <Link href="/transactions/new">
-              <Plus className="h-4 w-4" /> Transaction
-            </Link>
-          </Button>
-          <Button asChild size="sm">
-            <Link href="/properties/new">
-              <Plus className="h-4 w-4" /> Property
-            </Link>
-          </Button>
-        </div>
-      </div>
+      <PageHeader
+        title={`${greeting}, ${firstName}`}
+        subtitle={now.toLocaleDateString('en-CA', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        })}
+      >
+        <Button asChild variant="outline" size="sm">
+          <Link href="/transactions/new">
+            <Plus /> Transaction
+          </Link>
+        </Button>
+        <Button asChild size="sm">
+          <Link href="/properties/new">
+            <Plus /> Property
+          </Link>
+        </Button>
+      </PageHeader>
 
       {/* Stats */}
       <StatsCards
@@ -182,90 +178,96 @@ export default async function OverviewPage() {
       {/* Chart + Recent */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
         {/* Income vs Expense chart — 3/5 width */}
-        <div className="lg:col-span-3 rounded-xl border border-dynasty-gray-700 bg-dynasty-gray-900">
-          <div className="border-b border-dynasty-gray-700 px-6 py-4">
-            <h2 className="font-serif text-lg font-semibold text-dynasty-cream">
-              Income vs Expenses
-            </h2>
-            <p className="text-xs text-dynasty-gray-400 mt-0.5">Last 6 months</p>
-          </div>
-          <div className="px-4 py-4">
+        <Section className="lg:col-span-3">
+          <SectionHeader
+            title="Income vs Expenses"
+            description="Last six months"
+          />
+          <div className="px-5 py-5">
             <IncomeExpenseChart data={chartData} />
           </div>
-        </div>
+        </Section>
 
         {/* Recent transactions — 2/5 width */}
-        <div className="lg:col-span-2 rounded-xl border border-dynasty-gray-700 bg-dynasty-gray-900">
-          <div className="flex items-center justify-between border-b border-dynasty-gray-700 px-6 py-4">
-            <h2 className="font-serif text-lg font-semibold text-dynasty-cream">
-              Recent Transactions
-            </h2>
-            <Link
-              href="/transactions"
-              className="flex items-center gap-1 text-xs text-dynasty-gold hover:text-dynasty-gold-light transition-colors"
-            >
-              All <ArrowRight className="h-3 w-3" />
-            </Link>
-          </div>
-          <div className="divide-y divide-dynasty-gray-800">
+        <Section className="lg:col-span-2">
+          <SectionHeader
+            title="Recent Transactions"
+            action={
+              <Link
+                href="/transactions"
+                className="flex items-center gap-1.5 font-sans text-[10px] font-light uppercase tracking-[0.18em] text-dynasty-gold transition-colors hover:text-dynasty-gold-light"
+              >
+                View All <ArrowRight className="h-3 w-3" strokeWidth={1.2} />
+              </Link>
+            }
+          />
+          <div className="divide-y divide-[rgba(255,255,255,0.025)]">
             {recentTx.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-10 text-center">
-                <p className="text-sm text-dynasty-gray-400">No transactions yet</p>
-                <Button asChild variant="ghost" size="sm" className="mt-2">
-                  <Link href="/transactions/new">Add first</Link>
+              <div className="flex flex-col items-center justify-center px-6 py-10 text-center">
+                <p className="font-sans text-[12px] font-light text-dynasty-gray-500">
+                  No transactions yet
+                </p>
+                <Button asChild variant="ghost" size="sm" className="mt-3">
+                  <Link href="/transactions/new">Add First</Link>
                 </Button>
               </div>
             ) : (
               recentTx.map((tx) => (
                 <div
                   key={tx.id}
-                  className="flex items-center justify-between px-6 py-3 hover:bg-dynasty-gray-800/50 transition-colors"
+                  className="flex items-center justify-between px-7 py-3.5 transition-colors hover:bg-[rgba(201,168,76,0.025)]"
                 >
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-dynasty-cream truncate">
+                    <p className="truncate font-sans text-[13px] font-normal text-dynasty-warm-white">
                       {tx.description ?? tx.category}
                     </p>
-                    <p className="text-xs text-dynasty-gray-400">
+                    <p className="mt-0.5 font-sans text-[11px] font-light text-dynasty-gray-500">
                       {formatDate(tx.transaction_date)}
                     </p>
                   </div>
                   <span
-                    className={`ml-3 shrink-0 font-mono text-sm font-semibold ${
-                      tx.type === 'income' ? 'text-emerald-400' : 'text-red-400'
+                    className={`ml-3 shrink-0 font-mono text-[13px] font-medium tracking-tight ${
+                      tx.type === 'income'
+                        ? 'text-dynasty-gold'
+                        : 'text-dynasty-rose-gold'
                     }`}
                   >
-                    {tx.type === 'income' ? '+' : '-'}$
+                    {tx.type === 'income' ? '+' : '−'}$
                     {tx.amount.toLocaleString('en-CA', { minimumFractionDigits: 0 })}
                   </span>
                 </div>
               ))
             )}
           </div>
-        </div>
+        </Section>
       </div>
 
       {/* Properties + Reminders */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <div className="rounded-xl border border-dynasty-gray-700 bg-dynasty-gray-900">
-          <div className="flex items-center justify-between border-b border-dynasty-gray-700 px-6 py-4">
-            <h2 className="font-serif text-lg font-semibold text-dynasty-cream">Properties</h2>
-            <Link
-              href="/properties"
-              className="flex items-center gap-1 text-xs text-dynasty-gold hover:text-dynasty-gold-light transition-colors"
-            >
-              View all <ArrowRight className="h-3 w-3" />
-            </Link>
-          </div>
-          <div className="divide-y divide-dynasty-gray-800">
+        <Section>
+          <SectionHeader
+            title="Properties"
+            action={
+              <Link
+                href="/properties"
+                className="flex items-center gap-1.5 font-sans text-[10px] font-light uppercase tracking-[0.18em] text-dynasty-gold transition-colors hover:text-dynasty-gold-light"
+              >
+                View All <ArrowRight className="h-3 w-3" strokeWidth={1.2} />
+              </Link>
+            }
+          />
+          <div className="divide-y divide-[rgba(255,255,255,0.025)]">
             {properties.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-8 text-center">
+              <div className="flex flex-col items-center justify-center px-6 py-10 text-center">
                 <Building2
-                  className="h-8 w-8 text-dynasty-gray-600 mb-2"
+                  className="h-7 w-7 text-dynasty-gold/15"
                   strokeWidth={1}
                 />
-                <p className="text-sm text-dynasty-gray-400">No properties yet</p>
-                <Button asChild variant="ghost" size="sm" className="mt-2">
-                  <Link href="/properties/new">Add property</Link>
+                <p className="mt-3 font-sans text-[12px] font-light text-dynasty-gray-500">
+                  No properties yet
+                </p>
+                <Button asChild variant="ghost" size="sm" className="mt-3">
+                  <Link href="/properties/new">Add Property</Link>
                 </Button>
               </div>
             ) : (
@@ -273,40 +275,42 @@ export default async function OverviewPage() {
                 <Link
                   key={p.id}
                   href={`/properties/${p.id}`}
-                  className="flex items-center justify-between px-6 py-3.5 hover:bg-dynasty-gray-800/50 transition-colors"
+                  className="flex items-center justify-between px-7 py-4 transition-colors hover:bg-[rgba(201,168,76,0.025)]"
                 >
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-dynasty-cream truncate">{p.name}</p>
-                    <p className="text-xs text-dynasty-gray-400">
+                    <p className="truncate font-sans text-[13px] text-dynasty-warm-white">
+                      {p.name}
+                    </p>
+                    <p className="mt-0.5 font-sans text-[11px] font-light text-dynasty-gray-500">
                       {p.city}, {p.province}
                     </p>
                   </div>
-                  <Badge variant="default" className="ml-4 shrink-0 capitalize">
-                    {p.type}
-                  </Badge>
+                  <Badge className="ml-4 shrink-0">{p.type}</Badge>
                 </Link>
               ))
             )}
           </div>
-        </div>
+        </Section>
 
-        <div className="rounded-xl border border-dynasty-gray-700 bg-dynasty-gray-900">
-          <div className="flex items-center justify-between border-b border-dynasty-gray-700 px-6 py-4">
-            <h2 className="font-serif text-lg font-semibold text-dynasty-cream">
-              Upcoming Reminders
-            </h2>
-            <Link
-              href="/recurring"
-              className="flex items-center gap-1 text-xs text-dynasty-gold hover:text-dynasty-gold-light transition-colors"
-            >
-              View all <ArrowRight className="h-3 w-3" />
-            </Link>
-          </div>
-          <div className="divide-y divide-dynasty-gray-800">
+        <Section>
+          <SectionHeader
+            title="Upcoming Reminders"
+            action={
+              <Link
+                href="/recurring"
+                className="flex items-center gap-1.5 font-sans text-[10px] font-light uppercase tracking-[0.18em] text-dynasty-gold transition-colors hover:text-dynasty-gold-light"
+              >
+                View All <ArrowRight className="h-3 w-3" strokeWidth={1.2} />
+              </Link>
+            }
+          />
+          <div className="divide-y divide-[rgba(255,255,255,0.025)]">
             {reminders.length === 0 ? (
-              <div className="flex items-center gap-3 px-6 py-5">
-                <Bell className="h-4 w-4 text-emerald-400 shrink-0" strokeWidth={1.5} />
-                <p className="text-sm text-dynasty-gray-400">All clear — no pending reminders</p>
+              <div className="flex items-center gap-3 px-7 py-5">
+                <Bell className="h-4 w-4 shrink-0 text-dynasty-gold" strokeWidth={1.2} />
+                <p className="font-sans text-[12px] font-light tracking-[0.04em] text-dynasty-gray-400">
+                  All clear — no pending reminders
+                </p>
               </div>
             ) : (
               reminders.map((r) => {
@@ -314,18 +318,18 @@ export default async function OverviewPage() {
                 return (
                   <div
                     key={r.id}
-                    className="flex items-center justify-between px-6 py-3.5"
+                    className="flex items-center justify-between px-7 py-4"
                   >
                     <div className="min-w-0">
-                      <p className="text-sm font-medium text-dynasty-cream truncate">
+                      <p className="truncate font-sans text-[13px] text-dynasty-warm-white">
                         {payment?.name ?? 'Payment due'}
                       </p>
-                      <p className="text-xs text-dynasty-gray-400">
+                      <p className="mt-0.5 font-sans text-[11px] font-light text-dynasty-gray-500">
                         Due {formatDate(r.due_date)}
                       </p>
                     </div>
                     {payment?.amount && (
-                      <span className="ml-3 shrink-0 font-mono text-sm text-dynasty-gold">
+                      <span className="ml-3 shrink-0 font-mono text-[13px] font-medium tracking-tight text-dynasty-gold">
                         ${payment.amount.toLocaleString('en-CA', { minimumFractionDigits: 0 })}
                       </span>
                     )}
@@ -334,7 +338,7 @@ export default async function OverviewPage() {
               })
             )}
           </div>
-        </div>
+        </Section>
       </div>
     </div>
   )

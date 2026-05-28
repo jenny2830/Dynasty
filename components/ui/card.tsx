@@ -8,7 +8,9 @@ const Card = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      'rounded-xl border border-dynasty-gray-700 bg-dynasty-gray-900',
+      'rounded-[2px] border border-[rgba(201,168,76,0.08)]',
+      'bg-[linear-gradient(135deg,#161616_0%,#1C1A17_100%)]',
+      'shadow-[var(--shadow-card)]',
       className
     )}
     {...props}
@@ -22,7 +24,11 @@ const CardHeader = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn('flex flex-col space-y-1 p-6', className)}
+    className={cn(
+      'flex flex-col space-y-1 px-7 pt-6 pb-4',
+      'border-b border-[rgba(201,168,76,0.08)]',
+      className
+    )}
     {...props}
   />
 ))
@@ -34,7 +40,11 @@ const CardTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <h3
     ref={ref}
-    className={cn('font-serif text-xl font-semibold text-dynasty-cream', className)}
+    className={cn(
+      'font-serif text-[20px] font-medium tracking-[0.02em]',
+      'text-dynasty-warm-white',
+      className
+    )}
     {...props}
   />
 ))
@@ -46,7 +56,10 @@ const CardDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn('text-sm text-dynasty-gray-400', className)}
+    className={cn(
+      'text-[12px] font-light tracking-[0.06em] text-dynasty-gray-400',
+      className
+    )}
     {...props}
   />
 ))
@@ -56,7 +69,7 @@ const CardContent = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn('p-6 pt-0', className)} {...props} />
+  <div ref={ref} className={cn('px-7 py-6', className)} {...props} />
 ))
 CardContent.displayName = 'CardContent'
 
@@ -66,7 +79,10 @@ const CardFooter = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn('flex items-center p-6 pt-0', className)}
+    className={cn(
+      'flex items-center px-7 py-5 border-t border-[rgba(201,168,76,0.08)]',
+      className
+    )}
     {...props}
   />
 ))

@@ -3,6 +3,7 @@ import { Plus, Building2, MapPin } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { PageHeader } from '@/components/ui/page-header'
 import { formatCurrency } from '@/lib/utils'
 
 export const metadata = { title: 'Properties' }
@@ -34,54 +35,71 @@ export default async function PropertiesPage() {
         .order('created_at', { ascending: false })
     : { data: [] }
 
+  const count = properties?.length ?? 0
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="font-serif text-3xl font-semibold text-dynasty-cream">Properties</h1>
-          <p className="mt-1 text-sm text-dynasty-gray-400">
-            {properties?.length ?? 0} propert{(properties?.length ?? 0) === 1 ? 'y' : 'ies'} in portfolio
-          </p>
-        </div>
+    <div className="space-y-7">
+      <PageHeader
+        title="Properties"
+        subtitle={`${count} ${count === 1 ? 'estate' : 'estates'} in portfolio`}
+      >
         <Button asChild>
           <Link href="/properties/new">
-            <Plus className="h-4 w-4" /> Add Property
+            <Plus /> Add Property
           </Link>
         </Button>
-      </div>
+      </PageHeader>
 
       {!properties?.length ? (
-        <div className="flex flex-col items-center justify-center min-h-[50vh] rounded-xl border border-dashed border-dynasty-gray-700">
-          <Building2 className="h-12 w-12 text-dynasty-gray-600 mb-4" strokeWidth={1} />
-          <h2 className="font-serif text-xl text-dynasty-cream mb-2">No properties yet</h2>
-          <p className="text-sm text-dynasty-gray-400 mb-6 text-center max-w-sm">
+        <div className="flex min-h-[50vh] flex-col items-center justify-center rounded-[2px] border border-dashed border-[rgba(201,168,76,0.18)] bg-dynasty-gray-900/40 px-6 py-16 text-center">
+          <Building2
+            className="h-8 w-8 text-dynasty-gold/15"
+            strokeWidth={1}
+          />
+          <h2 className="mt-5 font-serif text-[22px] font-medium tracking-[0.04em] text-dynasty-gray-300">
+            No properties yet
+          </h2>
+          <p className="mt-2 max-w-sm font-sans text-[12px] font-light tracking-[0.06em] text-dynasty-gray-500">
             Add your first property to start tracking income, expenses, and ROI.
           </p>
-          <Button asChild>
+          <Button asChild variant="outline" className="mt-7">
             <Link href="/properties/new">
-              <Plus className="h-4 w-4" /> Add your first property
+              <Plus /> Add Your First Property
             </Link>
           </Button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
           {properties.map((p) => (
             <Link
               key={p.id}
               href={`/properties/${p.id}`}
-              className="group rounded-xl border border-dynasty-gray-700 bg-dynasty-gray-900 p-5 transition-all hover:border-dynasty-gold/30 hover:bg-dynasty-gray-800"
+              className="group relative overflow-hidden rounded-[2px] border border-[rgba(201,168,76,0.1)] bg-[linear-gradient(135deg,#161616_0%,#1C1A17_100%)] px-6 py-6 shadow-[var(--shadow-card)] transition-all duration-300 ease-out hover:border-[rgba(201,168,76,0.35)] hover:shadow-[var(--shadow-card-hover)]"
             >
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-dynasty-gold/10 border border-dynasty-gold/20">
-                    <Building2 className="h-4 w-4 text-dynasty-gold" strokeWidth={1.5} />
+              {/* Top accent line */}
+              <div
+                className="pointer-events-none absolute top-0 left-[10%] right-[10%] h-px"
+                style={{ background: 'var(--accent-top)' }}
+                aria-hidden
+              />
+              {/* Corner glow */}
+              <div
+                className="pointer-events-none absolute top-0 left-0 h-[60px] w-[60px]"
+                style={{ background: 'var(--accent-corner-tl)' }}
+                aria-hidden
+              />
+
+              <div className="relative mb-4 flex items-start justify-between gap-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[1px] border border-[rgba(201,168,76,0.2)] bg-[rgba(201,168,76,0.06)]">
+                    <Building2 className="h-4 w-4 text-dynasty-gold" strokeWidth={1.2} />
                   </div>
-                  <div>
-                    <p className="font-medium text-dynasty-cream leading-tight group-hover:text-dynasty-gold transition-colors">
+                  <div className="min-w-0">
+                    <p className="truncate font-serif text-[16px] font-medium leading-tight tracking-[0.02em] text-dynasty-warm-white transition-colors group-hover:text-dynasty-gold">
                       {p.name}
                     </p>
-                    <p className="text-xs text-dynasty-gray-400 capitalize">
-                      {p.type} · {p.property_subtype}
+                    <p className="mt-0.5 font-sans text-[10px] font-light uppercase tracking-[0.14em] text-dynasty-gray-500">
+                      {p.type} &middot; {p.property_subtype}
                     </p>
                   </div>
                 </div>
@@ -90,40 +108,46 @@ export default async function PropertiesPage() {
                 </Badge>
               </div>
 
-              <div className="flex items-center gap-1.5 text-xs text-dynasty-gray-400 mb-4">
-                <MapPin className="h-3 w-3 shrink-0" />
+              <div className="relative mb-5 flex items-center gap-1.5 font-sans text-[11px] font-light tracking-[0.04em] text-dynasty-gray-500">
+                <MapPin className="h-3 w-3 shrink-0" strokeWidth={1.2} />
                 <span className="truncate">
                   {p.address}, {p.city}, {p.province}
                 </span>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="relative grid grid-cols-2 gap-x-4 gap-y-3 pt-4 border-t border-[rgba(201,168,76,0.06)]">
                 <div>
-                  <p className="text-xs text-dynasty-gray-400">Current value</p>
-                  <p className="font-mono text-sm font-semibold text-dynasty-gold">
+                  <p className="font-sans text-[9px] font-light uppercase tracking-[0.2em] text-dynasty-gray-500">
+                    Current Value
+                  </p>
+                  <p className="mt-1 font-mono text-[14px] font-medium text-dynasty-gold">
                     {p.current_value ? formatCurrency(p.current_value) : '—'}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-dynasty-gray-400">Units</p>
-                  <p className="font-mono text-sm font-semibold text-dynasty-cream">
+                  <p className="font-sans text-[9px] font-light uppercase tracking-[0.2em] text-dynasty-gray-500">
+                    Units
+                  </p>
+                  <p className="mt-1 font-mono text-[14px] font-medium text-dynasty-warm-white">
                     {p.num_units}
                   </p>
                 </div>
                 {p.monthly_mortgage && (
                   <div>
-                    <p className="text-xs text-dynasty-gray-400">Monthly mortgage</p>
-                    <p className="font-mono text-sm text-dynasty-cream">
+                    <p className="font-sans text-[9px] font-light uppercase tracking-[0.2em] text-dynasty-gray-500">
+                      Monthly Mortgage
+                    </p>
+                    <p className="mt-1 font-mono text-[13px] font-light text-dynasty-cream">
                       {formatCurrency(p.monthly_mortgage)}
                     </p>
                   </div>
                 )}
                 {(p.condo_fee ?? p.strata_fee) && (
                   <div>
-                    <p className="text-xs text-dynasty-gray-400">
-                      {p.type === 'condo' ? 'Condo fee' : 'Strata fee'}
+                    <p className="font-sans text-[9px] font-light uppercase tracking-[0.2em] text-dynasty-gray-500">
+                      {p.type === 'condo' ? 'Condo Fee' : 'Strata Fee'}
                     </p>
-                    <p className="font-mono text-sm text-dynasty-cream">
+                    <p className="mt-1 font-mono text-[13px] font-light text-dynasty-cream">
                       {formatCurrency(p.condo_fee ?? p.strata_fee ?? 0)}
                     </p>
                   </div>

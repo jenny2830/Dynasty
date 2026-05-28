@@ -20,6 +20,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
+import { Section, SectionHeader } from '@/components/ui/section'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
 import { format, startOfMonth, endOfMonth, startOfQuarter, endOfQuarter, startOfYear, endOfYear, subMonths } from 'date-fns'
@@ -130,7 +131,6 @@ export function ReportBuilder({ properties }: ReportBuilderProps) {
   const totalExpenses = expenses.reduce((s, t) => s + t.amount, 0)
   const netIncome = totalIncome - totalExpenses
 
-  // Group by category
   const expenseByCategory = expenses.reduce<Record<string, number>>((acc, t) => {
     acc[t.category] = (acc[t.category] ?? 0) + t.amount
     return acc
@@ -144,7 +144,6 @@ export function ReportBuilder({ properties }: ReportBuilderProps) {
   const taxDeductible = expenses.filter((t) => t.is_tax_deductible)
   const totalDeductible = taxDeductible.reduce((s, t) => s + t.amount, 0)
 
-  // Group by month for cash flow
   const monthlyMap = transactions.reduce<Record<string, { income: number; expenses: number }>>((acc, t) => {
     const month = t.transaction_date.slice(0, 7)
     if (!acc[month]) acc[month] = { income: 0, expenses: 0 }
@@ -178,12 +177,12 @@ export function ReportBuilder({ properties }: ReportBuilderProps) {
   }[reportType]
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-7">
       {/* Controls */}
-      <div className="rounded-xl border border-dynasty-gray-700 bg-dynasty-gray-900 p-6">
+      <Section className="px-7 py-6">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="space-y-1.5">
-            <Label>Report type</Label>
+          <div className="space-y-2">
+            <Label>Report Type</Label>
             <Select value={reportType} onValueChange={(v) => setReportType(v as ReportType)}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
@@ -195,7 +194,7 @@ export function ReportBuilder({ properties }: ReportBuilderProps) {
             </Select>
           </div>
 
-          <div className="space-y-1.5">
+          <div className="space-y-2">
             <Label>Property</Label>
             <Select value={propertyId} onValueChange={setPropertyId}>
               <SelectTrigger><SelectValue /></SelectTrigger>
@@ -208,7 +207,7 @@ export function ReportBuilder({ properties }: ReportBuilderProps) {
             </Select>
           </div>
 
-          <div className="space-y-1.5">
+          <div className="space-y-2">
             <Label>Period</Label>
             <Select value={preset} onValueChange={setPreset}>
               <SelectTrigger><SelectValue /></SelectTrigger>
@@ -225,36 +224,37 @@ export function ReportBuilder({ properties }: ReportBuilderProps) {
 
           <div className="flex items-end">
             <Button onClick={handleGenerate} disabled={isPending} className="w-full">
-              <BarChart3 className="h-4 w-4" />
+              <BarChart3 />
               {isPending ? 'Generating…' : 'Generate'}
             </Button>
           </div>
         </div>
 
         {preset === 'custom' && (
-          <div className="mt-4 grid grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <Label>Start date</Label>
+          <div className="mt-5 grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Start Date</Label>
               <Input type="date" value={customStart} onChange={(e) => setCustomStart(e.target.value)} />
             </div>
-            <div className="space-y-1.5">
-              <Label>End date</Label>
+            <div className="space-y-2">
+              <Label>End Date</Label>
               <Input type="date" value={customEnd} onChange={(e) => setCustomEnd(e.target.value)} />
             </div>
           </div>
         )}
-      </div>
+      </Section>
 
       {/* Results */}
       {generated && (
-        <div className="space-y-6" id="report-output">
+        <div className="space-y-7" id="report-output">
           {/* Report header */}
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-4 pb-5 border-b border-[rgba(201,168,76,0.08)]">
             <div>
-              <h2 className="font-serif text-2xl font-semibold text-dynasty-cream">
+              <h2 className="flex items-center gap-3 font-serif text-[26px] font-semibold tracking-[0.04em] text-dynasty-warm-white">
+                <span className="text-[10px] text-dynasty-gold/70 leading-none">◆</span>
                 {reportTypeLabel}
               </h2>
-              <p className="text-sm text-dynasty-gray-400 mt-0.5">
+              <p className="mt-1 font-sans text-[11px] font-light uppercase tracking-[0.14em] text-dynasty-gray-500">
                 {dateStart && dateEnd
                   ? `${formatDate(dateStart)} — ${formatDate(dateEnd)}`
                   : ''}
@@ -263,78 +263,95 @@ export function ReportBuilder({ properties }: ReportBuilderProps) {
                   : ' · All properties'}
               </p>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 no-print">
               <Button variant="outline" size="sm" onClick={handleExportCSV}>
-                <FileDown className="h-4 w-4" /> CSV
+                <FileDown /> CSV
               </Button>
               <Button variant="outline" size="sm" onClick={() => window.print()}>
-                <Printer className="h-4 w-4" /> Print
+                <Printer /> Print
               </Button>
             </div>
           </div>
 
           {transactions.length === 0 ? (
-            <div className="rounded-xl border border-dynasty-gray-700 bg-dynasty-gray-900 flex items-center justify-center py-16">
-              <p className="text-dynasty-gray-400">No transactions found for this period</p>
-            </div>
+            <Section className="flex items-center justify-center py-16">
+              <p className="font-sans text-[12px] font-light text-dynasty-gray-500">
+                No transactions found for this period
+              </p>
+            </Section>
           ) : (
             <>
-              {/* P&L Report */}
               {reportType === 'pl' && (
-                <div className="space-y-4">
-                  <div className="grid grid-cols-3 gap-4">
+                <div className="space-y-5">
+                  <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
                     {[
-                      { label: 'Total Income', value: totalIncome, color: 'text-emerald-400', icon: TrendingUp },
-                      { label: 'Total Expenses', value: totalExpenses, color: 'text-red-400', icon: TrendingDown },
-                      { label: 'Net Income', value: netIncome, color: netIncome >= 0 ? 'text-dynasty-gold' : 'text-red-400', icon: Minus },
+                      { label: 'Total Income', value: totalIncome, color: 'text-dynasty-gold', icon: TrendingUp, positive: true },
+                      { label: 'Total Expenses', value: totalExpenses, color: 'text-dynasty-rose-gold', icon: TrendingDown, positive: false },
+                      { label: 'Net Income', value: netIncome, color: netIncome >= 0 ? 'text-dynasty-gold' : 'text-dynasty-rose-gold', icon: Minus, positive: netIncome >= 0 },
                     ].map(({ label, value, color, icon: Icon }) => (
-                      <div key={label} className="rounded-xl border border-dynasty-gray-700 bg-dynasty-gray-900 p-5">
-                        <div className="flex items-center justify-between mb-2">
-                          <p className="text-xs uppercase tracking-wider text-dynasty-gray-400">{label}</p>
-                          <Icon className={`h-4 w-4 ${color}`} />
+                      <div
+                        key={label}
+                        className="relative overflow-hidden rounded-[2px] border border-[rgba(201,168,76,0.1)] bg-[linear-gradient(135deg,#161616_0%,#1C1A17_100%)] px-6 py-5 shadow-[var(--shadow-card)]"
+                      >
+                        <div
+                          className="pointer-events-none absolute top-0 left-[10%] right-[10%] h-px"
+                          style={{ background: 'var(--accent-top)' }}
+                        />
+                        <div className="flex items-center justify-between">
+                          <p className="flex items-center gap-2 font-sans text-[9px] font-light uppercase tracking-[0.22em] text-dynasty-gray-500">
+                            <span className="text-[6px] text-[rgba(201,168,76,0.5)] leading-none">◆</span>
+                            {label}
+                          </p>
+                          <Icon className={`h-4 w-4 ${color}`} strokeWidth={1.2} />
                         </div>
-                        <p className={`font-mono text-2xl font-semibold ${color}`}>
+                        <p className={`mt-3 font-display text-[36px] leading-none tracking-[0.04em] ${color}`}>
                           {formatCurrency(value)}
                         </p>
                       </div>
                     ))}
                   </div>
 
-                  <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                    <CategoryTable title="Income by Category" data={incomeByCategory} total={totalIncome} color="emerald" />
-                    <CategoryTable title="Expenses by Category" data={expenseByCategory} total={totalExpenses} color="red" />
+                  <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+                    <CategoryTable title="Income by Category" data={incomeByCategory} total={totalIncome} color="gold" />
+                    <CategoryTable title="Expenses by Category" data={expenseByCategory} total={totalExpenses} color="rose" />
                   </div>
                 </div>
               )}
 
-              {/* Cash Flow */}
               {reportType === 'cash_flow' && (
-                <div className="rounded-xl border border-dynasty-gray-700 bg-dynasty-gray-900 overflow-hidden">
-                  <div className="border-b border-dynasty-gray-700 px-6 py-4">
-                    <h3 className="font-serif text-lg font-semibold text-dynasty-cream">Monthly Cash Flow</h3>
-                  </div>
+                <Section>
+                  <SectionHeader title="Monthly Cash Flow" />
                   <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
-                      <thead>
-                        <tr className="border-b border-dynasty-gray-700">
+                    <table className="w-full">
+                      <thead className="bg-dynasty-black border-b border-[rgba(201,168,76,0.1)]">
+                        <tr>
                           {['Month', 'Income', 'Expenses', 'Net Cash Flow'].map((h) => (
-                            <th key={h} className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-dynasty-gray-400">
+                            <th
+                              key={h}
+                              className="px-6 py-3.5 text-left font-sans text-[9px] font-light uppercase tracking-[0.2em] text-dynasty-gray-500"
+                            >
                               {h}
                             </th>
                           ))}
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-dynasty-gray-800">
+                      <tbody>
                         {Object.entries(monthlyMap)
                           .sort(([a], [b]) => a.localeCompare(b))
                           .map(([month, data]) => {
                             const net = data.income - data.expenses
                             return (
-                              <tr key={month} className="hover:bg-dynasty-gray-800/50 transition-colors">
-                                <td className="px-6 py-3.5 text-dynasty-cream">{format(new Date(month + '-01'), 'MMMM yyyy')}</td>
-                                <td className="px-6 py-3.5 font-mono text-emerald-400">{formatCurrency(data.income)}</td>
-                                <td className="px-6 py-3.5 font-mono text-red-400">{formatCurrency(data.expenses)}</td>
-                                <td className={`px-6 py-3.5 font-mono font-semibold ${net >= 0 ? 'text-dynasty-gold' : 'text-red-400'}`}>
+                              <tr key={month} className="border-b border-[rgba(255,255,255,0.025)] transition-colors hover:bg-[rgba(201,168,76,0.025)]">
+                                <td className="px-6 py-3.5 font-sans text-[13px] text-dynasty-warm-white">
+                                  {format(new Date(month + '-01'), 'MMMM yyyy')}
+                                </td>
+                                <td className="px-6 py-3.5 font-mono text-[13px] font-medium text-dynasty-gold">
+                                  {formatCurrency(data.income)}
+                                </td>
+                                <td className="px-6 py-3.5 font-mono text-[13px] font-medium text-dynasty-rose-gold">
+                                  {formatCurrency(data.expenses)}
+                                </td>
+                                <td className={`px-6 py-3.5 font-mono text-[13px] font-medium ${net >= 0 ? 'text-dynasty-gold' : 'text-dynasty-rose-gold'}`}>
                                   {formatCurrency(net)}
                                 </td>
                               </tr>
@@ -343,16 +360,24 @@ export function ReportBuilder({ properties }: ReportBuilderProps) {
                       </tbody>
                     </table>
                   </div>
-                </div>
+                </Section>
               )}
 
-              {/* Tax Summary */}
               {reportType === 'tax_summary' && (
-                <div className="space-y-4">
-                  <div className="rounded-xl border border-dynasty-gold/20 bg-dynasty-gold/5 p-5">
-                    <p className="text-xs uppercase tracking-wider text-dynasty-gray-400 mb-1">Total Tax-Deductible Expenses</p>
-                    <p className="font-mono text-3xl font-semibold text-dynasty-gold">{formatCurrency(totalDeductible)}</p>
-                    <p className="text-xs text-dynasty-gray-400 mt-1">
+                <div className="space-y-5">
+                  <div className="relative overflow-hidden rounded-[2px] border border-[rgba(201,168,76,0.2)] bg-[linear-gradient(135deg,#161616_0%,#1C1A17_100%)] px-7 py-6 shadow-[var(--shadow-card)]">
+                    <div
+                      className="pointer-events-none absolute top-0 left-[10%] right-[10%] h-px"
+                      style={{ background: 'var(--accent-top)' }}
+                    />
+                    <p className="flex items-center gap-2 font-sans text-[9px] font-light uppercase tracking-[0.22em] text-dynasty-gray-500">
+                      <span className="text-[6px] text-[rgba(201,168,76,0.5)] leading-none">◆</span>
+                      Total Tax-Deductible Expenses
+                    </p>
+                    <p className="mt-3 font-display text-[48px] leading-none tracking-[0.04em] text-dynasty-gold">
+                      {formatCurrency(totalDeductible)}
+                    </p>
+                    <p className="mt-2 font-sans text-[11px] font-light tracking-[0.06em] text-dynasty-gray-500">
                       {taxDeductible.length} deductible transaction{taxDeductible.length !== 1 ? 's' : ''}
                     </p>
                   </div>
@@ -360,13 +385,12 @@ export function ReportBuilder({ properties }: ReportBuilderProps) {
                 </div>
               )}
 
-              {/* Expense Breakdown */}
               {reportType === 'expense_breakdown' && (
                 <CategoryTable
                   title="Expense Breakdown"
                   data={expenseByCategory}
                   total={totalExpenses}
-                  color="red"
+                  color="rose"
                   showBar
                 />
               )}
@@ -388,51 +412,52 @@ function CategoryTable({
   title: string
   data: Record<string, number>
   total: number
-  color: 'emerald' | 'red'
+  color: 'gold' | 'rose'
   showBar?: boolean
 }) {
   const sorted = Object.entries(data).sort(([, a], [, b]) => b - a)
-  const colorClass = color === 'emerald' ? 'text-emerald-400' : 'text-red-400'
-  const barClass = color === 'emerald' ? 'bg-emerald-500' : 'bg-red-500'
+  const colorClass = color === 'gold' ? 'text-dynasty-gold' : 'text-dynasty-rose-gold'
+  const barClass = color === 'gold' ? 'bg-dynasty-gold' : 'bg-dynasty-rose-gold'
 
   return (
-    <div className="rounded-xl border border-dynasty-gray-700 bg-dynasty-gray-900 overflow-hidden">
-      <div className="border-b border-dynasty-gray-700 px-6 py-4">
-        <h3 className="font-serif text-lg font-semibold text-dynasty-cream">{title}</h3>
-      </div>
-      <div className="divide-y divide-dynasty-gray-800">
+    <Section>
+      <SectionHeader title={title} />
+      <div className="divide-y divide-[rgba(255,255,255,0.025)]">
         {sorted.map(([category, amount]) => {
           const pct = total > 0 ? (amount / total) * 100 : 0
           return (
-            <div key={category} className="flex items-center gap-4 px-6 py-3">
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-sm text-dynasty-cream">{category}</span>
-                  <span className={`font-mono text-sm font-semibold ${colorClass}`}>
+            <div key={category} className="flex items-center gap-4 px-7 py-3.5">
+              <div className="min-w-0 flex-1">
+                <div className="mb-1 flex items-center justify-between">
+                  <span className="font-sans text-[13px] text-dynasty-warm-white">
+                    {category}
+                  </span>
+                  <span className={`font-mono text-[13px] font-medium ${colorClass}`}>
                     {formatCurrency(amount)}
                   </span>
                 </div>
                 {showBar && (
-                  <div className="h-1.5 w-full rounded-full bg-dynasty-gray-700 overflow-hidden">
-                    <div
-                      className={`h-full ${barClass} rounded-full`}
-                      style={{ width: `${pct}%` }}
-                    />
+                  <div className="h-[2px] w-full overflow-hidden bg-dynasty-gray-700">
+                    <div className={`h-full ${barClass}`} style={{ width: `${pct}%` }} />
                   </div>
                 )}
               </div>
-              <span className="text-xs text-dynasty-gray-400 w-10 text-right">
+              <span className="w-10 text-right font-mono text-[11px] font-light text-dynasty-gray-500">
                 {pct.toFixed(0)}%
               </span>
             </div>
           )
         })}
-        <div className="flex items-center justify-between px-6 py-3 bg-dynasty-gray-800">
-          <span className="text-sm font-semibold text-dynasty-cream">Total</span>
-          <span className={`font-mono font-semibold ${colorClass}`}>{formatCurrency(total)}</span>
+        <div className="flex items-center justify-between px-7 py-3.5 bg-[rgba(201,168,76,0.04)]">
+          <span className="font-sans text-[12px] font-light uppercase tracking-[0.18em] text-dynasty-warm-white">
+            Total
+          </span>
+          <span className={`font-mono text-[14px] font-medium ${colorClass}`}>
+            {formatCurrency(total)}
+          </span>
         </div>
       </div>
-    </div>
+    </Section>
   )
 }
 
@@ -444,31 +469,42 @@ function TransactionTable({
   title: string
 }) {
   return (
-    <div className="rounded-xl border border-dynasty-gray-700 bg-dynasty-gray-900 overflow-hidden">
-      <div className="border-b border-dynasty-gray-700 px-6 py-4">
-        <h3 className="font-serif text-lg font-semibold text-dynasty-cream">{title}</h3>
-      </div>
+    <Section>
+      <SectionHeader title={title} />
       <div className="overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-dynasty-gray-700">
+        <table className="w-full">
+          <thead className="bg-dynasty-black border-b border-[rgba(201,168,76,0.1)]">
+            <tr>
               {['Date', 'Category', 'Description', 'Amount'].map((h) => (
-                <th key={h} className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-dynasty-gray-400">{h}</th>
+                <th
+                  key={h}
+                  className="px-6 py-3.5 text-left font-sans text-[9px] font-light uppercase tracking-[0.2em] text-dynasty-gray-500"
+                >
+                  {h}
+                </th>
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-dynasty-gray-800">
+          <tbody>
             {transactions.map((t) => (
-              <tr key={t.id} className="hover:bg-dynasty-gray-800/50 transition-colors">
-                <td className="px-6 py-3 text-dynasty-gray-400 whitespace-nowrap">{formatDate(t.transaction_date)}</td>
-                <td className="px-6 py-3"><Badge variant="secondary">{t.category}</Badge></td>
-                <td className="px-6 py-3 text-dynasty-cream">{t.description ?? '—'}</td>
-                <td className="px-6 py-3 font-mono text-dynasty-gold">{formatCurrency(t.amount)}</td>
+              <tr key={t.id} className="border-b border-[rgba(255,255,255,0.025)] transition-colors hover:bg-[rgba(201,168,76,0.025)]">
+                <td className="whitespace-nowrap px-6 py-3 font-sans text-[12px] font-light text-dynasty-gray-400">
+                  {formatDate(t.transaction_date)}
+                </td>
+                <td className="px-6 py-3">
+                  <Badge>{t.category}</Badge>
+                </td>
+                <td className="px-6 py-3 font-sans text-[13px] text-dynasty-warm-white">
+                  {t.description ?? '—'}
+                </td>
+                <td className="px-6 py-3 font-mono text-[13px] font-medium text-dynasty-gold">
+                  {formatCurrency(t.amount)}
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-    </div>
+    </Section>
   )
 }

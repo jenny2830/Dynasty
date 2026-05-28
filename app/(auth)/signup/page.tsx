@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { Crown } from 'lucide-react'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { Button } from '@/components/ui/button'
@@ -25,7 +25,6 @@ export default async function SignupPage({
     const password = formData.get('password') as string
     const fullName = formData.get('full_name') as string
 
-    // Create auth user
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
       password,
@@ -36,7 +35,6 @@ export default async function SignupPage({
     }
 
     if (authData.user) {
-      // Create landlord profile using admin client to bypass RLS on insert
       const { error: profileError } = await admin
         .from('landlords')
         .insert({
@@ -54,61 +52,78 @@ export default async function SignupPage({
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-dynasty-black px-4">
-      {/* Gold top accent line */}
-      <div className="fixed top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-dynasty-gold to-transparent" />
+    <div className="deco-marble relative flex min-h-screen flex-col items-center justify-center bg-dynasty-black px-4 py-12">
+      <div
+        className="fixed top-0 left-0 right-0 h-px"
+        style={{ background: 'var(--accent-top)' }}
+        aria-hidden
+      />
 
-      <div className="w-full max-w-sm space-y-8">
-        {/* Logo */}
-        <div className="flex flex-col items-center gap-3">
-          <div className="flex h-14 w-14 items-center justify-center rounded-full border border-dynasty-gold/30 bg-dynasty-gray-900">
-            <Crown className="h-7 w-7 text-dynasty-gold" strokeWidth={1.5} />
+      <div className="w-full max-w-[420px]">
+        {/* Logo + tagline outside card */}
+        <div className="mb-6 flex flex-col items-center">
+          <div className="relative h-[72px] w-[180px]">
+            <Image
+              src="/images/dynasty-logo.jpg"
+              alt="DYNASTY"
+              fill
+              priority
+              sizes="180px"
+              className="object-contain"
+            />
           </div>
-          <div className="text-center">
-            <h1 className="font-serif text-2xl font-bold tracking-widest text-dynasty-gold">
-              DYNASTY
-            </h1>
-            <p className="mt-1 text-xs tracking-widest text-dynasty-gray-400 uppercase">
-              Property Wealth Management
-            </p>
-          </div>
+          <p className="mt-3 text-center font-sans text-[8px] font-light uppercase tracking-[0.35em] text-[rgba(201,168,76,0.4)]">
+            <span className="inline-block mr-2">◆</span>
+            Legacy &middot; Luxury &middot; Timeless
+            <span className="inline-block ml-2">◆</span>
+          </p>
         </div>
 
-        {/* Card */}
-        <div className="rounded-2xl border border-dynasty-gray-700 bg-dynasty-gray-900 p-8 shadow-2xl">
+        {/* Auth card — deco corner frame */}
+        <div
+          className="deco-frame relative mx-auto rounded-[2px] border border-[rgba(201,168,76,0.18)] bg-[rgba(17,17,17,0.96)] px-11 py-12 backdrop-blur-[20px]"
+          style={{ boxShadow: 'var(--shadow-modal)' }}
+        >
           {success ? (
-            <div className="text-center space-y-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-dynasty-gold/10 border border-dynasty-gold/30 mx-auto">
-                <Crown className="h-6 w-6 text-dynasty-gold" strokeWidth={1.5} />
-              </div>
-              <h2 className="font-serif text-xl font-semibold text-dynasty-cream">
-                Check your email
-              </h2>
-              <p className="text-sm text-dynasty-gray-400">
-                We sent a confirmation link to your email address. Click it to activate your account.
+            <div className="text-center">
+              <h1 className="font-serif text-[26px] font-medium tracking-[0.04em] text-dynasty-warm-white">
+                Check Your Email
+              </h1>
+              <p className="mt-1.5 font-sans text-[11px] font-light uppercase tracking-[0.18em] text-dynasty-gray-500">
+                Confirmation pending
               </p>
-              <Button asChild variant="outline" className="w-full">
-                <Link href="/login">Back to sign in</Link>
+              <div className="mx-auto mt-4 h-px w-10 bg-dynasty-gold/50" />
+              <p className="mt-7 font-sans text-[13px] font-light leading-relaxed text-dynasty-gray-300">
+                We&apos;ve sent a confirmation link to your email address. Click
+                the link to activate your account and begin.
+              </p>
+              <Button asChild variant="outline" className="mt-8 w-full">
+                <Link href="/login">Back to Sign In</Link>
               </Button>
             </div>
           ) : (
             <>
-              <h2 className="font-serif text-xl font-semibold text-dynasty-cream mb-1">
-                Start your dynasty
-              </h2>
-              <p className="text-sm text-dynasty-gray-400 mb-6">
-                Create your landlord account — free to start
-              </p>
+              <div className="text-center">
+                <h1 className="font-serif text-[26px] font-medium tracking-[0.04em] text-dynasty-warm-white">
+                  Begin Your Dynasty
+                </h1>
+                <p className="mt-1.5 font-sans text-[11px] font-light uppercase tracking-[0.18em] text-dynasty-gray-500">
+                  Create your landlord account
+                </p>
+                <div className="mx-auto mt-4 h-px w-10 bg-dynasty-gold/50" />
+              </div>
 
               {error && (
-                <div className="mb-4 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3">
-                  <p className="text-sm text-red-400">{decodeURIComponent(error)}</p>
+                <div className="mt-7 rounded-[1px] border border-[rgba(183,110,121,0.3)] bg-[rgba(183,110,121,0.08)] px-4 py-3">
+                  <p className="font-sans text-[12px] font-light text-dynasty-rose-light">
+                    {decodeURIComponent(error)}
+                  </p>
                 </div>
               )}
 
-              <form action={signup} className="space-y-4">
-                <div className="space-y-1.5">
-                  <Label htmlFor="full_name">Full name</Label>
+              <form action={signup} className="mt-8 space-y-5">
+                <div className="space-y-2">
+                  <Label htmlFor="full_name">Full Name</Label>
                   <Input
                     id="full_name"
                     name="full_name"
@@ -119,8 +134,8 @@ export default async function SignupPage({
                   />
                 </div>
 
-                <div className="space-y-1.5">
-                  <Label htmlFor="email">Email address</Label>
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email Address</Label>
                   <Input
                     id="email"
                     name="email"
@@ -131,31 +146,31 @@ export default async function SignupPage({
                   />
                 </div>
 
-                <div className="space-y-1.5">
+                <div className="space-y-2">
                   <Label htmlFor="password">Password</Label>
                   <Input
                     id="password"
                     name="password"
                     type="password"
-                    placeholder="Min. 8 characters"
+                    placeholder="Minimum 8 characters"
                     autoComplete="new-password"
                     minLength={8}
                     required
                   />
                 </div>
 
-                <Button type="submit" className="w-full mt-2">
-                  Create account
+                <Button type="submit" className="mt-3 w-full">
+                  Create Account
                 </Button>
               </form>
 
-              <p className="mt-5 text-center text-xs text-dynasty-gray-400">
+              <p className="mt-6 text-center font-sans text-[10px] font-light leading-relaxed tracking-[0.04em] text-dynasty-gray-500">
                 By signing up you agree to our{' '}
-                <Link href="/terms" className="text-dynasty-gold hover:underline">
+                <Link href="/terms" className="text-dynasty-gold/80 hover:text-dynasty-gold hover:underline">
                   Terms
                 </Link>{' '}
                 and{' '}
-                <Link href="/privacy" className="text-dynasty-gold hover:underline">
+                <Link href="/privacy" className="text-dynasty-gold/80 hover:text-dynasty-gold hover:underline">
                   Privacy Policy
                 </Link>
               </p>
@@ -164,13 +179,13 @@ export default async function SignupPage({
         </div>
 
         {!success && (
-          <p className="text-center text-sm text-dynasty-gray-400">
-            Already have an account?{' '}
+          <p className="mt-7 text-center font-sans text-[11px] font-light tracking-[0.08em] text-dynasty-gray-400">
+            Already a member?{' '}
             <Link
               href="/login"
-              className="font-medium text-dynasty-gold hover:text-dynasty-gold-light transition-colors"
+              className="font-medium uppercase tracking-[0.18em] text-dynasty-gold transition-colors hover:text-dynasty-gold-light"
             >
-              Sign in
+              Sign In
             </Link>
           </p>
         )}

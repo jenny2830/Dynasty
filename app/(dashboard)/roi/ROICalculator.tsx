@@ -1,10 +1,11 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { TrendingUp, DollarSign, Percent, Building2 } from 'lucide-react'
+import { TrendingUp, Building2 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
+import { Section } from '@/components/ui/section'
 import {
   Select,
   SelectContent,
@@ -125,69 +126,45 @@ export function ROICalculator({ properties }: ROICalculatorProps) {
     { key: 'currentValue', label: 'Current Market Value (CAD)', help: 'For equity calculation' },
   ]
 
-  const resultMetrics = results
+  const headlineMetrics = results
     ? [
         {
           label: 'Cap Rate',
           value: formatPercent(results.capRate),
           help: 'NOI ÷ Purchase Price',
-          gold: true,
+          positive: results.capRate > 0,
         },
         {
-          label: 'Cash-on-Cash Return',
+          label: 'Cash-on-Cash',
           value: formatPercent(results.cashOnCash),
           help: 'Annual cash flow ÷ Cash invested',
-          gold: results.cashOnCash > 0,
+          positive: results.cashOnCash > 0,
         },
-        {
-          label: 'Gross Yield',
-          value: formatPercent(results.grossYield),
-          help: 'Annual rent ÷ Purchase price',
-          gold: false,
-        },
-        {
-          label: 'Net Yield',
-          value: formatPercent(results.netYield),
-          help: 'Annual NOI ÷ Purchase price',
-          gold: false,
-        },
-        {
-          label: 'Monthly Cash Flow',
-          value: formatCurrency(results.monthlyCashFlow),
-          help: 'After all expenses + mortgage',
-          gold: results.monthlyCashFlow > 0,
-        },
-        {
-          label: 'Annual Cash Flow',
-          value: formatCurrency(results.annualCashFlow),
-          help: 'Monthly × 12',
-          gold: results.annualCashFlow > 0,
-        },
-        {
-          label: 'Equity',
-          value: formatCurrency(results.equity),
-          help: 'Current value − original mortgage',
-          gold: results.equity > 0,
-        },
-        {
-          label: 'Annual NOI',
-          value: formatCurrency(results.annualNOI),
-          help: 'Net operating income',
-          gold: false,
-        },
+      ]
+    : []
+
+  const subMetrics = results
+    ? [
+        { label: 'Gross Yield', value: formatPercent(results.grossYield), positive: results.grossYield > 0 },
+        { label: 'Net Yield', value: formatPercent(results.netYield), positive: results.netYield > 0 },
+        { label: 'Monthly Cash Flow', value: formatCurrency(results.monthlyCashFlow), positive: results.monthlyCashFlow > 0 },
+        { label: 'Annual Cash Flow', value: formatCurrency(results.annualCashFlow), positive: results.annualCashFlow > 0 },
+        { label: 'Equity', value: formatCurrency(results.equity), positive: results.equity > 0 },
+        { label: 'Annual NOI', value: formatCurrency(results.annualNOI), positive: results.annualNOI > 0 },
       ]
     : []
 
   return (
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-      {/* Inputs */}
+      {/* Inputs panel */}
       <div className="space-y-6">
-        {/* Load from property */}
         {properties.length > 0 && (
-          <div className="rounded-xl border border-dynasty-gold/20 bg-dynasty-gold/5 p-4">
-            <div className="flex items-center gap-2 mb-3">
-              <Building2 className="h-4 w-4 text-dynasty-gold" />
-              <p className="text-sm font-medium text-dynasty-cream">Load from property</p>
+          <div className="rounded-[2px] border border-[rgba(201,168,76,0.18)] bg-[rgba(201,168,76,0.04)] px-5 py-4">
+            <div className="mb-3 flex items-center gap-2">
+              <Building2 className="h-3.5 w-3.5 text-dynasty-gold" strokeWidth={1.2} />
+              <p className="font-sans text-[10px] font-light uppercase tracking-[0.2em] text-dynasty-gold">
+                Load From Property
+              </p>
             </div>
             <Select onValueChange={loadFromProperty}>
               <SelectTrigger>
@@ -202,14 +179,18 @@ export function ROICalculator({ properties }: ROICalculatorProps) {
           </div>
         )}
 
-        <div className="rounded-xl border border-dynasty-gray-700 bg-dynasty-gray-900 p-6 space-y-4">
-          <h2 className="font-serif text-lg font-semibold text-dynasty-cream">Inputs</h2>
+        <Section className="px-7 py-6 space-y-5">
+          <h2 className="pb-3 border-b border-[rgba(201,168,76,0.08)] font-sans text-[9px] font-light uppercase tracking-[0.2em] text-dynasty-gray-500">
+            Inputs
+          </h2>
           {inputFields.map(({ key, label, help }) => (
-            <div key={key} className="space-y-1.5">
-              <Label htmlFor={key}>
-                {label}
-                {help && <span className="ml-1.5 text-dynasty-gray-400 font-normal">— {help}</span>}
-              </Label>
+            <div key={key} className="space-y-2">
+              <Label htmlFor={key}>{label}</Label>
+              {help && (
+                <p className="font-sans text-[11px] font-light tracking-[0.04em] text-dynasty-gray-500 -mt-1">
+                  {help}
+                </p>
+              )}
               <Input
                 id={key}
                 type="number"
@@ -227,59 +208,95 @@ export function ROICalculator({ properties }: ROICalculatorProps) {
             onClick={() => setInputs(EMPTY_INPUTS)}
             className="mt-2"
           >
-            Clear all
+            Clear All
           </Button>
-        </div>
+        </Section>
       </div>
 
-      {/* Results */}
-      <div className="space-y-4">
-        <div className="rounded-xl border border-dynasty-gray-700 bg-dynasty-gray-900 p-6">
-          <h2 className="font-serif text-lg font-semibold text-dynasty-cream mb-4">Results</h2>
+      {/* Results panel */}
+      <div className="space-y-5">
+        <Section variant="warm" className="px-7 py-6">
+          <h2 className="mb-5 pb-3 border-b border-[rgba(201,168,76,0.08)] font-sans text-[9px] font-light uppercase tracking-[0.2em] text-dynasty-gray-500">
+            Results
+          </h2>
 
           {!results ? (
-            <div className="flex flex-col items-center justify-center py-8 text-center">
-              <TrendingUp className="h-10 w-10 text-dynasty-gray-600 mb-3" strokeWidth={1} />
-              <p className="text-sm text-dynasty-gray-400">
-                Enter purchase price to see calculations
+            <div className="flex flex-col items-center justify-center py-10 text-center">
+              <TrendingUp className="h-8 w-8 text-dynasty-gold/15" strokeWidth={1} />
+              <p className="mt-4 font-serif text-[16px] font-medium tracking-[0.02em] text-dynasty-gray-300">
+                Awaiting Inputs
+              </p>
+              <p className="mt-1.5 font-sans text-[11px] font-light tracking-[0.06em] text-dynasty-gray-500">
+                Enter purchase price to begin calculations
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-3">
-              {resultMetrics.map(({ label, value, help, gold }) => (
-                <div
-                  key={label}
-                  className={`rounded-lg p-4 border ${
-                    gold
-                      ? 'border-dynasty-gold/20 bg-dynasty-gold/5'
-                      : 'border-dynasty-gray-700 bg-dynasty-gray-800'
-                  }`}
-                >
-                  <p className="text-xs text-dynasty-gray-400 uppercase tracking-wider">{label}</p>
-                  <p
-                    className={`font-mono text-lg font-semibold mt-1 ${
-                      gold ? 'text-dynasty-gold' : 'text-dynasty-cream'
-                    }`}
+            <div className="space-y-6">
+              {/* Headline metrics — Bebas display */}
+              <div className="grid grid-cols-2 gap-4">
+                {headlineMetrics.map((m) => (
+                  <div
+                    key={m.label}
+                    className="rounded-[1px] border border-[rgba(201,168,76,0.12)] bg-[rgba(201,168,76,0.04)] px-5 py-4"
                   >
-                    {value}
-                  </p>
-                  {help && <p className="text-xs text-dynasty-gray-400 mt-0.5">{help}</p>}
-                </div>
-              ))}
+                    <p className="font-sans text-[9px] font-light uppercase tracking-[0.2em] text-dynasty-gray-500">
+                      {m.label}
+                    </p>
+                    <p
+                      className={`mt-2 font-display text-[44px] leading-none tracking-[0.04em] ${
+                        m.positive ? 'text-dynasty-gold' : 'text-dynasty-rose-gold'
+                      }`}
+                    >
+                      {m.value}
+                    </p>
+                    {m.help && (
+                      <p className="mt-2 font-sans text-[10px] font-light tracking-[0.04em] text-dynasty-gray-500">
+                        {m.help}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {/* Sub-metrics grid */}
+              <div className="grid grid-cols-2 gap-3">
+                {subMetrics.map((m) => (
+                  <div
+                    key={m.label}
+                    className="rounded-[1px] border border-[rgba(201,168,76,0.06)] bg-dynasty-black-soft px-4 py-3"
+                  >
+                    <p className="font-sans text-[9px] font-light uppercase tracking-[0.2em] text-dynasty-gray-500">
+                      {m.label}
+                    </p>
+                    <p
+                      className={`mt-1 font-mono text-[16px] font-medium tracking-tight ${
+                        m.positive ? 'text-dynasty-gold' : 'text-dynasty-rose-gold'
+                      }`}
+                    >
+                      {m.value}
+                    </p>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
-        </div>
+        </Section>
 
         {results && (
-          <div className="rounded-xl border border-dynasty-gray-700 bg-dynasty-gray-900 p-5 text-xs text-dynasty-gray-400 space-y-1">
-            <p className="font-semibold text-dynasty-gray-200 mb-2 text-sm">Key Benchmarks (Canadian market)</p>
-            <p>Cap Rate &gt; 5% is generally considered good for residential</p>
-            <p>Cash-on-Cash &gt; 8–10% indicates strong cash flow</p>
-            <p>Monthly cash flow should be positive after all expenses</p>
-            <p className="mt-2 text-dynasty-gray-600">
-              * These calculations are estimates for planning purposes only. Consult a financial advisor for investment decisions.
+          <Section className="px-6 py-5">
+            <p className="mb-3 font-sans text-[9px] font-light uppercase tracking-[0.2em] text-dynasty-gold/80">
+              <span className="mr-2 text-[6px] text-[rgba(201,168,76,0.5)] leading-none">◆</span>
+              Canadian Market Benchmarks
             </p>
-          </div>
+            <ul className="space-y-1.5 font-sans text-[12px] font-light tracking-[0.02em] text-dynasty-gray-300">
+              <li>Cap Rate &gt; 5% is generally considered good for residential</li>
+              <li>Cash-on-Cash &gt; 8–10% indicates strong cash flow</li>
+              <li>Monthly cash flow should be positive after all expenses</li>
+            </ul>
+            <p className="mt-3 font-sans text-[10px] font-light italic tracking-[0.04em] text-dynasty-gray-500">
+              * Estimates for planning purposes only. Consult a financial advisor for investment decisions.
+            </p>
+          </Section>
         )}
       </div>
     </div>

@@ -53,16 +53,18 @@ export function RecurringForm({ mode, payment, properties }: RecurringFormProps)
   const today = new Date().toISOString().split('T')[0]
 
   return (
-    <form action={formAction} className="space-y-6">
+    <form action={formAction} className="space-y-7">
       {state?.errors?._form && (
-        <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3">
-          <p className="text-sm text-red-400">{state.errors._form[0]}</p>
+        <div className="rounded-[1px] border border-[rgba(183,110,121,0.3)] bg-[rgba(183,110,121,0.08)] px-4 py-3">
+          <p className="font-sans text-[12px] font-light text-dynasty-rose-light">
+            {state.errors._form[0]}
+          </p>
         </div>
       )}
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div className="space-y-1.5">
-          <Label htmlFor="name">Payment name *</Label>
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+        <div className="space-y-2">
+          <Label htmlFor="name">Payment Name *</Label>
           <Input
             id="name"
             name="name"
@@ -71,11 +73,13 @@ export function RecurringForm({ mode, payment, properties }: RecurringFormProps)
             required
           />
           {state?.errors?.name && (
-            <p className="text-xs text-red-400">{state.errors.name[0]}</p>
+            <p className="font-sans text-[11px] font-light text-dynasty-rose-light">
+              {state.errors.name[0]}
+            </p>
           )}
         </div>
 
-        <div className="space-y-1.5">
+        <div className="space-y-2">
           <Label htmlFor="property_id">Property *</Label>
           <Select name="property_id" defaultValue={payment?.property_id ?? ''}>
             <SelectTrigger id="property_id">
@@ -90,11 +94,13 @@ export function RecurringForm({ mode, payment, properties }: RecurringFormProps)
             </SelectContent>
           </Select>
           {state?.errors?.property_id && (
-            <p className="text-xs text-red-400">{state.errors.property_id[0]}</p>
+            <p className="font-sans text-[11px] font-light text-dynasty-rose-light">
+              {state.errors.property_id[0]}
+            </p>
           )}
         </div>
 
-        <div className="space-y-1.5">
+        <div className="space-y-2">
           <Label htmlFor="category">Category *</Label>
           <Select name="category" defaultValue={payment?.category}>
             <SelectTrigger id="category">
@@ -110,7 +116,7 @@ export function RecurringForm({ mode, payment, properties }: RecurringFormProps)
           </Select>
         </div>
 
-        <div className="space-y-1.5">
+        <div className="space-y-2">
           <Label htmlFor="amount">Amount (CAD) *</Label>
           <Input
             id="amount"
@@ -124,7 +130,7 @@ export function RecurringForm({ mode, payment, properties }: RecurringFormProps)
           />
         </div>
 
-        <div className="space-y-1.5">
+        <div className="space-y-2">
           <Label htmlFor="frequency">Frequency</Label>
           <Select name="frequency" defaultValue={payment?.frequency ?? 'monthly'}>
             <SelectTrigger id="frequency">
@@ -140,8 +146,8 @@ export function RecurringForm({ mode, payment, properties }: RecurringFormProps)
           </Select>
         </div>
 
-        <div className="space-y-1.5">
-          <Label htmlFor="next_due_date">Next due date *</Label>
+        <div className="space-y-2">
+          <Label htmlFor="next_due_date">Next Due Date *</Label>
           <Input
             id="next_due_date"
             name="next_due_date"
@@ -151,8 +157,8 @@ export function RecurringForm({ mode, payment, properties }: RecurringFormProps)
           />
         </div>
 
-        <div className="space-y-1.5">
-          <Label htmlFor="reminder_days_before">Remind me (days before)</Label>
+        <div className="space-y-2">
+          <Label htmlFor="reminder_days_before">Remind Me (Days Before)</Label>
           <Input
             id="reminder_days_before"
             name="reminder_days_before"
@@ -164,23 +170,24 @@ export function RecurringForm({ mode, payment, properties }: RecurringFormProps)
         </div>
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-start gap-3">
         <Checkbox
           id="auto_log_transaction"
           name="auto_log_transaction"
           defaultChecked={payment?.auto_log_transaction ?? false}
+          className="mt-0.5"
         />
         <div>
-          <Label htmlFor="auto_log_transaction" className="cursor-pointer">
+          <Label htmlFor="auto_log_transaction" className="cursor-pointer normal-case tracking-[0.06em] text-[12px] text-dynasty-gray-300">
             Auto-log transaction when marked as paid
           </Label>
-          <p className="text-xs text-dynasty-gray-400">
+          <p className="mt-1 font-sans text-[11px] font-light tracking-[0.04em] text-dynasty-gray-500">
             Automatically creates an expense transaction on the due date
           </p>
         </div>
       </div>
 
-      <div className="space-y-1.5">
+      <div className="space-y-2">
         <Label htmlFor="notes">Notes</Label>
         <Textarea
           id="notes"
@@ -191,8 +198,8 @@ export function RecurringForm({ mode, payment, properties }: RecurringFormProps)
         />
       </div>
 
-      <div className="flex gap-3 pt-2">
-        <SubmitButton label={mode === 'create' ? 'Add payment' : 'Save changes'} />
+      <div className="flex gap-3 pt-3 border-t border-[rgba(201,168,76,0.08)]">
+        <SubmitButton label={mode === 'create' ? 'Add Payment' : 'Save Changes'} />
         <Button type="button" variant="outline" onClick={() => window.history.back()}>
           Cancel
         </Button>

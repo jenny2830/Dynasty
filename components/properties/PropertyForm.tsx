@@ -26,6 +26,14 @@ function SubmitButton({ label }: { label: string }) {
   )
 }
 
+function FormSectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <h2 className="mb-5 pb-2 border-b border-[rgba(201,168,76,0.08)] font-sans text-[9px] font-light uppercase tracking-[0.2em] text-dynasty-gray-500">
+      {children}
+    </h2>
+  )
+}
+
 interface PropertyFormProps {
   mode: 'create' | 'edit'
   property?: Property
@@ -42,21 +50,20 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
   const [state, formAction] = useActionState<PropertyFormState, FormData>(action, null)
 
   return (
-    <form action={formAction} className="space-y-8">
+    <form action={formAction} className="space-y-9">
       {state?.errors?._form && (
-        <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3">
-          <p className="text-sm text-red-400">{state.errors._form[0]}</p>
+        <div className="rounded-[1px] border border-[rgba(183,110,121,0.3)] bg-[rgba(183,110,121,0.08)] px-4 py-3">
+          <p className="font-sans text-[12px] font-light text-dynasty-rose-light">
+            {state.errors._form[0]}
+          </p>
         </div>
       )}
 
-      {/* Basic info */}
-      <section className="space-y-4">
-        <h2 className="font-serif text-lg font-semibold text-dynasty-cream border-b border-dynasty-gray-700 pb-2">
-          Basic Information
-        </h2>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div className="space-y-1.5">
-            <Label htmlFor="name">Property name *</Label>
+      <section>
+        <FormSectionLabel>Basic Information</FormSectionLabel>
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="name">Property Name *</Label>
             <Input
               id="name"
               name="name"
@@ -65,11 +72,13 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
               required
             />
             {state?.errors?.name && (
-              <p className="text-xs text-red-400">{state.errors.name[0]}</p>
+              <p className="font-sans text-[11px] font-light text-dynasty-rose-light">
+                {state.errors.name[0]}
+              </p>
             )}
           </div>
 
-          <div className="space-y-1.5">
+          <div className="space-y-2">
             <Label htmlFor="status">Status</Label>
             <Select name="status" defaultValue={property?.status ?? 'active'}>
               <SelectTrigger id="status">
@@ -85,8 +94,8 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
             </Select>
           </div>
 
-          <div className="space-y-1.5">
-            <Label htmlFor="type">Property type *</Label>
+          <div className="space-y-2">
+            <Label htmlFor="type">Property Type *</Label>
             <Select
               name="type"
               defaultValue={property?.type ?? 'rental'}
@@ -105,7 +114,7 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
             </Select>
           </div>
 
-          <div className="space-y-1.5">
+          <div className="space-y-2">
             <Label htmlFor="property_subtype">Subtype *</Label>
             <Select name="property_subtype" defaultValue={property?.property_subtype ?? 'residential'}>
               <SelectTrigger id="property_subtype">
@@ -121,8 +130,8 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
             </Select>
           </div>
 
-          <div className="space-y-1.5">
-            <Label htmlFor="num_units">Number of units</Label>
+          <div className="space-y-2">
+            <Label htmlFor="num_units">Number of Units</Label>
             <Input
               id="num_units"
               name="num_units"
@@ -134,14 +143,11 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
         </div>
       </section>
 
-      {/* Address */}
-      <section className="space-y-4">
-        <h2 className="font-serif text-lg font-semibold text-dynasty-cream border-b border-dynasty-gray-700 pb-2">
-          Address
-        </h2>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div className="sm:col-span-2 space-y-1.5">
-            <Label htmlFor="address">Street address *</Label>
+      <section>
+        <FormSectionLabel>Address</FormSectionLabel>
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+          <div className="sm:col-span-2 space-y-2">
+            <Label htmlFor="address">Street Address *</Label>
             <Input
               id="address"
               name="address"
@@ -151,7 +157,7 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
             />
           </div>
 
-          <div className="space-y-1.5">
+          <div className="space-y-2">
             <Label htmlFor="city">City *</Label>
             <Input
               id="city"
@@ -162,7 +168,7 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
             />
           </div>
 
-          <div className="space-y-1.5">
+          <div className="space-y-2">
             <Label htmlFor="province">Province *</Label>
             <Select name="province" defaultValue={property?.province ?? 'ON'}>
               <SelectTrigger id="province">
@@ -178,8 +184,8 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
             </Select>
           </div>
 
-          <div className="space-y-1.5">
-            <Label htmlFor="postal_code">Postal code</Label>
+          <div className="space-y-2">
+            <Label htmlFor="postal_code">Postal Code</Label>
             <Input
               id="postal_code"
               name="postal_code"
@@ -190,14 +196,11 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
         </div>
       </section>
 
-      {/* Financials */}
-      <section className="space-y-4">
-        <h2 className="font-serif text-lg font-semibold text-dynasty-cream border-b border-dynasty-gray-700 pb-2">
-          Financial Details
-        </h2>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div className="space-y-1.5">
-            <Label htmlFor="purchase_price">Purchase price (CAD)</Label>
+      <section>
+        <FormSectionLabel>Financial Details</FormSectionLabel>
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="purchase_price">Purchase Price (CAD)</Label>
             <Input
               id="purchase_price"
               name="purchase_price"
@@ -209,8 +212,8 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
             />
           </div>
 
-          <div className="space-y-1.5">
-            <Label htmlFor="current_value">Current value (CAD)</Label>
+          <div className="space-y-2">
+            <Label htmlFor="current_value">Current Value (CAD)</Label>
             <Input
               id="current_value"
               name="current_value"
@@ -222,8 +225,8 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
             />
           </div>
 
-          <div className="space-y-1.5">
-            <Label htmlFor="mortgage_balance">Mortgage balance (CAD)</Label>
+          <div className="space-y-2">
+            <Label htmlFor="mortgage_balance">Mortgage Balance (CAD)</Label>
             <Input
               id="mortgage_balance"
               name="mortgage_balance"
@@ -235,8 +238,8 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
             />
           </div>
 
-          <div className="space-y-1.5">
-            <Label htmlFor="monthly_mortgage">Monthly mortgage (CAD)</Label>
+          <div className="space-y-2">
+            <Label htmlFor="monthly_mortgage">Monthly Mortgage (CAD)</Label>
             <Input
               id="monthly_mortgage"
               name="monthly_mortgage"
@@ -249,8 +252,8 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
           </div>
 
           {type === 'condo' && (
-            <div className="space-y-1.5">
-              <Label htmlFor="condo_fee">Monthly condo fee (CAD)</Label>
+            <div className="space-y-2">
+              <Label htmlFor="condo_fee">Monthly Condo Fee (CAD)</Label>
               <Input
                 id="condo_fee"
                 name="condo_fee"
@@ -264,8 +267,8 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
           )}
 
           {type === 'strata' && (
-            <div className="space-y-1.5">
-              <Label htmlFor="strata_fee">Monthly strata fee (CAD)</Label>
+            <div className="space-y-2">
+              <Label htmlFor="strata_fee">Monthly Strata Fee (CAD)</Label>
               <Input
                 id="strata_fee"
                 name="strata_fee"
@@ -280,10 +283,10 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
         </div>
       </section>
 
-      {/* Notes */}
-      <section className="space-y-4">
-        <div className="space-y-1.5">
-          <Label htmlFor="notes">Notes</Label>
+      <section>
+        <FormSectionLabel>Notes</FormSectionLabel>
+        <div className="space-y-2">
+          <Label htmlFor="notes">Additional Notes</Label>
           <Textarea
             id="notes"
             name="notes"
@@ -295,7 +298,7 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
       </section>
 
       <div className="flex gap-3 pt-2">
-        <SubmitButton label={mode === 'create' ? 'Add property' : 'Save changes'} />
+        <SubmitButton label={mode === 'create' ? 'Add Property' : 'Save Changes'} />
         <Button
           type="button"
           variant="outline"

@@ -29,36 +29,32 @@ export function DeletePropertyButton({ propertyId }: { propertyId: string }) {
 
   return (
     <>
-      <Button
-        variant="outline"
-        size="sm"
-        className="text-red-400 border-red-500/30 hover:bg-red-500/10 hover:text-red-300"
-        onClick={() => setOpen(true)}
-      >
-        <Trash2 className="h-4 w-4" />
+      <Button variant="destructive" size="sm" onClick={() => setOpen(true)}>
+        <Trash2 />
         Delete
       </Button>
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete property?</DialogTitle>
+            <DialogTitle>Delete Property?</DialogTitle>
             <DialogDescription>
-              This will permanently delete the property and all associated transactions,
-              units, and recurring payments. This action cannot be undone.
+              This permanently removes the property along with every associated
+              transaction, unit, and recurring payment. This action cannot be
+              undone.
             </DialogDescription>
           </DialogHeader>
-          {error && <p className="text-sm text-red-400">{error}</p>}
-          <DialogFooter className="gap-2">
+          {error && (
+            <p className="font-sans text-[12px] font-light text-dynasty-rose-light">
+              {error}
+            </p>
+          )}
+          <DialogFooter className="gap-3">
             <Button variant="outline" onClick={() => setOpen(false)} disabled={isPending}>
               Cancel
             </Button>
-            <Button
-              variant="destructive"
-              onClick={handleDelete}
-              disabled={isPending}
-            >
-              {isPending ? 'Deleting…' : 'Delete permanently'}
+            <Button variant="destructive" onClick={handleDelete} disabled={isPending}>
+              {isPending ? 'Deleting…' : 'Delete Permanently'}
             </Button>
           </DialogFooter>
         </DialogContent>

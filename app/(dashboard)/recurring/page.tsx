@@ -1,8 +1,10 @@
 import Link from 'next/link'
-import { Plus } from 'lucide-react'
+import { Plus, RefreshCw } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { Button } from '@/components/ui/button'
-import { formatCurrency, formatDate } from '@/lib/utils'
+import { PageHeader } from '@/components/ui/page-header'
+import { Section, SectionHeader } from '@/components/ui/section'
+import { formatCurrency } from '@/lib/utils'
 import { RecurringPaymentRow } from './RecurringPaymentRow'
 
 export const metadata = { title: 'Recurring Payments' }
@@ -35,65 +37,55 @@ export default async function RecurringPage() {
     .reduce((s, p) => s + p.amount, 0)
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="font-serif text-3xl font-semibold text-dynasty-cream">
-            Recurring Payments
-          </h1>
-          <p className="mt-1 text-sm text-dynasty-gray-400">
-            {active.length} active · {formatCurrency(totalMonthly)}/mo committed
-          </p>
-        </div>
+    <div className="space-y-7">
+      <PageHeader
+        title="Recurring Payments"
+        subtitle={`${active.length} active · ${formatCurrency(totalMonthly)}/mo committed`}
+      >
         <Button asChild>
           <Link href="/recurring/new">
-            <Plus className="h-4 w-4" /> Add Payment
+            <Plus /> Add Payment
           </Link>
         </Button>
-      </div>
+      </PageHeader>
 
       {!payments?.length ? (
-        <div className="flex flex-col items-center justify-center min-h-[50vh] rounded-xl border border-dashed border-dynasty-gray-700">
-          <h2 className="font-serif text-xl text-dynasty-cream mb-2">No recurring payments</h2>
-          <p className="text-sm text-dynasty-gray-400 mb-6 text-center max-w-sm">
+        <div className="flex min-h-[50vh] flex-col items-center justify-center rounded-[2px] border border-dashed border-[rgba(201,168,76,0.18)] bg-dynasty-gray-900/40 px-6 py-16 text-center">
+          <RefreshCw className="h-7 w-7 text-dynasty-gold/15" strokeWidth={1} />
+          <h2 className="mt-5 font-serif text-[22px] font-medium tracking-[0.04em] text-dynasty-gray-300">
+            No recurring payments
+          </h2>
+          <p className="mt-2 max-w-sm font-sans text-[12px] font-light tracking-[0.06em] text-dynasty-gray-500">
             Set up recurring payments for mortgage, insurance, taxes, and other regular expenses.
           </p>
-          <Button asChild>
+          <Button asChild variant="outline" className="mt-7">
             <Link href="/recurring/new">
-              <Plus className="h-4 w-4" /> Add first payment
+              <Plus /> Add First Payment
             </Link>
           </Button>
         </div>
       ) : (
-        <div className="space-y-6">
+        <div className="space-y-7">
           {active.length > 0 && (
-            <div className="rounded-xl border border-dynasty-gray-700 bg-dynasty-gray-900 overflow-hidden">
-              <div className="border-b border-dynasty-gray-700 px-6 py-4">
-                <h2 className="font-serif text-lg font-semibold text-dynasty-cream">
-                  Active ({active.length})
-                </h2>
-              </div>
-              <div className="divide-y divide-dynasty-gray-800">
+            <Section>
+              <SectionHeader title={`Active (${active.length})`} />
+              <div className="divide-y divide-[rgba(255,255,255,0.025)]">
                 {active.map((p) => (
                   <RecurringPaymentRow key={p.id} payment={p} />
                 ))}
               </div>
-            </div>
+            </Section>
           )}
 
           {inactive.length > 0 && (
-            <div className="rounded-xl border border-dynasty-gray-700 bg-dynasty-gray-900 overflow-hidden opacity-60">
-              <div className="border-b border-dynasty-gray-700 px-6 py-4">
-                <h2 className="font-serif text-lg font-semibold text-dynasty-gray-400">
-                  Inactive ({inactive.length})
-                </h2>
-              </div>
-              <div className="divide-y divide-dynasty-gray-800">
+            <Section className="opacity-60">
+              <SectionHeader title={`Inactive (${inactive.length})`} />
+              <div className="divide-y divide-[rgba(255,255,255,0.025)]">
                 {inactive.map((p) => (
                   <RecurringPaymentRow key={p.id} payment={p} />
                 ))}
               </div>
-            </div>
+            </Section>
           )}
         </div>
       )}

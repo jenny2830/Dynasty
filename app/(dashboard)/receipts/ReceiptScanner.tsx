@@ -1,11 +1,12 @@
 'use client'
 
 import { useState, useRef, useCallback, useTransition } from 'react'
-import { Upload, ScanLine, CheckCircle, XCircle, Loader2 } from 'lucide-react'
+import { ScanLine, CheckCircle2, XCircle, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
+import { Section, SectionHeader } from '@/components/ui/section'
 import {
   Select,
   SelectContent,
@@ -51,7 +52,6 @@ interface ReceiptScannerProps {
 
 export function ReceiptScanner({ properties, recentReceipts }: ReceiptScannerProps) {
   const [scanState, setScanState] = useState<ScanState>('idle')
-  const [extracted, setExtracted] = useState<ExtractedData | null>(null)
   const [receiptId, setReceiptId] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isDragging, setIsDragging] = useState(false)
@@ -59,7 +59,6 @@ export function ReceiptScanner({ properties, recentReceipts }: ReceiptScannerPro
   const fileInputRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
 
-  // Form state for confirmation
   const [editData, setEditData] = useState<ExtractedData | null>(null)
   const [selectedProperty, setSelectedProperty] = useState<string>('none')
 
@@ -98,7 +97,6 @@ export function ReceiptScanner({ properties, recentReceipts }: ReceiptScannerPro
         throw new Error(json.error ?? 'Scan failed')
       }
 
-      setExtracted(json.data)
       setEditData(json.data)
       setReceiptId(json.receiptId)
       setScanState('confirm')
@@ -158,7 +156,6 @@ export function ReceiptScanner({ properties, recentReceipts }: ReceiptScannerPro
     startTransition(async () => {
       await rejectReceipt(receiptId)
       setScanState('idle')
-      setExtracted(null)
       setEditData(null)
       setReceiptId(null)
       router.refresh()
@@ -170,7 +167,7 @@ export function ReceiptScanner({ properties, recentReceipts }: ReceiptScannerPro
   return (
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-5">
       {/* Scanner panel — 3/5 */}
-      <div className="lg:col-span-3 space-y-4">
+      <div className="lg:col-span-3 space-y-5">
         {/* Upload zone */}
         {(scanState === 'idle' || scanState === 'scanning') && (
           <div
@@ -178,12 +175,12 @@ export function ReceiptScanner({ properties, recentReceipts }: ReceiptScannerPro
             onDragLeave={() => setIsDragging(false)}
             onDrop={handleDrop}
             onClick={() => scanState === 'idle' && fileInputRef.current?.click()}
-            className={`relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed transition-all cursor-pointer h-52 ${
+            className={`relative flex h-60 flex-col items-center justify-center rounded-[2px] border border-dashed bg-dynasty-gray-900 px-6 transition-all duration-300 ${
               isDragging
-                ? 'border-dynasty-gold bg-dynasty-gold/5'
+                ? 'border-[rgba(201,168,76,0.5)] bg-[rgba(201,168,76,0.02)]'
                 : scanState === 'scanning'
-                ? 'border-dynasty-gray-600 cursor-default'
-                : 'border-dynasty-gray-600 hover:border-dynasty-gold/50 hover:bg-dynasty-gray-800/30'
+                ? 'border-[rgba(201,168,76,0.2)] cursor-default'
+                : 'border-[rgba(201,168,76,0.2)] cursor-pointer hover:border-[rgba(201,168,76,0.5)] hover:bg-[rgba(201,168,76,0.02)]'
             }`}
           >
             <input
@@ -195,20 +192,22 @@ export function ReceiptScanner({ properties, recentReceipts }: ReceiptScannerPro
             />
             {scanState === 'scanning' ? (
               <>
-                <Loader2 className="h-10 w-10 text-dynasty-gold animate-spin mb-3" />
-                <p className="text-sm font-medium text-dynasty-cream">Extracting data with Claude AI…</p>
-                <p className="text-xs text-dynasty-gray-400 mt-1">Image is never stored</p>
+                <Loader2 className="h-8 w-8 animate-spin text-dynasty-gold/60" strokeWidth={1.2} />
+                <p className="mt-4 font-serif text-[18px] font-medium tracking-[0.02em] text-dynasty-warm-white">
+                  Extracting Receipt Data
+                </p>
+                <p className="mt-2 font-sans text-[11px] font-light uppercase tracking-[0.18em] text-dynasty-gray-500">
+                  Claude Vision · Image never stored
+                </p>
               </>
             ) : (
               <>
-                <div className="flex h-14 w-14 items-center justify-center rounded-full border border-dynasty-gold/20 bg-dynasty-gold/10 mb-3">
-                  <Upload className="h-6 w-6 text-dynasty-gold" strokeWidth={1.5} />
-                </div>
-                <p className="text-sm font-medium text-dynasty-cream">
-                  Drop receipt here or click to upload
+                <ScanLine className="h-8 w-8 text-[rgba(201,168,76,0.3)]" strokeWidth={1} />
+                <p className="mt-4 font-serif text-[18px] font-medium tracking-[0.02em] text-dynasty-warm-white">
+                  Drop Receipt Here
                 </p>
-                <p className="text-xs text-dynasty-gray-400 mt-1">
-                  JPEG, PNG, WebP · Max 10MB
+                <p className="mt-2 font-sans text-[11px] font-light uppercase tracking-[0.18em] text-dynasty-gray-500">
+                  Or click to upload &middot; JPEG · PNG · WebP · Max 10MB
                 </p>
               </>
             )}
@@ -216,52 +215,58 @@ export function ReceiptScanner({ properties, recentReceipts }: ReceiptScannerPro
         )}
 
         {error && (
-          <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3">
-            <p className="text-sm text-red-400">{error}</p>
+          <div className="rounded-[1px] border border-[rgba(183,110,121,0.3)] bg-[rgba(183,110,121,0.08)] px-4 py-3">
+            <p className="font-sans text-[12px] font-light text-dynasty-rose-light">
+              {error}
+            </p>
           </div>
         )}
 
-        {/* Success state */}
         {scanState === 'success' && (
-          <div className="flex flex-col items-center justify-center rounded-xl border border-emerald-500/30 bg-emerald-500/10 py-12">
-            <CheckCircle className="h-12 w-12 text-emerald-400 mb-3" />
-            <p className="font-serif text-lg font-semibold text-dynasty-cream">Receipt confirmed!</p>
-            <p className="text-sm text-dynasty-gray-400 mt-1">Redirecting to transactions…</p>
+          <div className="flex flex-col items-center justify-center rounded-[2px] border border-[rgba(201,168,76,0.25)] bg-[rgba(201,168,76,0.04)] py-12">
+            <CheckCircle2 className="h-10 w-10 text-dynasty-gold" strokeWidth={1.2} />
+            <p className="mt-4 font-serif text-[20px] font-medium tracking-[0.02em] text-dynasty-warm-white">
+              Receipt Confirmed
+            </p>
+            <p className="mt-1.5 font-sans text-[11px] font-light uppercase tracking-[0.18em] text-dynasty-gray-500">
+              Redirecting to transactions
+            </p>
           </div>
         )}
 
         {/* Confirmation form */}
         {scanState === 'confirm' && editData && (
-          <div className="rounded-xl border border-dynasty-gray-700 bg-dynasty-gray-900 overflow-hidden">
-            <div className="border-b border-dynasty-gray-700 px-6 py-4 flex items-center justify-between">
+          <Section variant="warm" className="overflow-hidden">
+            <div className="flex items-center justify-between px-7 py-5 border-b border-[rgba(201,168,76,0.08)]">
               <div>
-                <h2 className="font-serif text-lg font-semibold text-dynasty-cream">
+                <h2 className="font-serif text-[18px] font-medium tracking-[0.02em] text-dynasty-warm-white">
                   Extracted Data
                 </h2>
-                <p className="text-xs text-dynasty-gray-400 mt-0.5">
+                <p className="mt-0.5 font-sans text-[11px] font-light uppercase tracking-[0.12em] text-dynasty-gray-500">
                   Review and edit before confirming
                 </p>
               </div>
-              {/* Confidence badge */}
               <div className="text-right">
-                <p className="text-xs text-dynasty-gray-400">AI confidence</p>
-                <div className="flex items-center gap-2 mt-1">
-                  <div className="h-1.5 w-20 rounded-full bg-dynasty-gray-700 overflow-hidden">
+                <p className="font-sans text-[9px] font-light uppercase tracking-[0.22em] text-dynasty-gray-500">
+                  AI Confidence
+                </p>
+                <div className="mt-1.5 flex items-center gap-2">
+                  <div className="h-[2px] w-24 bg-dynasty-gray-700 overflow-hidden">
                     <div
-                      className="h-full bg-dynasty-gold rounded-full transition-all"
+                      className="h-full bg-dynasty-gold transition-all"
                       style={{ width: `${(editData.confidence ?? 0) * 100}%` }}
                     />
                   </div>
-                  <span className="font-mono text-xs text-dynasty-gold">
+                  <span className="font-mono text-[12px] font-medium text-dynasty-gold">
                     {Math.round((editData.confidence ?? 0) * 100)}%
                   </span>
                 </div>
               </div>
             </div>
 
-            <div className="p-6 space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
+            <div className="px-7 py-6 space-y-5">
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                <div className="space-y-2">
                   <Label htmlFor="vendor">Vendor</Label>
                   <Input
                     id="vendor"
@@ -271,7 +276,7 @@ export function ReceiptScanner({ properties, recentReceipts }: ReceiptScannerPro
                   />
                 </div>
 
-                <div className="space-y-1.5">
+                <div className="space-y-2">
                   <Label htmlFor="amount">Amount (CAD) *</Label>
                   <Input
                     id="amount"
@@ -285,7 +290,7 @@ export function ReceiptScanner({ properties, recentReceipts }: ReceiptScannerPro
                   />
                 </div>
 
-                <div className="space-y-1.5">
+                <div className="space-y-2">
                   <Label htmlFor="receipt_date">Date *</Label>
                   <Input
                     id="receipt_date"
@@ -296,7 +301,7 @@ export function ReceiptScanner({ properties, recentReceipts }: ReceiptScannerPro
                   />
                 </div>
 
-                <div className="space-y-1.5">
+                <div className="space-y-2">
                   <Label htmlFor="category">Category *</Label>
                   <Select
                     value={editData.category ?? ''}
@@ -313,7 +318,7 @@ export function ReceiptScanner({ properties, recentReceipts }: ReceiptScannerPro
                   </Select>
                 </div>
 
-                <div className="col-span-2 space-y-1.5">
+                <div className="col-span-1 sm:col-span-2 space-y-2">
                   <Label htmlFor="description">Description</Label>
                   <Input
                     id="description"
@@ -323,8 +328,8 @@ export function ReceiptScanner({ properties, recentReceipts }: ReceiptScannerPro
                   />
                 </div>
 
-                <div className="col-span-2 space-y-1.5">
-                  <Label htmlFor="property">Associate with property</Label>
+                <div className="col-span-1 sm:col-span-2 space-y-2">
+                  <Label htmlFor="property">Associate with Property</Label>
                   <Select value={selectedProperty} onValueChange={setSelectedProperty}>
                     <SelectTrigger id="property">
                       <SelectValue placeholder="Select property (optional)" />
@@ -339,55 +344,53 @@ export function ReceiptScanner({ properties, recentReceipts }: ReceiptScannerPro
                 </div>
               </div>
 
-              {error && <p className="text-sm text-red-400">{error}</p>}
+              {error && (
+                <p className="font-sans text-[12px] font-light text-dynasty-rose-light">
+                  {error}
+                </p>
+              )}
 
               <div className="flex gap-3 pt-2">
                 <Button onClick={handleConfirm} disabled={isPending} className="flex-1">
-                  <CheckCircle className="h-4 w-4" />
-                  {isPending ? 'Confirming…' : 'Confirm & create transaction'}
+                  <CheckCircle2 />
+                  {isPending ? 'Confirming…' : 'Confirm & Create'}
                 </Button>
-                <Button
-                  variant="outline"
-                  onClick={handleReject}
-                  disabled={isPending}
-                  className="text-red-400 border-red-500/30"
-                >
-                  <XCircle className="h-4 w-4" /> Discard
+                <Button variant="destructive" onClick={handleReject} disabled={isPending}>
+                  <XCircle /> Discard
                 </Button>
               </div>
             </div>
-          </div>
+          </Section>
         )}
       </div>
 
       {/* Recent scans — 2/5 */}
       <div className="lg:col-span-2">
-        <div className="rounded-xl border border-dynasty-gray-700 bg-dynasty-gray-900">
-          <div className="border-b border-dynasty-gray-700 px-6 py-4 flex items-center gap-2">
-            <ScanLine className="h-4 w-4 text-dynasty-gold" />
-            <h2 className="font-serif text-lg font-semibold text-dynasty-cream">Recent Scans</h2>
-          </div>
-          <div className="divide-y divide-dynasty-gray-800">
+        <Section>
+          <SectionHeader title="Recent Scans" />
+          <div className="divide-y divide-[rgba(255,255,255,0.025)]">
             {recentReceipts.length === 0 ? (
-              <div className="flex items-center justify-center py-8">
-                <p className="text-sm text-dynasty-gray-400">No receipts scanned yet</p>
+              <div className="flex items-center justify-center px-6 py-10">
+                <p className="font-sans text-[12px] font-light text-dynasty-gray-500">
+                  No receipts scanned yet
+                </p>
               </div>
             ) : (
               recentReceipts.map((r) => (
-                <div key={r.id} className="px-6 py-3.5">
-                  <div className="flex items-start justify-between gap-2">
+                <div key={r.id} className="px-7 py-4">
+                  <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="text-sm font-medium text-dynasty-cream truncate">
+                      <p className="truncate font-sans text-[13px] text-dynasty-warm-white">
                         {r.vendor_name ?? 'Unknown vendor'}
                       </p>
-                      <p className="text-xs text-dynasty-gray-400">
+                      <p className="mt-0.5 font-sans text-[11px] font-light text-dynasty-gray-500">
                         {r.receipt_date ? formatDate(r.receipt_date) : '—'}
                         {r.category ? ` · ${r.category}` : ''}
                       </p>
                     </div>
-                    <div className="text-right shrink-0">
+                    <div className="shrink-0 text-right">
                       {r.amount && (
-                        <p className="font-mono text-sm text-dynasty-gold">
+                        <p className="font-mono text-[13px] font-medium text-dynasty-gold">
                           {formatCurrency(r.amount)}
                         </p>
                       )}
@@ -399,7 +402,7 @@ export function ReceiptScanner({ properties, recentReceipts }: ReceiptScannerPro
                             ? 'destructive'
                             : 'warning'
                         }
-                        className="text-xs mt-0.5"
+                        className="mt-1.5"
                       >
                         {r.status}
                       </Badge>
@@ -409,7 +412,7 @@ export function ReceiptScanner({ properties, recentReceipts }: ReceiptScannerPro
               ))
             )}
           </div>
-        </div>
+        </Section>
       </div>
     </div>
   )

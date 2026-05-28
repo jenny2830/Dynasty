@@ -1,25 +1,41 @@
 import type { Metadata } from 'next'
-import { Inter, Playfair_Display } from 'next/font/google'
+import { Cormorant_Garamond, Jost, Bebas_Neue, JetBrains_Mono } from 'next/font/google'
 import './globals.css'
 
-const inter = Inter({
+const cormorant = Cormorant_Garamond({
   subsets: ['latin'],
-  variable: '--font-inter',
+  weight: ['300', '400', '500', '600', '700'],
+  variable: '--font-cormorant',
   display: 'swap',
 })
 
-const playfair = Playfair_Display({
+const jost = Jost({
   subsets: ['latin'],
-  variable: '--font-playfair',
+  weight: ['300', '400', '500'],
+  variable: '--font-jost',
+  display: 'swap',
+})
+
+const bebas = Bebas_Neue({
+  subsets: ['latin'],
+  weight: ['400'],
+  variable: '--font-bebas',
+  display: 'swap',
+})
+
+const jetbrains = JetBrains_Mono({
+  subsets: ['latin'],
+  weight: ['400', '500'],
+  variable: '--font-jetbrains',
   display: 'swap',
 })
 
 export const metadata: Metadata = {
   title: {
-    default: 'DYNASTY — Property Wealth Management',
+    default: 'DYNASTY — Property Wealth Platform',
     template: '%s | DYNASTY',
   },
-  description: 'Premium property wealth management for Canadian landlords.',
+  description: 'Legacy. Luxury. Timeless. Premium property wealth management for Canadian landlords.',
   keywords: ['property management', 'landlord software', 'real estate', 'Canada', 'CAD'],
   authors: [{ name: 'DYNASTY' }],
 }
@@ -30,8 +46,11 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
-      <body className="bg-dynasty-black text-dynasty-cream antialiased">
+    <html
+      lang="en"
+      className={`${cormorant.variable} ${jost.variable} ${bebas.variable} ${jetbrains.variable}`}
+    >
+      <body className="bg-dynasty-black text-dynasty-warm-white antialiased">
         {children}
       </body>
     </html>

@@ -1,6 +1,6 @@
 'use client'
 
-import { useActionState, useState, useEffect } from 'react'
+import { useActionState, useState, useEffect, useRef } from 'react'
 import { useFormStatus } from 'react-dom'
 import { createTransaction, updateTransaction, type TxFormState } from '@/app/actions/transactions'
 import { Button } from '@/components/ui/button'
@@ -69,19 +69,34 @@ export function TransactionForm({
 
   const [state, formAction] = useActionState<TxFormState, FormData>(action, null)
 
-  // Load units when property changes
+  const lastPropertyIdRef = useRef<string | null>(null)
   useEffect(() => {
-    if (!selectedProperty) {
-      setUnits([])
-      return
+    if (lastPropertyIdRef.current === selectedProperty) return
+    lastPropertyIdRef.current = selectedProperty
+
+    let cancelled = false
+    if (!selectedProperty || selectedProperty === 'none') {
+      // Schedule the clear off the effect body so it does not run synchronously.
+      queueMicrotask(() => {
+        if (!cancelled) setUnits([])
+      })
+      return () => {
+        cancelled = true
+      }
     }
+
     const supabase = createClient()
     supabase
       .from('units')
       .select('id, unit_number')
       .eq('property_id', selectedProperty)
       .order('unit_number')
-      .then(({ data }) => setUnits(data ?? []))
+      .then(({ data }) => {
+        if (!cancelled) setUnits(data ?? [])
+      })
+    return () => {
+      cancelled = true
+    }
   }, [selectedProperty])
 
   const categories =
@@ -92,28 +107,30 @@ export function TransactionForm({
   const today = new Date().toISOString().split('T')[0]
 
   return (
-    <form action={formAction} className="space-y-6">
+    <form action={formAction} className="space-y-7">
       {state?.errors?._form && (
-        <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3">
-          <p className="text-sm text-red-400">{state.errors._form[0]}</p>
+        <div className="rounded-[1px] border border-[rgba(183,110,121,0.3)] bg-[rgba(183,110,121,0.08)] px-4 py-3">
+          <p className="font-sans text-[12px] font-light text-dynasty-rose-light">
+            {state.errors._form[0]}
+          </p>
         </div>
       )}
 
-      {/* Type toggle */}
-      <div className="space-y-1.5">
-        <Label>Transaction type *</Label>
-        <div className="flex rounded-lg overflow-hidden border border-dynasty-gray-600">
+      {/* Type toggle — sharp art deco segmented control */}
+      <div className="space-y-2">
+        <Label>Transaction Type *</Label>
+        <div className="flex overflow-hidden rounded-[1px] border border-[rgba(201,168,76,0.15)]">
           {(['expense', 'income'] as const).map((t) => (
             <button
               key={t}
               type="button"
               onClick={() => setTxType(t)}
-              className={`flex-1 py-2.5 text-sm font-medium capitalize transition-colors ${
+              className={`flex-1 py-3 font-sans text-[10px] font-light uppercase tracking-[0.22em] transition-colors ${
                 txType === t
                   ? t === 'income'
-                    ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
-                    : 'bg-red-500/20 text-red-400 border-red-500/30'
-                  : 'text-dynasty-gray-400 hover:text-dynasty-cream hover:bg-dynasty-gray-700'
+                    ? 'bg-[rgba(201,168,76,0.08)] text-dynasty-gold'
+                    : 'bg-[rgba(183,110,121,0.08)] text-dynasty-rose-gold'
+                  : 'text-dynasty-gray-500 hover:text-dynasty-gold hover:bg-[rgba(201,168,76,0.04)]'
               }`}
             >
               {t}
@@ -123,9 +140,8 @@ export function TransactionForm({
         <input type="hidden" name="type" value={txType} />
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        {/* Amount */}
-        <div className="space-y-1.5">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+        <div className="space-y-2">
           <Label htmlFor="amount">Amount (CAD) *</Label>
           <Input
             id="amount"
@@ -138,12 +154,13 @@ export function TransactionForm({
             required
           />
           {state?.errors?.amount && (
-            <p className="text-xs text-red-400">{state.errors.amount[0]}</p>
+            <p className="font-sans text-[11px] font-light text-dynasty-rose-light">
+              {state.errors.amount[0]}
+            </p>
           )}
         </div>
 
-        {/* Date */}
-        <div className="space-y-1.5">
+        <div className="space-y-2">
           <Label htmlFor="transaction_date">Date *</Label>
           <Input
             id="transaction_date"
@@ -154,8 +171,7 @@ export function TransactionForm({
           />
         </div>
 
-        {/* Category */}
-        <div className="space-y-1.5">
+        <div className="space-y-2">
           <Label htmlFor="category">Category *</Label>
           <Select
             name="category"
@@ -174,12 +190,13 @@ export function TransactionForm({
             </SelectContent>
           </Select>
           {state?.errors?.category && (
-            <p className="text-xs text-red-400">{state.errors.category[0]}</p>
+            <p className="font-sans text-[11px] font-light text-dynasty-rose-light">
+              {state.errors.category[0]}
+            </p>
           )}
         </div>
 
-        {/* Property */}
-        <div className="space-y-1.5">
+        <div className="space-y-2">
           <Label htmlFor="property_id">Property</Label>
           <Select
             name="property_id"
@@ -200,9 +217,8 @@ export function TransactionForm({
           </Select>
         </div>
 
-        {/* Unit (only if property selected and has units) */}
         {units.length > 0 && (
-          <div className="space-y-1.5">
+          <div className="space-y-2">
             <Label htmlFor="unit_id">Unit</Label>
             <Select name="unit_id" defaultValue={transaction?.unit_id ?? 'none'}>
               <SelectTrigger id="unit_id">
@@ -221,8 +237,7 @@ export function TransactionForm({
         )}
       </div>
 
-      {/* Description */}
-      <div className="space-y-1.5">
+      <div className="space-y-2">
         <Label htmlFor="description">Description</Label>
         <Textarea
           id="description"
@@ -233,7 +248,6 @@ export function TransactionForm({
         />
       </div>
 
-      {/* Tax deductible */}
       {txType === 'expense' && (
         <div className="flex items-center gap-3">
           <Checkbox
@@ -242,14 +256,14 @@ export function TransactionForm({
             checked={taxDeductible}
             onCheckedChange={(v) => setTaxDeductible(Boolean(v))}
           />
-          <Label htmlFor="is_tax_deductible" className="cursor-pointer">
+          <Label htmlFor="is_tax_deductible" className="cursor-pointer normal-case tracking-[0.06em] text-[12px] text-dynasty-gray-300">
             Tax deductible expense
           </Label>
         </div>
       )}
 
-      <div className="flex gap-3 pt-2">
-        <SubmitButton label={mode === 'create' ? 'Add transaction' : 'Save changes'} />
+      <div className="flex gap-3 pt-3 border-t border-[rgba(201,168,76,0.08)]">
+        <SubmitButton label={mode === 'create' ? 'Add Transaction' : 'Save Changes'} />
         <Button type="button" variant="outline" onClick={() => window.history.back()}>
           Cancel
         </Button>

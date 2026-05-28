@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { ReceiptScanner } from './ReceiptScanner'
+import { PageHeader } from '@/components/ui/page-header'
 
 export const metadata = { title: 'Receipt Scanner' }
 
@@ -24,7 +25,6 @@ export default async function ReceiptsPage() {
         .order('name')
     : { data: [] }
 
-  // Recent scanned receipts
   const { data: recentReceipts } = landlord
     ? await supabase
         .from('receipts')
@@ -36,12 +36,10 @@ export default async function ReceiptsPage() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="font-serif text-3xl font-semibold text-dynasty-cream">Receipt Scanner</h1>
-        <p className="mt-1 text-sm text-dynasty-gray-400">
-          AI-powered extraction using Claude Vision · Images are processed and immediately discarded
-        </p>
-      </div>
+      <PageHeader
+        title="Receipt Scanner"
+        subtitle="AI extraction · Images processed and immediately discarded"
+      />
 
       <ReceiptScanner
         properties={properties ?? []}

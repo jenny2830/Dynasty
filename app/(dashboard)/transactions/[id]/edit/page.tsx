@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { TransactionForm } from '@/components/transactions/TransactionForm'
 import { DeleteTransactionButton } from './DeleteTransactionButton'
+import { PageHeader } from '@/components/ui/page-header'
 
 export const metadata = { title: 'Edit Transaction' }
 
@@ -34,26 +35,22 @@ export default async function EditTransactionPage({
   if (txResult.error || !txResult.data) notFound()
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
-      <div>
-        <Link
-          href="/transactions"
-          className="flex items-center gap-1.5 text-sm text-dynasty-gray-400 hover:text-dynasty-cream transition-colors mb-4"
-        >
-          <ChevronLeft className="h-4 w-4" /> Back to transactions
-        </Link>
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="font-serif text-3xl font-semibold text-dynasty-cream">Edit Transaction</h1>
-            <p className="mt-1 text-sm text-dynasty-gray-400">
-              {txResult.data.description ?? txResult.data.category}
-            </p>
-          </div>
-          <DeleteTransactionButton txId={id} />
-        </div>
-      </div>
+    <div className="mx-auto max-w-2xl space-y-7">
+      <Link
+        href="/transactions"
+        className="inline-flex items-center gap-1.5 font-sans text-[10px] font-light uppercase tracking-[0.18em] text-dynasty-gray-400 transition-colors hover:text-dynasty-gold"
+      >
+        <ChevronLeft className="h-3 w-3" strokeWidth={1.2} /> Back to Transactions
+      </Link>
 
-      <div className="rounded-xl border border-dynasty-gray-700 bg-dynasty-gray-900 p-6">
+      <PageHeader
+        title="Edit Transaction"
+        subtitle={txResult.data.description ?? txResult.data.category}
+      >
+        <DeleteTransactionButton txId={id} />
+      </PageHeader>
+
+      <div className="rounded-[2px] border border-[rgba(201,168,76,0.08)] bg-dynasty-black-soft px-9 py-9 shadow-[var(--shadow-card)]">
         <TransactionForm
           mode="edit"
           transaction={txResult.data}

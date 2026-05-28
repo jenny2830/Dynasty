@@ -14,46 +14,84 @@ function StatCard({ label, value, subtext, trend, icon, highlight }: StatCardPro
   return (
     <div
       className={cn(
-        'relative rounded-xl p-5 border transition-colors',
-        highlight
-          ? 'bg-dynasty-gray-800 border-dynasty-gold/30'
-          : 'bg-dynasty-gray-900 border-dynasty-gray-700'
+        'group relative overflow-hidden rounded-[2px]',
+        'border border-[rgba(201,168,76,0.1)]',
+        'bg-[linear-gradient(135deg,#161616_0%,#1C1A17_100%)]',
+        'shadow-[var(--shadow-card)]',
+        'transition-all duration-300 ease-out',
+        'hover:border-[rgba(201,168,76,0.35)] hover:shadow-[var(--shadow-card-hover)]',
+        'px-7 pt-7 pb-6'
       )}
     >
-      <div className="flex items-start justify-between">
-        <div className="flex-1">
-          <p className="text-xs font-medium uppercase tracking-wider text-dynasty-gray-400">
-            {label}
-          </p>
+      {/* Art Deco top-left corner glow */}
+      <div
+        className="pointer-events-none absolute top-0 left-0 h-[60px] w-[60px]"
+        style={{ background: 'var(--accent-corner-tl)' }}
+        aria-hidden
+      />
+      {/* Gold top accent line */}
+      <div
+        className="pointer-events-none absolute top-0 left-[10%] right-[10%] h-px"
+        style={{ background: 'var(--accent-top)' }}
+        aria-hidden
+      />
+
+      <div className="relative flex items-start justify-between gap-3">
+        <div className="min-w-0 flex-1">
+          {/* Label with diamond ornament */}
           <p
             className={cn(
-              'mt-2 font-mono text-2xl font-semibold tracking-tight',
-              highlight ? 'text-dynasty-gold' : 'text-dynasty-cream'
+              'flex items-center gap-2 uppercase',
+              'font-sans font-light text-[9px] tracking-[0.22em]',
+              'text-dynasty-gray-500 mb-2.5'
+            )}
+          >
+            <span className="text-[6px] text-[rgba(201,168,76,0.5)] leading-none">◆</span>
+            <span className="truncate">{label}</span>
+          </p>
+
+          {/* Value — Bebas Neue display */}
+          <p
+            className={cn(
+              'font-display text-[38px] leading-none tracking-[0.04em]',
+              highlight ? 'text-dynasty-gold' : 'text-dynasty-warm-white'
             )}
           >
             {value}
           </p>
+
           {subtext && (
-            <p className="mt-1 text-xs text-dynasty-gray-400">{subtext}</p>
+            <p
+              className={cn(
+                'mt-2 font-sans font-light text-[11px] tracking-[0.04em]',
+                'text-dynasty-gray-500'
+              )}
+            >
+              {subtext}
+            </p>
           )}
+
           {trend && (
             <p
               className={cn(
-                'mt-2 text-xs font-medium',
-                trend.value >= 0 ? 'text-emerald-400' : 'text-red-400'
+                'mt-2 font-sans text-[11px] font-light tracking-[0.04em]',
+                trend.value >= 0 ? 'text-dynasty-gold' : 'text-dynasty-rose-gold'
               )}
             >
               {trend.value >= 0 ? '↑' : '↓'} {Math.abs(trend.value)}%{' '}
-              <span className="text-dynasty-gray-400 font-normal">{trend.label}</span>
+              <span className="text-dynasty-gray-500">{trend.label}</span>
             </p>
           )}
         </div>
+
+        {/* Icon — thin elegant, rose accent on muted, gold on highlight */}
         <div
           className={cn(
-            'flex h-10 w-10 items-center justify-center rounded-lg',
+            'flex h-9 w-9 shrink-0 items-center justify-center rounded-[1px]',
+            'border transition-colors',
             highlight
-              ? 'bg-dynasty-gold/15 text-dynasty-gold'
-              : 'bg-dynasty-gray-800 text-dynasty-gray-400'
+              ? 'border-[rgba(201,168,76,0.25)] bg-[rgba(201,168,76,0.06)] text-dynasty-gold'
+              : 'border-[rgba(201,168,76,0.12)] bg-[rgba(201,168,76,0.04)] text-dynasty-gold/60'
           )}
         >
           {icon}
@@ -77,12 +115,12 @@ export function StatsCards({
   pendingReminders,
 }: StatsCardsProps) {
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
       <StatCard
         label="Portfolio Value"
         value={formatCurrency(totalPortfolioValue)}
         subtext="Total current value"
-        icon={<Building2 className="h-5 w-5" strokeWidth={1.5} />}
+        icon={<Building2 className="h-4 w-4" strokeWidth={1.2} />}
         highlight
       />
       <StatCard
@@ -90,20 +128,20 @@ export function StatsCards({
         value={formatCurrency(monthlyNetIncome)}
         subtext="Income minus expenses"
         trend={{ value: 4.2, label: 'vs last month' }}
-        icon={<TrendingUp className="h-5 w-5" strokeWidth={1.5} />}
+        icon={<TrendingUp className="h-4 w-4" strokeWidth={1.2} />}
         highlight
       />
       <StatCard
         label="Active Properties"
         value={activeProperties.toString()}
         subtext="Across all units"
-        icon={<DollarSign className="h-5 w-5" strokeWidth={1.5} />}
+        icon={<DollarSign className="h-4 w-4" strokeWidth={1.2} />}
       />
       <StatCard
         label="Pending Reminders"
         value={pendingReminders.toString()}
         subtext={pendingReminders === 0 ? 'All clear' : 'Action required'}
-        icon={<Bell className="h-5 w-5" strokeWidth={1.5} />}
+        icon={<Bell className="h-4 w-4" strokeWidth={1.2} />}
       />
     </div>
   )

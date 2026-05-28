@@ -1,21 +1,22 @@
-import { Settings } from 'lucide-react'
+import { Settings as SettingsIcon } from 'lucide-react'
+import { PageHeader } from '@/components/ui/page-header'
 
 export const metadata = { title: 'Settings' }
 
 export default function SettingsPage() {
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="font-serif text-3xl font-semibold text-dynasty-cream">Settings</h1>
-        <p className="mt-1 text-sm text-dynasty-gray-400">
-          Account, billing, and notification preferences
-        </p>
-      </div>
+    <div className="space-y-7">
+      <PageHeader
+        title="Settings"
+        subtitle="Account · Billing · Notifications"
+      />
 
-      <div className="flex flex-col items-center justify-center min-h-[50vh] rounded-xl border border-dashed border-dynasty-gray-700">
-        <Settings className="h-12 w-12 text-dynasty-gray-600 mb-4" strokeWidth={1} />
-        <h2 className="font-serif text-xl text-dynasty-cream mb-2">Settings coming soon</h2>
-        <p className="text-sm text-dynasty-gray-400 text-center max-w-sm">
+      <div className="flex min-h-[50vh] flex-col items-center justify-center rounded-[2px] border border-dashed border-[rgba(201,168,76,0.18)] bg-dynasty-gray-900/40 px-6 py-16 text-center">
+        <SettingsIcon className="h-8 w-8 text-dynasty-gold/15" strokeWidth={1} />
+        <h2 className="mt-5 font-serif text-[22px] font-medium tracking-[0.04em] text-dynasty-gray-300">
+          Settings coming soon
+        </h2>
+        <p className="mt-2 max-w-sm font-sans text-[12px] font-light tracking-[0.06em] text-dynasty-gray-500">
           Profile management, billing, and notification settings will be available here.
         </p>
       </div>

@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { ReportBuilder } from './ReportBuilder'
+import { PageHeader } from '@/components/ui/page-header'
 
 export const metadata = { title: 'Reports' }
 
@@ -25,13 +26,11 @@ export default async function ReportsPage() {
     : { data: [] }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="font-serif text-3xl font-semibold text-dynasty-cream">Reports</h1>
-        <p className="mt-1 text-sm text-dynasty-gray-400">
-          P&amp;L, cash flow, tax summaries, and expense breakdowns
-        </p>
-      </div>
+    <div className="space-y-7">
+      <PageHeader
+        title="Reports"
+        subtitle="Profit &amp; loss · Cash flow · Tax summaries · Expense breakdowns"
+      />
       <ReportBuilder properties={properties ?? []} />
     </div>
   )
