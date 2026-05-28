@@ -16,10 +16,18 @@ export default async function DashboardLayout({
     redirect('/login')
   }
 
+  const { data: landlord } = await supabase
+    .from('landlords')
+    .select('theme_preference')
+    .eq('auth_user_id', user.id)
+    .maybeSingle()
+
   return (
     <div className="flex min-h-screen bg-dynasty-black">
-      <Sidebar />
-      {/* Main content — offset by sidebar width (240px) */}
+      <Sidebar
+        userId={user.id}
+        initialTheme={landlord?.theme_preference ?? 'dark'}
+      />
       <div className="flex flex-1 flex-col pl-60">
         <main className="flex-1 overflow-y-auto px-8 py-10 lg:px-12">
           <div className="mx-auto max-w-[1400px]">{children}</div>

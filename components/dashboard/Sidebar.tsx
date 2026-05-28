@@ -3,6 +3,8 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
+import { useEffect } from 'react'
+import { useTheme } from 'next-themes'
 import {
   LayoutDashboard,
   Building2,
@@ -16,6 +18,7 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
+import { ThemeToggle } from './ThemeToggle'
 
 const NAV_PRIMARY = [
   { href: '/overview',     label: 'Overview',      Icon: LayoutDashboard },
@@ -77,9 +80,21 @@ function NavSectionLabel({ children }: { children: React.ReactNode }) {
   )
 }
 
-export function Sidebar() {
+interface SidebarProps {
+  userId?: string
+  initialTheme?: string
+}
+
+export function Sidebar({ userId, initialTheme }: SidebarProps) {
   const pathname = usePathname()
   const router = useRouter()
+  const { setTheme } = useTheme()
+
+  useEffect(() => {
+    if (initialTheme) {
+      setTheme(initialTheme)
+    }
+  }, [initialTheme, setTheme])
 
   async function handleSignOut() {
     const supabase = createClient()
@@ -109,7 +124,7 @@ export function Sidebar() {
         >
           <div className="relative h-20 w-full flex items-center justify-center">
             <Image
-              src="/images/dynasty-logo.jpg"
+              src="/images/dynasty_logo.jpg"
               alt="DYNASTY"
               fill
               priority
@@ -121,7 +136,6 @@ export function Sidebar() {
               }}
             />
           </div>
-          {/* Tagline */}
           <p
             className={cn(
               'mt-3 uppercase text-center',
@@ -153,6 +167,7 @@ export function Sidebar() {
 
           <NavSectionLabel>Account</NavSectionLabel>
           <div className="flex flex-col">
+            <ThemeToggle userId={userId} />
             {NAV_ACCOUNT.map((item) => (
               <NavItem key={item.href} {...item} isActive={isActive(item.href)} />
             ))}

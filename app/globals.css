@@ -84,6 +84,43 @@
 }
 
 /* ─────────────────────────────────────────────
+   Light / Dark theme CSS variables
+   ───────────────────────────────────────────── */
+.dark {
+  --bg-primary:     #080808;
+  --bg-secondary:   #0F0F0F;
+  --bg-card:        #161616;
+  --bg-sidebar:     #080808;
+
+  --text-primary:   #FAF7F2;
+  --text-secondary: #8A8A82;
+  --text-muted:     #4A4A45;
+
+  --border-default: rgba(201, 168, 76, 0.12);
+  --border-hover:   rgba(201, 168, 76, 0.35);
+
+  --gold:           #C9A84C;
+  --rose:           #B76E79;
+}
+
+.light {
+  --bg-primary:     #FAF7F2;
+  --bg-secondary:   #F0EBE3;
+  --bg-card:        #FFFFFF;
+  --bg-sidebar:     #1C1A17;
+
+  --text-primary:   #1C1A17;
+  --text-secondary: #4A4A45;
+  --text-muted:     #8A8A82;
+
+  --border-default: rgba(201, 168, 76, 0.2);
+  --border-hover:   rgba(201, 168, 76, 0.45);
+
+  --gold:           #9A7A2E;
+  --rose:           #8B4F58;
+}
+
+/* ─────────────────────────────────────────────
    Base
    ───────────────────────────────────────────── */
 html {
@@ -93,12 +130,35 @@ html {
   -moz-osx-font-smoothing: grayscale;
 }
 
+html.light {
+  background-color: #FAF7F2;
+  color: #1C1A17;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-jost), ui-sans-serif, system-ui, sans-serif;
   font-weight: 300;
   letter-spacing: 0.01em;
+}
+
+/* Light mode global background override */
+.light body,
+.light main {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* Light mode scrollbar */
+.light ::-webkit-scrollbar-track {
+  background: #F0EBE3;
+}
+.light ::-webkit-scrollbar-thumb {
+  background: rgba(154, 122, 46, 0.25);
+}
+.light ::-webkit-scrollbar-thumb:hover {
+  background: rgba(154, 122, 46, 0.45);
 }
 
 /* ─────────────────────────────────────────────

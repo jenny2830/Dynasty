@@ -22,6 +22,11 @@ export type Database = {
           stripe_customer_id: string | null
           stripe_subscription_id: string | null
           created_at: string
+          theme_preference: 'dark' | 'light'
+          last_selected_property_id: string | null
+          default_date_range: 'week' | 'month' | 'quarter' | 'year'
+          notification_prefs: Json
+          onboarding_completed: boolean
         }
         Insert: {
           id?: string
@@ -35,6 +40,11 @@ export type Database = {
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           created_at?: string
+          theme_preference?: 'dark' | 'light'
+          last_selected_property_id?: string | null
+          default_date_range?: 'week' | 'month' | 'quarter' | 'year'
+          notification_prefs?: Json
+          onboarding_completed?: boolean
         }
         Update: {
           id?: string
@@ -48,6 +58,11 @@ export type Database = {
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           created_at?: string
+          theme_preference?: 'dark' | 'light'
+          last_selected_property_id?: string | null
+          default_date_range?: 'week' | 'month' | 'quarter' | 'year'
+          notification_prefs?: Json
+          onboarding_completed?: boolean
         }
         Relationships: []
       }

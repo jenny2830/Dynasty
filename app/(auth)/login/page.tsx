@@ -51,7 +51,7 @@ export default async function LoginPage({
         <div className="mb-6 flex flex-col items-center">
           <div className="relative h-[72px] w-[180px]">
             <Image
-              src="/images/dynasty-logo.jpg"
+              src="/images/dynasty_logo.jpg"
               alt="DYNASTY"
               fill
               priority
