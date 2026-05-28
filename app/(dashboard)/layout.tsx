@@ -23,14 +23,12 @@ export default async function DashboardLayout({
     .maybeSingle()
 
   return (
-    <div className="flex min-h-screen bg-dynasty-black">
+    <div className="flex min-h-screen w-full bg-dynasty-black">
       <Sidebar
         userId={user.id}
         initialTheme={landlord?.theme_preference ?? 'dark'}
       />
-      <main className="ml-60 flex-1 min-h-screen p-8">
-        <div className="mx-auto max-w-[1400px]">{children}</div>
-      </main>
+      <main className="min-w-0 flex-1 px-10 py-8">{children}</main>
     </div>
   )
 }

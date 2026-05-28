@@ -108,7 +108,7 @@ export function Sidebar({ userId, initialTheme }: SidebarProps) {
   return (
     <aside
       className={cn(
-        'fixed inset-y-0 left-0 z-50 flex w-60 flex-col',
+        'sticky top-0 z-50 flex h-screen w-60 shrink-0 flex-col',
         'bg-dynasty-black border-r border-[rgba(201,168,76,0.12)]',
         'deco-hatching'
       )}

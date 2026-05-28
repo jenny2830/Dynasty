@@ -144,6 +144,8 @@ html.light {
 }
 
 body {
+  margin: 0;
+  padding: 0;
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-jost), ui-sans-serif, system-ui, sans-serif;
