@@ -66,8 +66,12 @@ export function SectionHeader({
           fontSize: '18px',
           fontWeight: 500,
           letterSpacing: '0.02em',
-          color: '#FAF7F2',
           margin: 0,
+          background: 'linear-gradient(135deg, #F0D060 0%, #E8C97A 20%, #C9A84C 55%, #B8922A 80%, #9A7A2E 100%)',
+          WebkitBackgroundClip: 'text',
+          backgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          color: 'transparent',
         }}>
           {title}
         </h2>

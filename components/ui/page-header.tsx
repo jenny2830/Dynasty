@@ -23,7 +23,6 @@ export function PageHeader({ title, subtitle, children, className }: PageHeaderP
             fontFamily: "'Cormorant Garamond', serif",
             fontWeight: 600,
             fontSize: '30px',
-            color: '#FAF7F2',
             letterSpacing: '0.04em',
             display: 'flex',
             alignItems: 'center',
@@ -32,7 +31,16 @@ export function PageHeader({ title, subtitle, children, className }: PageHeaderP
             margin: 0,
           }}>
             <span style={{ color: '#C9A84C', fontSize: '8px', opacity: 0.7 }}>◆</span>
-            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{title}</span>
+            <span style={{
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              background: 'linear-gradient(135deg, #F0D060 0%, #E8C97A 20%, #C9A84C 55%, #B8922A 80%, #9A7A2E 100%)',
+              WebkitBackgroundClip: 'text',
+              backgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              color: 'transparent',
+            }}>{title}</span>
           </h1>
 
           {subtitle && (

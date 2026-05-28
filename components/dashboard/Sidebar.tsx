@@ -2,8 +2,6 @@
 
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { useEffect } from 'react'
-import { useTheme } from 'next-themes'
 import {
   LayoutDashboard,
   Building2,
@@ -16,7 +14,6 @@ import {
   LogOut,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
-import { ThemeToggle } from './ThemeToggle'
 
 const NAV_PRIMARY = [
   { href: '/overview',     label: 'Overview',      Icon: LayoutDashboard },
@@ -60,6 +57,7 @@ function NavItem({ href, label, Icon, isActive }: NavItemProps) {
         borderLeft: '2px solid #C9A84C',
         background: 'rgba(201,168,76,0.07)',
         textDecoration: 'none',
+        transition: 'color 0.2s ease',
       } : {
         color: '#9A8F7A',
         fontFamily: "'Jost', sans-serif",
@@ -73,6 +71,12 @@ function NavItem({ href, label, Icon, isActive }: NavItemProps) {
         transition: 'color 0.2s ease',
         cursor: 'pointer',
         textDecoration: 'none',
+      }}
+      onMouseEnter={e => {
+        if (!isActive) (e.currentTarget as HTMLElement).style.color = '#B76E79'
+      }}
+      onMouseLeave={e => {
+        if (!isActive) (e.currentTarget as HTMLElement).style.color = '#9A8F7A'
       }}
     >
       <Icon
@@ -105,16 +109,9 @@ interface SidebarProps {
   initialTheme?: string
 }
 
-export function Sidebar({ userId, initialTheme }: SidebarProps) {
+export function Sidebar({ userId }: SidebarProps) {
   const pathname = usePathname()
   const router = useRouter()
-  const { setTheme } = useTheme()
-
-  useEffect(() => {
-    if (initialTheme) {
-      setTheme(initialTheme)
-    }
-  }, [initialTheme, setTheme])
 
   async function handleSignOut() {
     const supabase = createClient()
@@ -143,18 +140,18 @@ export function Sidebar({ userId, initialTheme }: SidebarProps) {
       <div style={{ position: 'relative', display: 'flex', flex: 1, flexDirection: 'column' }}>
         {/* Logo area */}
         <div style={{
-          padding: '24px 20px 20px',
+          padding: '16px 20px 12px',
           borderBottom: '1px solid rgba(201,168,76,0.15)',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '4px 0' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/images/dynasty_logo.jpg"
               alt="Dynasty"
-              style={{ height: '140px', width: '100%', objectFit: 'contain', display: 'block', margin: '0 auto', padding: '12px 16px' }}
+              style={{ height: '190px', width: '100%', objectFit: 'contain', display: 'block', margin: '0 auto', padding: '8px 12px' }}
             />
           </div>
           <p style={{
@@ -164,8 +161,7 @@ export function Sidebar({ userId, initialTheme }: SidebarProps) {
             letterSpacing: '0.25em',
             textTransform: 'uppercase',
             textAlign: 'center',
-            marginBottom: '0',
-            marginTop: '12px',
+            margin: '8px 0 0 0',
           }}>
             Property Wealth Platform
           </p>
@@ -191,7 +187,6 @@ export function Sidebar({ userId, initialTheme }: SidebarProps) {
 
           <NavSectionLabel>Account</NavSectionLabel>
           <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <ThemeToggle />
             {NAV_ACCOUNT.map((item) => (
               <NavItem key={item.href} {...item} isActive={isActive(item.href)} />
             ))}
@@ -212,7 +207,10 @@ export function Sidebar({ userId, initialTheme }: SidebarProps) {
                 textTransform: 'uppercase',
                 textAlign: 'left',
                 width: '100%',
+                transition: 'color 0.2s ease',
               }}
+              onMouseEnter={e => (e.currentTarget.style.color = '#B76E79')}
+              onMouseLeave={e => (e.currentTarget.style.color = '#9A8F7A')}
             >
               <LogOut style={{ width: '15px', height: '15px', flexShrink: 0 }} strokeWidth={1.2} />
               <span>Sign Out</span>
