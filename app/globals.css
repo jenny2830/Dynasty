@@ -825,3 +825,32 @@ input:-webkit-autofill:focus {
   }
   .no-print { display: none !important; }
 }
+
+/* ─────────────────────────────────────────────
+   Light mode — triggered by data-theme attribute
+   ───────────────────────────────────────────── */
+[data-theme="light"] body,
+[data-theme="light"] main,
+[data-theme="light"] .flex-1 {
+  background-color: #FAF7F2 !important;
+  color: #1C1A17 !important;
+}
+[data-theme="light"] h1,
+[data-theme="light"] h2,
+[data-theme="light"] h3,
+[data-theme="light"] h4 {
+  color: #1C1A17 !important;
+}
+[data-theme="light"] p,
+[data-theme="light"] span,
+[data-theme="light"] td,
+[data-theme="light"] label {
+  color: #4A4A45 !important;
+}
+[data-theme="light"] input,
+[data-theme="light"] select,
+[data-theme="light"] textarea {
+  background: #FFFFFF !important;
+  color: #1C1A17 !important;
+  border-color: rgba(154,122,46,0.25) !important;
+}

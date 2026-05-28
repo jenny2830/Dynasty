@@ -5,23 +5,29 @@ interface SectionProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: 'default' | 'warm'
 }
 
-/**
- * Section panel — base luxury container for content groupings.
- *
- * - Sharp 2px border-radius
- * - Subtle gold border at 8% opacity
- * - Layered card shadow with inner gold rim
- * - Optional `warm` variant uses the warmer marble gradient backdrop
- */
 export const Section = React.forwardRef<HTMLDivElement, SectionProps>(
-  ({ className, variant = 'default', ...props }, ref) => {
+  ({ className, variant = 'default', children, ...props }, ref) => {
     void variant
     return (
       <div
         ref={ref}
-        className={cn('lux-card deco-corners', className)}
+        className={cn(className)}
+        style={{
+          background: '#111111',
+          border: '1px solid rgba(201,168,76,0.1)',
+          borderRadius: '2px',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.35)',
+          position: 'relative',
+          overflow: 'hidden',
+        }}
         {...props}
-      />
+      >
+        {/* Top-left corner mark */}
+        <div style={{ position: 'absolute', top: '6px', left: '6px', width: '14px', height: '14px', borderTop: '1px solid rgba(201,168,76,0.5)', borderLeft: '1px solid rgba(201,168,76,0.5)', pointerEvents: 'none', zIndex: 1 }} />
+        {/* Bottom-right corner mark */}
+        <div style={{ position: 'absolute', bottom: '6px', right: '6px', width: '14px', height: '14px', borderBottom: '1px solid rgba(201,168,76,0.5)', borderRight: '1px solid rgba(201,168,76,0.5)', pointerEvents: 'none', zIndex: 1 }} />
+        {children}
+      </div>
     )
   }
 )
@@ -33,9 +39,6 @@ interface SectionHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
   action?: React.ReactNode
 }
 
-/**
- * Section header — used inside a Section to title a group.
- */
 export function SectionHeader({
   title,
   description,
@@ -45,23 +48,45 @@ export function SectionHeader({
 }: SectionHeaderProps) {
   return (
     <div
-      className={cn(
-        'flex flex-wrap items-center justify-between gap-3 px-7 py-4 border-b border-[rgba(201,168,76,0.08)]',
-        className
-      )}
+      className={cn(className)}
+      style={{
+        display: 'flex',
+        flexWrap: 'wrap',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: '12px',
+        padding: '16px 28px',
+        borderBottom: '1px solid rgba(201,168,76,0.08)',
+      }}
       {...props}
     >
-      <div className="min-w-0">
-        <h2 className="font-serif text-[18px] font-medium tracking-[0.02em] text-dynasty-warm-white">
+      <div style={{ minWidth: 0 }}>
+        <h2 style={{
+          fontFamily: "'Cormorant Garamond', serif",
+          fontSize: '18px',
+          fontWeight: 500,
+          letterSpacing: '0.02em',
+          color: '#FAF7F2',
+          margin: 0,
+        }}>
           {title}
         </h2>
         {description && (
-          <p className="mt-0.5 font-sans text-[11px] font-light uppercase tracking-[0.12em] text-dynasty-gray-500">
+          <p style={{
+            marginTop: '2px',
+            fontFamily: "'Jost', sans-serif",
+            fontWeight: 300,
+            fontSize: '11px',
+            textTransform: 'uppercase',
+            letterSpacing: '0.12em',
+            color: '#4A4A45',
+            margin: '2px 0 0 0',
+          }}>
             {description}
           </p>
         )}
       </div>
-      {action && <div className="shrink-0">{action}</div>}
+      {action && <div style={{ flexShrink: 0 }}>{action}</div>}
     </div>
   )
 }

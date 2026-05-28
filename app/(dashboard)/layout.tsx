@@ -23,13 +23,20 @@ export default async function DashboardLayout({
     .maybeSingle()
 
   return (
-    <div className="flex min-h-screen w-full bg-dynasty-black">
+    <div style={{ display: 'flex', minHeight: '100vh', width: '100%', backgroundColor: '#080808' }}>
       <Sidebar
         userId={user.id}
         initialTheme={landlord?.theme_preference ?? 'dark'}
       />
-      <main className="deco-lattice min-w-0 flex-1 px-10 py-8">
-        <div className="relative z-[1]">{children}</div>
+      <main style={{
+        flex: 1,
+        minWidth: 0,
+        padding: '32px 40px',
+        backgroundColor: '#0A0A0A',
+        backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 60px, rgba(201,168,76,0.008) 60px, rgba(201,168,76,0.008) 61px), repeating-linear-gradient(-45deg, transparent, transparent 60px, rgba(201,168,76,0.008) 60px, rgba(201,168,76,0.008) 61px)',
+        position: 'relative',
+      }}>
+        <div style={{ position: 'relative', zIndex: 1 }}>{children}</div>
       </main>
     </div>
   )

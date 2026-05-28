@@ -54,7 +54,7 @@ export default function RootLayout({
     >
       <body className="bg-dynasty-black text-dynasty-warm-white antialiased">
         <ThemeProvider
-          attribute="class"
+          attribute="data-theme"
           defaultTheme="dark"
           enableSystem={false}
           storageKey="dynasty-theme"

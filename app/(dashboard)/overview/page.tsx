@@ -232,11 +232,15 @@ export default async function OverviewPage() {
                     </p>
                   </div>
                   <span
-                    className={`ml-3 shrink-0 font-mono text-[13px] font-medium tracking-tight ${
-                      tx.type === 'income'
-                        ? 'text-dynasty-gold'
-                        : 'text-dynasty-rose-gold'
-                    }`}
+                    style={{
+                      marginLeft: '12px',
+                      flexShrink: 0,
+                      fontFamily: "'JetBrains Mono', monospace",
+                      fontSize: '13px',
+                      fontWeight: 500,
+                      letterSpacing: '-0.025em',
+                      color: tx.type === 'income' ? '#C9A84C' : '#B76E79',
+                    }}
                   >
                     {tx.type === 'income' ? '+' : '−'}$
                     {tx.amount.toLocaleString('en-CA', { minimumFractionDigits: 0 })}
@@ -341,7 +345,15 @@ export default async function OverviewPage() {
                       </p>
                     </div>
                     {payment?.amount && (
-                      <span className="ml-3 shrink-0 font-mono text-[13px] font-medium tracking-tight text-dynasty-gold">
+                      <span style={{
+                        marginLeft: '12px',
+                        flexShrink: 0,
+                        fontFamily: "'JetBrains Mono', monospace",
+                        fontSize: '13px',
+                        fontWeight: 500,
+                        letterSpacing: '-0.025em',
+                        color: '#C9A84C',
+                      }}>
                         ${payment.amount.toLocaleString('en-CA', { minimumFractionDigits: 0 })}
                       </span>
                     )}
