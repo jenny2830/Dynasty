@@ -1,8 +1,29 @@
-import { BarChart3 } from 'lucide-react'
+import { createClient } from '@/lib/supabase/server'
+import { ReportBuilder } from './ReportBuilder'
 
 export const metadata = { title: 'Reports' }
 
-export default function ReportsPage() {
+export default async function ReportsPage() {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return null
+
+  const { data: landlord } = await supabase
+    .from('landlords')
+    .select('id')
+    .eq('auth_user_id', user.id)
+    .single()
+
+  const { data: properties } = landlord
+    ? await supabase
+        .from('properties')
+        .select('id, name')
+        .eq('landlord_id', landlord.id)
+        .order('name')
+    : { data: [] }
+
   return (
     <div className="space-y-6">
       <div>
@@ -11,14 +32,7 @@ export default function ReportsPage() {
           P&amp;L, cash flow, tax summaries, and expense breakdowns
         </p>
       </div>
-
-      <div className="flex flex-col items-center justify-center min-h-[50vh] rounded-xl border border-dashed border-dynasty-gray-700">
-        <BarChart3 className="h-12 w-12 text-dynasty-gray-600 mb-4" strokeWidth={1} />
-        <h2 className="font-serif text-xl text-dynasty-cream mb-2">No reports yet</h2>
-        <p className="text-sm text-dynasty-gray-400 text-center max-w-sm">
-          Add transactions first to generate profit &amp; loss, tax summaries, and cash flow reports.
-        </p>
-      </div>
+      <ReportBuilder properties={properties ?? []} />
     </div>
   )
 }

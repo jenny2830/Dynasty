@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import {
   LayoutDashboard,
   Building2,
@@ -16,16 +16,15 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
-import { useRouter } from 'next/navigation'
 
 const NAV_ITEMS = [
-  { href: '/',             label: 'Overview',     Icon: LayoutDashboard },
-  { href: '/properties',  label: 'Properties',   Icon: Building2 },
-  { href: '/transactions',label: 'Transactions', Icon: ArrowLeftRight },
-  { href: '/recurring',   label: 'Recurring',    Icon: RefreshCw },
-  { href: '/receipts',    label: 'Receipts',     Icon: ScanLine },
-  { href: '/reports',     label: 'Reports',      Icon: BarChart3 },
-  { href: '/roi',         label: 'ROI',          Icon: TrendingUp },
+  { href: '/overview',     label: 'Overview',      Icon: LayoutDashboard },
+  { href: '/properties',   label: 'Properties',    Icon: Building2 },
+  { href: '/transactions', label: 'Transactions',  Icon: ArrowLeftRight },
+  { href: '/recurring',    label: 'Recurring',     Icon: RefreshCw },
+  { href: '/receipts',     label: 'Receipts',      Icon: ScanLine },
+  { href: '/reports',      label: 'Reports',       Icon: BarChart3 },
+  { href: '/roi',          label: 'ROI',           Icon: TrendingUp },
 ] as const
 
 const BOTTOM_ITEMS = [
@@ -54,9 +53,9 @@ export function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex flex-1 flex-col gap-1 overflow-y-auto px-3 py-4">
+      <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto px-3 py-4">
         {NAV_ITEMS.map(({ href, label, Icon }) => {
-          const isActive = href === '/' ? pathname === '/' : pathname.startsWith(href)
+          const isActive = pathname === href || pathname.startsWith(href + '/')
           return (
             <Link
               key={href}
@@ -65,14 +64,11 @@ export function Sidebar() {
                 'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150',
                 isActive
                   ? 'bg-dynasty-gold/10 text-dynasty-gold border border-dynasty-gold/20'
-                  : 'text-dynasty-gray-400 hover:bg-dynasty-gray-800 hover:text-dynasty-cream'
+                  : 'text-dynasty-gray-400 hover:bg-dynasty-gray-800 hover:text-dynasty-cream border border-transparent'
               )}
             >
               <Icon
-                className={cn(
-                  'h-4 w-4 shrink-0',
-                  isActive ? 'text-dynasty-gold' : 'text-dynasty-gray-400'
-                )}
+                className={cn('h-4 w-4 shrink-0', isActive ? 'text-dynasty-gold' : 'text-dynasty-gray-400')}
                 strokeWidth={1.5}
               />
               {label}
@@ -84,8 +80,8 @@ export function Sidebar() {
         })}
       </nav>
 
-      {/* Bottom items */}
-      <div className="border-t border-dynasty-gray-800 px-3 py-3 space-y-1">
+      {/* Bottom */}
+      <div className="border-t border-dynasty-gray-800 px-3 py-3 space-y-0.5">
         {BOTTOM_ITEMS.map(({ href, label, Icon }) => {
           const isActive = pathname.startsWith(href)
           return (
@@ -96,7 +92,7 @@ export function Sidebar() {
                 'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150',
                 isActive
                   ? 'bg-dynasty-gold/10 text-dynasty-gold border border-dynasty-gold/20'
-                  : 'text-dynasty-gray-400 hover:bg-dynasty-gray-800 hover:text-dynasty-cream'
+                  : 'text-dynasty-gray-400 hover:bg-dynasty-gray-800 hover:text-dynasty-cream border border-transparent'
               )}
             >
               <Icon className="h-4 w-4 shrink-0" strokeWidth={1.5} />
@@ -106,7 +102,7 @@ export function Sidebar() {
         })}
         <button
           onClick={handleSignOut}
-          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-dynasty-gray-400 transition-all duration-150 hover:bg-dynasty-gray-800 hover:text-red-400"
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-dynasty-gray-400 transition-all duration-150 hover:bg-dynasty-gray-800 hover:text-red-400 border border-transparent"
         >
           <LogOut className="h-4 w-4 shrink-0" strokeWidth={1.5} />
           Sign out
