@@ -28,11 +28,9 @@ export default async function DashboardLayout({
         userId={user.id}
         initialTheme={landlord?.theme_preference ?? 'dark'}
       />
-      <div className="flex flex-1 flex-col ml-60">
-        <main className="flex-1 overflow-y-auto px-8 py-10">
-          <div className="mx-auto max-w-[1400px]">{children}</div>
-        </main>
-      </div>
+      <main className="ml-60 flex-1 min-h-screen p-8">
+        <div className="mx-auto max-w-[1400px]">{children}</div>
+      </main>
     </div>
   )
 }

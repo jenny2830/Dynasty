@@ -1,6 +1,5 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import Image from 'next/image'
 import { createClient } from '@/lib/supabase/server'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -49,13 +48,11 @@ export default async function LoginPage({
       <div className="w-full max-w-[420px]">
         {/* Logo + tagline outside card */}
         <div className="mb-6 flex flex-col items-center">
-          <Image
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             src="/images/dynasty_logo.jpg"
-            alt="DYNASTY"
-            width={180}
-            height={72}
-            priority
-            style={{ objectFit: 'contain', display: 'block', borderRadius: 0 }}
+            alt="Dynasty"
+            style={{ height: '72px', objectFit: 'contain', display: 'block', margin: '0 auto' }}
           />
           <p className="mt-3 text-center font-sans text-[8px] font-light uppercase tracking-[0.35em] text-[rgba(201,168,76,0.4)]">
             <span className="inline-block mr-2">◆</span>

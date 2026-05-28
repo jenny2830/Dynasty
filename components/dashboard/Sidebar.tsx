@@ -1,6 +1,5 @@
 'use client'
 
-import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect } from 'react'
@@ -123,13 +122,11 @@ export function Sidebar({ userId, initialTheme }: SidebarProps) {
           )}
         >
           <div className="flex items-center justify-center py-1">
-            <Image
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
               src="/images/dynasty_logo.jpg"
-              alt="DYNASTY"
-              width={200}
-              height={72}
-              priority
-              style={{ objectFit: 'contain', display: 'block', margin: '0 auto', borderRadius: 0 }}
+              alt="Dynasty"
+              style={{ height: '72px', objectFit: 'contain', display: 'block', margin: '0 auto' }}
             />
           </div>
           <p
