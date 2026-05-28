@@ -204,10 +204,16 @@ export default async function OverviewPage() {
           <div className="divide-y divide-[rgba(255,255,255,0.025)]">
             {recentTx.length === 0 ? (
               <div className="flex flex-col items-center justify-center px-6 py-10 text-center">
-                <p className="font-sans text-[12px] font-light text-dynasty-gray-500">
+                <p className="mb-3 font-sans text-[10px] tracking-[0.4em] text-[rgba(201,168,76,0.3)]">
+                  ◆ ◇ ◆
+                </p>
+                <p className="font-serif text-[18px] font-medium text-dynasty-gray-400">
                   No transactions yet
                 </p>
-                <Button asChild variant="ghost" size="sm" className="mt-3">
+                <p className="mt-1 font-sans text-[12px] font-light tracking-[0.06em] text-dynasty-gray-600">
+                  Your ledger awaits its first entry
+                </p>
+                <Button asChild variant="outline" size="sm" className="mt-4">
                   <Link href="/transactions/new">Add First</Link>
                 </Button>
               </div>
@@ -259,14 +265,20 @@ export default async function OverviewPage() {
           <div className="divide-y divide-[rgba(255,255,255,0.025)]">
             {properties.length === 0 ? (
               <div className="flex flex-col items-center justify-center px-6 py-10 text-center">
+                <p className="mb-3 font-sans text-[10px] tracking-[0.4em] text-[rgba(201,168,76,0.3)]">
+                  ◆ ◇ ◆
+                </p>
                 <Building2
-                  className="h-7 w-7 text-dynasty-gold/15"
+                  className="h-9 w-9 text-[rgba(201,168,76,0.2)]"
                   strokeWidth={1}
                 />
-                <p className="mt-3 font-sans text-[12px] font-light text-dynasty-gray-500">
+                <p className="mt-3 font-serif text-[18px] font-medium text-dynasty-gray-400">
                   No properties yet
                 </p>
-                <Button asChild variant="ghost" size="sm" className="mt-3">
+                <p className="mt-1 font-sans text-[12px] font-light tracking-[0.06em] text-dynasty-gray-600">
+                  Begin building your portfolio
+                </p>
+                <Button asChild variant="outline" size="sm" className="mt-4">
                   <Link href="/properties/new">Add Property</Link>
                 </Button>
               </div>

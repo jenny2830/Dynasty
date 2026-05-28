@@ -55,6 +55,25 @@
   --background: #080808;
   --foreground: #FAF7F2;
 
+  /* Gold scale */
+  --gold:          #C9A84C;
+  --gold-light:    #E8C97A;
+  --gold-bright:   #F0D060;
+  --gold-dark:     #9A7A2E;
+  --gold-muted:    #8B7340;
+
+  /* Rose gold scale — the signature luxury accent */
+  --rose-gold:     #B76E79;
+  --rose-light:    #D4959E;
+  --rose-mid:      #C08591;
+  --rose-dark:     #8B4F58;
+
+  /* Black scale */
+  --black:         #080808;
+  --black-soft:    #0F0F0F;
+  --black-card:    #141414;
+  --black-warm:    #1A1815;
+
   /* Art Deco ornaments (CSS only) */
   --ornament-line:       linear-gradient(90deg, transparent, #C9A84C, transparent);
   --ornament-corner:     linear-gradient(135deg, #C9A84C 0%, transparent 60%);
@@ -361,34 +380,255 @@ button, label, p, span, a, input, textarea, select {
   color: #4A4A45;
 }
 
+/* ============================================
+   ART DECO TEXTURE LAYERS (CSS only)
+   ============================================ */
+
+/* Subtle diamond lattice — applied to main background */
+.deco-lattice {
+  position: relative;
+}
+.deco-lattice::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.4;
+  background-image:
+    repeating-linear-gradient(45deg,
+      transparent, transparent 60px,
+      rgba(201,168,76,0.012) 60px, rgba(201,168,76,0.012) 61px),
+    repeating-linear-gradient(-45deg,
+      transparent, transparent 60px,
+      rgba(201,168,76,0.012) 60px, rgba(201,168,76,0.012) 61px);
+}
+
+/* Art Deco fan/sunburst — radiating lines for hero areas */
+.deco-sunburst {
+  position: relative;
+}
+.deco-sunburst::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 300px;
+  height: 300px;
+  transform: translate(-50%, -60%);
+  pointer-events: none;
+  opacity: 0.04;
+  background: repeating-conic-gradient(
+    from 0deg at 50% 50%,
+    var(--gold) 0deg, var(--gold) 0.5deg,
+    transparent 0.5deg, transparent 6deg
+  );
+  border-radius: 50%;
+  mask-image: radial-gradient(circle, black 0%, transparent 70%);
+  -webkit-mask-image: radial-gradient(circle, black 0%, transparent 70%);
+}
+
+/* ============================================
+   ART DECO ORNAMENTAL CORNERS (CSS only)
+   ============================================ */
+
+/* Two-corner brackets (top-left + bottom-right) */
+.deco-corners {
+  position: relative;
+}
+.deco-corners::before,
+.deco-corners::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  pointer-events: none;
+  z-index: 1;
+}
+.deco-corners::before {
+  top: 6px;
+  left: 6px;
+  border-top: 1px solid rgba(201,168,76,0.5);
+  border-left: 1px solid rgba(201,168,76,0.5);
+}
+.deco-corners::after {
+  bottom: 6px;
+  right: 6px;
+  border-bottom: 1px solid rgba(201,168,76,0.5);
+  border-right: 1px solid rgba(201,168,76,0.5);
+}
+
+/* Four-corner brackets for premium cards (pure CSS gradient brackets) */
+.deco-corners-4 {
+  position: relative;
+}
+.deco-corners-4::before {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.45;
+  background:
+    linear-gradient(#C9A84C, #C9A84C) left top / 14px 1px no-repeat,
+    linear-gradient(#C9A84C, #C9A84C) left top / 1px 14px no-repeat,
+    linear-gradient(#C9A84C, #C9A84C) right top / 14px 1px no-repeat,
+    linear-gradient(#C9A84C, #C9A84C) right top / 1px 14px no-repeat,
+    linear-gradient(#C9A84C, #C9A84C) left bottom / 14px 1px no-repeat,
+    linear-gradient(#C9A84C, #C9A84C) left bottom / 1px 14px no-repeat,
+    linear-gradient(#C9A84C, #C9A84C) right bottom / 14px 1px no-repeat,
+    linear-gradient(#C9A84C, #C9A84C) right bottom / 1px 14px no-repeat;
+}
+
+/* ============================================
+   ART DECO DIVIDERS & ORNAMENTS
+   ============================================ */
+
+/* Ornamental divider line with center diamond */
+.deco-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 16px 0;
+}
+.deco-divider::before,
+.deco-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(201,168,76,0.3), transparent);
+}
+.deco-divider-mark {
+  color: var(--gold);
+  font-size: 9px;
+}
+
+/* Gold accent line at top of cards */
+.deco-top-line {
+  position: relative;
+}
+.deco-top-line::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 15%;
+  right: 15%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+/* Rose gold accent line variant */
+.deco-top-line-rose::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 15%;
+  right: 15%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--rose-gold), transparent);
+}
+
+/* ============================================
+   PREMIUM CARD SYSTEM
+   ============================================ */
+
+.lux-card {
+  position: relative;
+  background:
+    radial-gradient(ellipse 100% 70% at 50% 0%, rgba(201,168,76,0.03) 0%, transparent 60%),
+    linear-gradient(160deg, #141414 0%, #1A1815 100%);
+  border: 1px solid rgba(201,168,76,0.12);
+  border-radius: 2px;
+  box-shadow:
+    0 4px 24px rgba(0,0,0,0.4),
+    inset 0 1px 0 rgba(201,168,76,0.06);
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.lux-card:hover {
+  border-color: rgba(201,168,76,0.28);
+  box-shadow:
+    0 8px 36px rgba(0,0,0,0.55),
+    inset 0 1px 0 rgba(201,168,76,0.1),
+    0 0 0 1px rgba(201,168,76,0.08);
+}
+
+/* Premium card with rose gold accent */
+.lux-card-rose {
+  border-color: rgba(183,110,121,0.15);
+}
+.lux-card-rose:hover {
+  border-color: rgba(183,110,121,0.3);
+  box-shadow:
+    0 8px 36px rgba(0,0,0,0.55),
+    0 0 0 1px rgba(183,110,121,0.1);
+}
+
+/* ============================================
+   FINANCIAL VALUE COLORS
+   ============================================ */
+
+.val-income,
+.val-positive {
+  color: var(--gold);
+  font-family: var(--font-jetbrains), ui-monospace, monospace;
+}
+.val-expense,
+.val-negative {
+  color: var(--rose-gold);
+  font-family: var(--font-jetbrains), ui-monospace, monospace;
+}
+
+/* ============================================
+   GOLD / ROSE GRADIENT TEXT (for big numbers)
+   ============================================ */
+
+.text-gold-gradient {
+  background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold) 50%, var(--gold-dark) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+.text-rose-gradient {
+  background: linear-gradient(135deg, var(--rose-light) 0%, var(--rose-gold) 50%, var(--rose-dark) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* ============================================
+   BADGES
+   ============================================ */
+
+.badge-income {
+  background: rgba(201,168,76,0.08);
+  color: var(--gold);
+  border: 1px solid rgba(201,168,76,0.2);
+  font-family: var(--font-jost), sans-serif;
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 1px;
+}
+.badge-expense {
+  background: rgba(183,110,121,0.08);
+  color: var(--rose-gold);
+  border: 1px solid rgba(183,110,121,0.2);
+  font-family: var(--font-jost), sans-serif;
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 1px;
+}
+
 /* ─────────────────────────────────────────────
-   Stat card — Art Deco corner marks
-   Applied via .stat-card class on the card div.
+   Stat card — marker class (corners via .deco-corners-4)
    ───────────────────────────────────────────── */
 .stat-card {
   position: relative;
-}
-.stat-card::before {
-  content: '';
-  position: absolute;
-  top: -1px;
-  left: -1px;
-  width: 14px;
-  height: 14px;
-  border-top: 1px solid rgba(201, 168, 76, 0.5);
-  border-left: 1px solid rgba(201, 168, 76, 0.5);
-  pointer-events: none;
-}
-.stat-card::after {
-  content: '';
-  position: absolute;
-  bottom: -1px;
-  right: -1px;
-  width: 14px;
-  height: 14px;
-  border-bottom: 1px solid rgba(201, 168, 76, 0.5);
-  border-right: 1px solid rgba(201, 168, 76, 0.5);
-  pointer-events: none;
 }
 
 /* ─────────────────────────────────────────────
@@ -417,25 +657,25 @@ button, label, p, span, a, input, textarea, select {
    Scrollbar — thin, gold accent
    ───────────────────────────────────────────── */
 ::-webkit-scrollbar {
-  width: 3px;
-  height: 3px;
+  width: 4px;
+  height: 4px;
 }
 ::-webkit-scrollbar-track {
   background: #080808;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(201, 168, 76, 0.15);
+  background: linear-gradient(180deg, rgba(201, 168, 76, 0.3), rgba(183, 110, 121, 0.2));
   border-radius: 0;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(201, 168, 76, 0.35);
+  background: linear-gradient(180deg, rgba(201, 168, 76, 0.5), rgba(183, 110, 121, 0.35));
 }
 
 /* ─────────────────────────────────────────────
    Selection
    ───────────────────────────────────────────── */
 ::selection {
-  background: rgba(201, 168, 76, 0.25);
+  background: rgba(201, 168, 76, 0.2);
   color: #FAF7F2;
 }
 

@@ -60,7 +60,7 @@ export default async function SignupPage({
 
       <div className="w-full max-w-[420px]">
         {/* Logo + tagline outside card */}
-        <div className="mb-6 flex flex-col items-center">
+        <div className="deco-sunburst mb-6 flex flex-col items-center">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/images/dynasty_logo.jpg"
@@ -74,9 +74,9 @@ export default async function SignupPage({
           </p>
         </div>
 
-        {/* Auth card — deco corner frame */}
+        {/* Auth card — lux-card with four-corner Art Deco frame */}
         <div
-          className="deco-frame relative mx-auto rounded-[2px] border border-[rgba(201,168,76,0.18)] bg-[rgba(17,17,17,0.96)] px-11 py-12 backdrop-blur-[20px]"
+          className="lux-card deco-corners-4 relative mx-auto px-11 py-12"
           style={{ boxShadow: 'var(--shadow-modal)' }}
         >
           {success ? (
@@ -105,7 +105,11 @@ export default async function SignupPage({
                 <p className="mt-1.5 font-sans text-[11px] font-light uppercase tracking-[0.18em] text-dynasty-gray-500">
                   Create your landlord account
                 </p>
-                <div className="mx-auto mt-4 h-px w-10 bg-dynasty-gold/50" />
+              </div>
+
+              {/* Ornamental divider */}
+              <div className="deco-divider">
+                <span className="deco-divider-mark">◆</span>
               </div>
 
               {error && (

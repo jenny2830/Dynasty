@@ -14,20 +14,16 @@ interface SectionProps extends React.HTMLAttributes<HTMLDivElement> {
  * - Optional `warm` variant uses the warmer marble gradient backdrop
  */
 export const Section = React.forwardRef<HTMLDivElement, SectionProps>(
-  ({ className, variant = 'default', ...props }, ref) => (
-    <div
-      ref={ref}
-      className={cn(
-        'rounded-[2px] border border-[rgba(201,168,76,0.08)]',
-        variant === 'warm'
-          ? 'bg-[linear-gradient(135deg,#161616_0%,#1C1A17_100%)]'
-          : 'bg-dynasty-gray-900',
-        'shadow-[var(--shadow-card)]',
-        className
-      )}
-      {...props}
-    />
-  )
+  ({ className, variant = 'default', ...props }, ref) => {
+    void variant
+    return (
+      <div
+        ref={ref}
+        className={cn('lux-card deco-corners', className)}
+        {...props}
+      />
+    )
+  }
 )
 Section.displayName = 'Section'
 

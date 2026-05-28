@@ -28,7 +28,9 @@ export default async function DashboardLayout({
         userId={user.id}
         initialTheme={landlord?.theme_preference ?? 'dark'}
       />
-      <main className="min-w-0 flex-1 px-10 py-8">{children}</main>
+      <main className="deco-lattice min-w-0 flex-1 px-10 py-8">
+        <div className="relative z-[1]">{children}</div>
+      </main>
     </div>
   )
 }

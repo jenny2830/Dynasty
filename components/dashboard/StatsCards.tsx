@@ -8,28 +8,17 @@ interface StatCardProps {
   trend?: { value: number; label: string }
   icon: React.ReactNode
   highlight?: boolean
+  negative?: boolean
 }
 
-function StatCard({ label, value, subtext, trend, icon, highlight }: StatCardProps) {
+function StatCard({ label, value, subtext, trend, icon, highlight, negative }: StatCardProps) {
   return (
     <div
       className={cn(
-        'stat-card group relative rounded-[2px]',
-        'border border-[rgba(201,168,76,0.12)]',
-        'bg-[#111111]',
-        'shadow-[0_4px_24px_rgba(0,0,0,0.4)]',
-        'transition-[border-color] duration-300 ease-out',
-        'hover:border-[rgba(201,168,76,0.3)]',
-        'px-7 pt-7 pb-6'
+        'stat-card lux-card deco-corners-4 deco-top-line',
+        'group px-7 pt-7 pb-6'
       )}
     >
-      {/* Gold top accent line — thin radiating gradient */}
-      <div
-        className="pointer-events-none absolute top-0 left-[10%] right-[10%] h-px"
-        style={{ background: 'var(--accent-top)' }}
-        aria-hidden
-      />
-
       <div className="relative flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           {/* Label with diamond ornament */}
@@ -44,11 +33,11 @@ function StatCard({ label, value, subtext, trend, icon, highlight }: StatCardPro
             <span className="truncate">{label}</span>
           </p>
 
-          {/* Value — Bebas Neue display */}
+          {/* Value — Bebas Neue display with gradient fill */}
           <p
             className={cn(
-              'font-display text-[38px] leading-none tracking-[0.04em]',
-              highlight ? 'text-dynasty-gold' : 'text-dynasty-warm-white'
+              'font-display text-[40px] leading-none tracking-[0.04em]',
+              negative ? 'text-rose-gradient' : 'text-gold-gradient'
             )}
           >
             {value}
@@ -124,6 +113,7 @@ export function StatsCards({
         trend={{ value: 4.2, label: 'vs last month' }}
         icon={<TrendingUp className="h-4 w-4" strokeWidth={1.2} />}
         highlight
+        negative={monthlyNetIncome < 0}
       />
       <StatCard
         label="Active Properties"

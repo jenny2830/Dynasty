@@ -106,7 +106,14 @@ export function IncomeExpenseChart({ data }: IncomeExpenseChartProps) {
           iconType="square"
           iconSize={8}
           formatter={(value: string) => (
-            <span style={{ color: '#8A8A82', textTransform: 'uppercase', letterSpacing: '0.18em', fontSize: 10 }}>
+            <span
+              style={{
+                color: value === 'expenses' ? '#B76E79' : '#C9A84C',
+                textTransform: 'uppercase',
+                letterSpacing: '0.18em',
+                fontSize: 10,
+              }}
+            >
               {value}
             </span>
           )}
