@@ -129,7 +129,7 @@ export function Sidebar({ userId, initialTheme }: SidebarProps) {
               width={200}
               height={72}
               priority
-              style={{ objectFit: 'contain', display: 'block', borderRadius: 0 }}
+              style={{ objectFit: 'contain', display: 'block', margin: '0 auto', borderRadius: 0 }}
             />
           </div>
           <p
@@ -163,7 +163,7 @@ export function Sidebar({ userId, initialTheme }: SidebarProps) {
 
           <NavSectionLabel>Account</NavSectionLabel>
           <div className="flex flex-col">
-            <ThemeToggle userId={userId} />
+            <ThemeToggle />
             {NAV_ACCOUNT.map((item) => (
               <NavItem key={item.href} {...item} isActive={isActive(item.href)} />
             ))}

@@ -153,9 +153,30 @@ body {
 
 /* Light mode global background override */
 .light body,
-.light main {
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
+.light main,
+.light .main-content {
+  background-color: #FAF7F2 !important;
+  color: #1C1A17 !important;
+}
+
+.light [class*="card"],
+.light [class*="Card"] {
+  background: #FFFFFF !important;
+  border-color: rgba(154, 122, 46, 0.2) !important;
+}
+
+.light h1, .light h2, .light h3, .light h4 {
+  color: #1C1A17 !important;
+}
+
+.light p, .light span, .light td, .light th {
+  color: #4A4A45 !important;
+}
+
+.light input, .light select, .light textarea {
+  background: #FFFFFF !important;
+  border-color: rgba(154, 122, 46, 0.2) !important;
+  color: #1C1A17 !important;
 }
 
 /* Light mode scrollbar */
