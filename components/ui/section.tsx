@@ -11,7 +11,7 @@ export const Section = React.forwardRef<HTMLDivElement, SectionProps>(
     return (
       <div
         ref={ref}
-        className={cn(className)}
+        className={cn('lux-panel', className)}
         style={{
           background: '#111111',
           border: '1px solid rgba(201,168,76,0.1)',

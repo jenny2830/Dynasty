@@ -22,10 +22,10 @@ import {
 import { EXPENSE_ONLY_CATEGORIES, PAYMENT_FREQUENCIES } from '@/lib/constants'
 import type { RecurringPayment } from '@/types/database.types'
 
-function SubmitButton({ label }: { label: string }) {
+function SubmitButton({ label, className }: { label: string; className?: string }) {
   const { pending } = useFormStatus()
   return (
-    <Button type="submit" disabled={pending}>
+    <Button type="submit" disabled={pending} className={className}>
       {pending ? 'Saving…' : label}
     </Button>
   )
@@ -198,9 +198,9 @@ export function RecurringForm({ mode, payment, properties }: RecurringFormProps)
         />
       </div>
 
-      <div className="flex gap-3 pt-3 border-t border-[rgba(201,168,76,0.08)]">
-        <SubmitButton label={mode === 'create' ? 'Add Payment' : 'Save Changes'} />
-        <Button type="button" variant="outline" onClick={() => window.history.back()}>
+      <div className="flex flex-col sm:flex-row gap-3 pt-3 border-t border-[rgba(201,168,76,0.08)]">
+        <SubmitButton label={mode === 'create' ? 'Add Payment' : 'Save Changes'} className="w-full sm:w-auto" />
+        <Button type="button" variant="outline" onClick={() => window.history.back()} className="w-full sm:w-auto">
           Cancel
         </Button>
       </div>

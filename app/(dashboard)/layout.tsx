@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { Sidebar } from '@/components/dashboard/Sidebar'
+import { PreferencesInit } from '@/components/dashboard/PreferencesInit'
 
 export default async function DashboardLayout({
   children,
@@ -24,6 +25,7 @@ export default async function DashboardLayout({
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', width: '100%', backgroundColor: '#080808' }}>
+      <PreferencesInit />
       <Sidebar
         userId={user.id}
         initialTheme={landlord?.theme_preference ?? 'dark'}

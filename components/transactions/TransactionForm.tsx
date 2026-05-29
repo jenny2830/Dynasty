@@ -19,10 +19,10 @@ import { EXPENSE_CATEGORIES, INCOME_CATEGORIES } from '@/lib/constants'
 import type { Transaction } from '@/types/database.types'
 import { createClient } from '@/lib/supabase/client'
 
-function SubmitButton({ label }: { label: string }) {
+function SubmitButton({ label, className }: { label: string; className?: string }) {
   const { pending } = useFormStatus()
   return (
-    <Button type="submit" disabled={pending}>
+    <Button type="submit" disabled={pending} className={className}>
       {pending ? 'Saving…' : label}
     </Button>
   )
@@ -262,9 +262,9 @@ export function TransactionForm({
         </div>
       )}
 
-      <div className="flex gap-3 pt-3 border-t border-[rgba(201,168,76,0.08)]">
-        <SubmitButton label={mode === 'create' ? 'Add Transaction' : 'Save Changes'} />
-        <Button type="button" variant="outline" onClick={() => window.history.back()}>
+      <div className="flex flex-col sm:flex-row gap-3 pt-3 border-t border-[rgba(201,168,76,0.08)]">
+        <SubmitButton label={mode === 'create' ? 'Add Transaction' : 'Save Changes'} className="w-full sm:w-auto" />
+        <Button type="button" variant="outline" onClick={() => window.history.back()} className="w-full sm:w-auto">
           Cancel
         </Button>
       </div>

@@ -909,3 +909,50 @@ input:-webkit-autofill:focus {
     flex-wrap: wrap;
   }
 }
+
+/* ─────────────────────────────────────────────
+   Text size preference (Settings)
+   Scales the whole content area proportionally
+   via zoom so the layout reflows cleanly instead
+   of getting crammed. "md" is the default.
+   ───────────────────────────────────────────── */
+[data-text-size="sm"] .dashboard-main {
+  zoom: 0.92;
+}
+[data-text-size="lg"] .dashboard-main {
+  zoom: 1.1;
+}
+
+/* ─────────────────────────────────────────────
+   Light mode — invert the dashboard surfaces.
+   The sidebar intentionally stays dark (the logo
+   sits on a black field). These rules use
+   !important to override the inline styles on the
+   inline-styled cards / main content.
+   ───────────────────────────────────────────── */
+[data-theme="light"] .dashboard-main {
+  background-color: #FAF7F2 !important;
+  color: #1C1A17 !important;
+}
+[data-theme="light"] .lux-panel,
+[data-theme="light"] .stat-panel {
+  background: #FFFFFF !important;
+  border-color: rgba(154,122,46,0.22) !important;
+  box-shadow: 0 2px 14px rgba(0,0,0,0.06) !important;
+}
+[data-theme="light"] [class*="text-dynasty-warm-white"],
+[data-theme="light"] [class*="text-dynasty-cream"] {
+  color: #1C1A17 !important;
+}
+[data-theme="light"] [class*="text-dynasty-gray-200"],
+[data-theme="light"] [class*="text-dynasty-gray-300"] {
+  color: #3A3A35 !important;
+}
+[data-theme="light"] [class*="text-dynasty-gray-400"],
+[data-theme="light"] [class*="text-dynasty-gray-500"] {
+  color: #6B6B65 !important;
+}
+[data-theme="light"] thead,
+[data-theme="light"] [class*="bg-dynasty-black"] {
+  background-color: #F5F0E8 !important;
+}

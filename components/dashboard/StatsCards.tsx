@@ -13,7 +13,7 @@ interface StatCardProps {
 
 function StatCard({ label, value, subtext, trend, icon, highlight, negative }: StatCardProps) {
   return (
-    <div style={{
+    <div className="stat-panel" style={{
       position: 'relative',
       background: 'linear-gradient(160deg, #141414 0%, #1A1815 100%)',
       border: '1px solid rgba(201,168,76,0.12)',

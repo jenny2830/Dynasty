@@ -17,10 +17,10 @@ import {
 import { CANADIAN_PROVINCES, PROPERTY_TYPES, PROPERTY_SUBTYPES, PROPERTY_STATUSES } from '@/lib/constants'
 import type { Property } from '@/types/database.types'
 
-function SubmitButton({ label }: { label: string }) {
+function SubmitButton({ label, className }: { label: string; className?: string }) {
   const { pending } = useFormStatus()
   return (
-    <Button type="submit" disabled={pending}>
+    <Button type="submit" disabled={pending} className={className}>
       {pending ? 'Saving…' : label}
     </Button>
   )
@@ -297,12 +297,13 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
         </div>
       </section>
 
-      <div className="flex gap-3 pt-2">
-        <SubmitButton label={mode === 'create' ? 'Add Property' : 'Save Changes'} />
+      <div className="flex flex-col sm:flex-row gap-3 pt-2">
+        <SubmitButton label={mode === 'create' ? 'Add Property' : 'Save Changes'} className="w-full sm:w-auto" />
         <Button
           type="button"
           variant="outline"
           onClick={() => window.history.back()}
+          className="w-full sm:w-auto"
         >
           Cancel
         </Button>
