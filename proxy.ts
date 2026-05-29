@@ -38,7 +38,6 @@ export async function proxy(request: NextRequest) {
     isAuthPage ||
     pathname.startsWith('/_next') ||
     pathname.startsWith('/api/webhooks') ||
-    pathname.startsWith('/dynasty_logo.jpg') ||
     pathname.startsWith('/images/') ||
     isStaticAsset ||
     pathname === '/favicon.ico'

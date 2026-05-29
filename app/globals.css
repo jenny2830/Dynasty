@@ -330,6 +330,41 @@ html[data-color-palette="rose-gold"] ::-webkit-scrollbar-thumb:hover {
 /* ── Rose gold: text selection ── */
 html[data-color-palette="rose-gold"] ::selection { background: rgba(183,110,121,0.22); }
 
+/* ── Rose gold: input / select / textarea borders ── */
+html[data-color-palette="rose-gold"] input:not([type="checkbox"]):not([type="radio"]),
+html[data-color-palette="rose-gold"] select,
+html[data-color-palette="rose-gold"] textarea {
+  border-color: rgba(183,110,121,0.22) !important;
+}
+html[data-color-palette="rose-gold"] input:not([type="checkbox"]):not([type="radio"]):focus,
+html[data-color-palette="rose-gold"] select:focus,
+html[data-color-palette="rose-gold"] textarea:focus {
+  border-color: rgba(183,110,121,0.55) !important;
+  box-shadow: 0 0 0 3px rgba(183,110,121,0.06) !important;
+}
+html[data-color-palette="rose-gold"] input:not([type="checkbox"]):not([type="radio"]):hover,
+html[data-color-palette="rose-gold"] select:hover,
+html[data-color-palette="rose-gold"] textarea:hover {
+  border-color: rgba(183,110,121,0.38) !important;
+}
+
+/* ── Rose gold: generic bordered boxes / panels ── */
+html[data-color-palette="rose-gold"] [class*="border-[rgba(201"],
+html[data-color-palette="rose-gold"] [class*="border-dynasty-gold"] {
+  border-color: rgba(183,110,121,0.20) !important;
+}
+
+/* ── Rose gold: lux-panel (Section component) ── */
+html[data-color-palette="rose-gold"] .lux-panel {
+  border-color: rgba(183,110,121,0.12) !important;
+}
+
+/* ── Rose gold: dialog / modal borders ── */
+html[data-color-palette="rose-gold"] [role="dialog"],
+html[data-color-palette="rose-gold"] [data-radix-popper-content-wrapper] {
+  --border-gold: 1px solid rgba(183,110,121,0.20);
+}
+
 /* White & Black — light main content, black sidebar with neutral accents */
 html[data-color-palette="white-black"] {
   --sidebar-bg:               #080808;

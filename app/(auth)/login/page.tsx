@@ -50,7 +50,7 @@ export default async function LoginPage({
         <div className="deco-sunburst mb-6 flex flex-col items-center">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/dynasty_logo.jpg"
+            src="/images/dynastynobg.png"
             alt="Dynasty"
             style={{
               width: '280px',
