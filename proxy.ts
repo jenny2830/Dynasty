@@ -31,12 +31,16 @@ export async function proxy(request: NextRequest) {
   } = await supabase.auth.getUser()
 
   const { pathname } = request.nextUrl
+  const isStaticAsset = /\.[a-zA-Z0-9]+$/.test(pathname)
 
   const isAuthPage = pathname === '/login' || pathname === '/signup'
   const isPublicPath =
     isAuthPage ||
     pathname.startsWith('/_next') ||
     pathname.startsWith('/api/webhooks') ||
+    pathname.startsWith('/dynasty_logo.jpg') ||
+    pathname.startsWith('/images/') ||
+    isStaticAsset ||
     pathname === '/favicon.ico'
 
   // Redirect unauthenticated users to login
