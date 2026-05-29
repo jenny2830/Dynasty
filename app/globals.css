@@ -108,6 +108,29 @@
       rgba(201, 168, 76, 0.018) 28px,
       rgba(201, 168, 76, 0.018) 29px
     );
+
+  /* ── Color palette variables (sidebar + accents) ── */
+  /* Default = Black & Gold */
+  --sidebar-bg:               #080808;
+  --sidebar-border:           rgba(201,168,76,0.12);
+  --sidebar-logo-border:      rgba(201,168,76,0.15);
+  --sidebar-tagline:          rgba(201,168,76,0.45);
+  --sidebar-label-color:      #6B6B65;
+  --sidebar-active-color:     #C9A84C;
+  --sidebar-active-border:    #C9A84C;
+  --sidebar-active-bg:        rgba(201,168,76,0.07);
+  --sidebar-muted-color:      #9A8F7A;
+  --sidebar-hover-color:      #B76E79;
+  --sidebar-divider:          rgba(201,168,76,0.08);
+  --sidebar-footer-color:     rgba(201,168,76,0.30);
+  --sidebar-footer-diamond:   rgba(201,168,76,0.50);
+  --sidebar-close-btn-border: rgba(201,168,76,0.20);
+  --sidebar-hamburger-border: rgba(201,168,76,0.30);
+  --sidebar-hamburger-color:  #C9A84C;
+  --sidebar-hamburger-bg:     rgba(8,8,8,0.85);
+  --sidebar-deco:
+    repeating-linear-gradient(45deg, transparent, transparent 28px, rgba(201,168,76,0.018) 28px, rgba(201,168,76,0.018) 29px),
+    repeating-linear-gradient(-45deg, transparent, transparent 28px, rgba(201,168,76,0.018) 28px, rgba(201,168,76,0.018) 29px);
 }
 
 /* ─────────────────────────────────────────────
@@ -145,6 +168,68 @@
 
   --gold:           #9A7A2E;
   --rose:           #8B4F58;
+}
+
+/* ─────────────────────────────────────────────
+   Color palette overrides
+   Applied via html[data-color-palette="..."]
+   set by SettingsPanel + PreferencesInit.
+   ───────────────────────────────────────────── */
+
+/* Rose Gold — dark surfaces, rose gold accents */
+html[data-color-palette="rose-gold"] {
+  --sidebar-bg:               #0C0809;
+  --sidebar-border:           rgba(183,110,121,0.18);
+  --sidebar-logo-border:      rgba(183,110,121,0.18);
+  --sidebar-tagline:          rgba(183,110,121,0.50);
+  --sidebar-label-color:      #6B6165;
+  --sidebar-active-color:     #D4959E;
+  --sidebar-active-border:    #B76E79;
+  --sidebar-active-bg:        rgba(183,110,121,0.09);
+  --sidebar-muted-color:      #9A8A8C;
+  --sidebar-hover-color:      #C9A84C;
+  --sidebar-divider:          rgba(183,110,121,0.10);
+  --sidebar-footer-color:     rgba(183,110,121,0.35);
+  --sidebar-footer-diamond:   rgba(183,110,121,0.55);
+  --sidebar-close-btn-border: rgba(183,110,121,0.20);
+  --sidebar-hamburger-border: rgba(183,110,121,0.35);
+  --sidebar-hamburger-color:  #D4959E;
+  --sidebar-hamburger-bg:     rgba(12,8,9,0.85);
+  --sidebar-deco:
+    repeating-linear-gradient(45deg, transparent, transparent 28px, rgba(183,110,121,0.022) 28px, rgba(183,110,121,0.022) 29px),
+    repeating-linear-gradient(-45deg, transparent, transparent 28px, rgba(183,110,121,0.022) 28px, rgba(183,110,121,0.022) 29px);
+}
+
+/* Rose gold main-content deco accents */
+html[data-color-palette="rose-gold"] .deco-frame::before,
+html[data-color-palette="rose-gold"] .deco-frame::after { border-color: #B76E79; }
+html[data-color-palette="rose-gold"] .deco-corners::before { border-top-color: rgba(183,110,121,0.5); border-left-color: rgba(183,110,121,0.5); }
+html[data-color-palette="rose-gold"] .deco-corners::after  { border-bottom-color: rgba(183,110,121,0.5); border-right-color: rgba(183,110,121,0.5); }
+html[data-color-palette="rose-gold"] .deco-top-line::after { background: linear-gradient(90deg, transparent, #B76E79, transparent); }
+html[data-color-palette="rose-gold"] .deco-rule::after     { background: #B76E79; }
+
+/* White & Black — light main content, black sidebar with neutral accents */
+html[data-color-palette="white-black"] {
+  --sidebar-bg:               #080808;
+  --sidebar-border:           rgba(255,255,255,0.08);
+  --sidebar-logo-border:      rgba(255,255,255,0.10);
+  --sidebar-tagline:          rgba(255,255,255,0.28);
+  --sidebar-label-color:      #5A5A55;
+  --sidebar-active-color:     #FAF7F2;
+  --sidebar-active-border:    #DDDDD5;
+  --sidebar-active-bg:        rgba(255,255,255,0.07);
+  --sidebar-muted-color:      #7A7A72;
+  --sidebar-hover-color:      #B5B5AA;
+  --sidebar-divider:          rgba(255,255,255,0.06);
+  --sidebar-footer-color:     rgba(255,255,255,0.25);
+  --sidebar-footer-diamond:   rgba(255,255,255,0.38);
+  --sidebar-close-btn-border: rgba(255,255,255,0.15);
+  --sidebar-hamburger-border: rgba(255,255,255,0.25);
+  --sidebar-hamburger-color:  #FAF7F2;
+  --sidebar-hamburger-bg:     rgba(8,8,8,0.85);
+  --sidebar-deco:
+    repeating-linear-gradient(45deg, transparent, transparent 28px, rgba(255,255,255,0.012) 28px, rgba(255,255,255,0.012) 29px),
+    repeating-linear-gradient(-45deg, transparent, transparent 28px, rgba(255,255,255,0.012) 28px, rgba(255,255,255,0.012) 29px);
 }
 
 /* ─────────────────────────────────────────────

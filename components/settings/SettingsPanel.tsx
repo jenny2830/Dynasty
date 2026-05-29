@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useTheme } from 'next-themes'
-import { Sun, Moon, Type, KeyRound, Check } from 'lucide-react'
+import { Palette, Type, KeyRound, Check } from 'lucide-react'
 import { Section, SectionHeader } from '@/components/ui/section'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -10,11 +10,38 @@ import { Label } from '@/components/ui/label'
 import { createClient } from '@/lib/supabase/client'
 
 type TextSize = 'sm' | 'md' | 'lg'
+type ColorPalette = 'black-gold' | 'rose-gold' | 'white-black'
 
 const TEXT_SIZES: { value: TextSize; label: string; hint: string }[] = [
   { value: 'sm', label: 'Compact', hint: 'Smaller' },
   { value: 'md', label: 'Standard', hint: 'Default' },
   { value: 'lg', label: 'Large', hint: 'Bigger' },
+]
+
+const COLOR_PALETTES: {
+  value: ColorPalette
+  label: string
+  hint: string
+  swatches: string[]
+} [] = [
+  {
+    value: 'black-gold',
+    label: 'Black & Gold',
+    hint: 'Default',
+    swatches: ['#080808', '#C9A84C'],
+  },
+  {
+    value: 'rose-gold',
+    label: 'Rose Gold',
+    hint: 'Signature',
+    swatches: ['#0C0809', '#B76E79', '#D4959E'],
+  },
+  {
+    value: 'white-black',
+    label: 'White & Black',
+    hint: 'Light',
+    swatches: ['#FAF7F2', '#1C1A17'],
+  },
 ]
 
 function SegButton({
@@ -57,10 +84,88 @@ function SegButton({
   )
 }
 
+function PaletteButton({
+  active,
+  onClick,
+  label,
+  hint,
+  swatches,
+}: {
+  active: boolean
+  onClick: () => void
+  label: string
+  hint: string
+  swatches: string[]
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      style={{
+        flex: 1,
+        minWidth: '110px',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'flex-start',
+        gap: '9px',
+        padding: '13px 14px',
+        background: active ? 'rgba(201,168,76,0.08)' : 'transparent',
+        border: active
+          ? '1px solid rgba(201,168,76,0.45)'
+          : '1px solid rgba(201,168,76,0.15)',
+        borderRadius: '2px',
+        cursor: 'pointer',
+        transition: 'all 0.2s ease',
+        textAlign: 'left',
+      }}
+    >
+      {/* Color swatch row */}
+      <div style={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
+        {swatches.map((color, i) => (
+          <div
+            key={i}
+            style={{
+              width: '11px',
+              height: '11px',
+              borderRadius: '50%',
+              background: color,
+              border: '1px solid rgba(201,168,76,0.18)',
+              flexShrink: 0,
+            }}
+          />
+        ))}
+      </div>
+      {/* Labels */}
+      <div>
+        <div style={{
+          fontFamily: "'Jost', sans-serif",
+          fontSize: '10px',
+          letterSpacing: '0.13em',
+          textTransform: 'uppercase',
+          color: active ? '#C9A84C' : '#9A8F7A',
+          lineHeight: 1.2,
+        }}>
+          {label}
+        </div>
+        <div style={{
+          fontFamily: "'Jost', sans-serif",
+          fontSize: '9px',
+          letterSpacing: '0.06em',
+          color: active ? 'rgba(201,168,76,0.55)' : '#6B6B65',
+          marginTop: '3px',
+        }}>
+          {hint}
+        </div>
+      </div>
+    </button>
+  )
+}
+
 export function SettingsPanel() {
-  const { setTheme, resolvedTheme } = useTheme()
+  const { setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
   const [textSize, setTextSize] = useState<TextSize>('md')
+  const [colorPalette, setColorPalette] = useState<ColorPalette>('black-gold')
 
   // Password form state
   const [password, setPassword] = useState('')
@@ -70,9 +175,15 @@ export function SettingsPanel() {
 
   useEffect(() => {
     setMounted(true)
-    const saved = localStorage.getItem('dynasty-text-size')
-    if (saved === 'sm' || saved === 'md' || saved === 'lg') {
-      setTextSize(saved)
+
+    const savedSize = localStorage.getItem('dynasty-text-size')
+    if (savedSize === 'sm' || savedSize === 'md' || savedSize === 'lg') {
+      setTextSize(savedSize)
+    }
+
+    const savedPalette = localStorage.getItem('dynasty-color-palette')
+    if (savedPalette === 'black-gold' || savedPalette === 'rose-gold' || savedPalette === 'white-black') {
+      setColorPalette(savedPalette)
     }
   }, [])
 
@@ -82,7 +193,16 @@ export function SettingsPanel() {
     document.documentElement.dataset.textSize = size
   }
 
-  const isDark = mounted ? resolvedTheme !== 'light' : true
+  function applyColorPalette(palette: ColorPalette) {
+    setColorPalette(palette)
+    localStorage.setItem('dynasty-color-palette', palette)
+    document.documentElement.dataset.colorPalette = palette
+    if (palette === 'white-black') {
+      setTheme('light')
+    } else {
+      setTheme('dark')
+    }
+  }
 
   async function handlePasswordChange(e: React.FormEvent) {
     e.preventDefault()
@@ -119,9 +239,9 @@ export function SettingsPanel() {
     <div className="space-y-6">
       {/* ── Appearance ── */}
       <Section>
-        <SectionHeader title="Appearance" description="Theme & text size" />
+        <SectionHeader title="Appearance" description="Color palette & text size" />
         <div className="space-y-8 px-7 py-7">
-          {/* Theme */}
+          {/* Color palette */}
           <div>
             <p style={{
               display: 'flex',
@@ -134,18 +254,20 @@ export function SettingsPanel() {
               color: '#6B6B65',
               margin: '0 0 12px 0',
             }}>
-              <Sun style={{ width: '13px', height: '13px' }} strokeWidth={1.4} />
+              <Palette style={{ width: '13px', height: '13px' }} strokeWidth={1.4} />
               Color Theme
             </p>
             <div className="flex flex-col sm:flex-row gap-3">
-              <SegButton active={mounted && isDark} onClick={() => setTheme('dark')}>
-                <Moon style={{ width: '14px', height: '14px' }} strokeWidth={1.4} />
-                Dark
-              </SegButton>
-              <SegButton active={mounted && !isDark} onClick={() => setTheme('light')}>
-                <Sun style={{ width: '14px', height: '14px' }} strokeWidth={1.4} />
-                Light
-              </SegButton>
+              {COLOR_PALETTES.map((p) => (
+                <PaletteButton
+                  key={p.value}
+                  active={mounted && colorPalette === p.value}
+                  onClick={() => applyColorPalette(p.value)}
+                  label={p.label}
+                  hint={p.hint}
+                  swatches={p.swatches}
+                />
+              ))}
             </div>
             <p style={{
               marginTop: '10px',
@@ -155,7 +277,7 @@ export function SettingsPanel() {
               letterSpacing: '0.04em',
               color: '#6B6B65',
             }}>
-              Light mode inverts the dashboard surfaces to a warm ivory palette.
+              Changes the accent color and sidebar throughout the dashboard.
             </p>
           </div>
 

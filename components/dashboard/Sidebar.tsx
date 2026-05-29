@@ -50,7 +50,7 @@ function NavItem({ href, label, Icon, isActive, onNavigate }: NavItemProps) {
       prefetch={true}
       onClick={onNavigate}
       style={isActive ? {
-        color: '#C9A84C',
+        color: 'var(--sidebar-active-color)',
         fontFamily: "'Jost', sans-serif",
         fontSize: '11px',
         letterSpacing: '0.14em',
@@ -59,12 +59,12 @@ function NavItem({ href, label, Icon, isActive, onNavigate }: NavItemProps) {
         display: 'flex',
         alignItems: 'center',
         gap: '12px',
-        borderLeft: '2px solid #C9A84C',
-        background: 'rgba(201,168,76,0.07)',
+        borderLeft: '2px solid var(--sidebar-active-border)',
+        background: 'var(--sidebar-active-bg)',
         textDecoration: 'none',
         transition: 'color 0.2s ease',
       } : {
-        color: '#9A8F7A',
+        color: 'var(--sidebar-muted-color)',
         fontFamily: "'Jost', sans-serif",
         fontSize: '11px',
         letterSpacing: '0.14em',
@@ -78,10 +78,10 @@ function NavItem({ href, label, Icon, isActive, onNavigate }: NavItemProps) {
         textDecoration: 'none',
       }}
       onMouseEnter={e => {
-        if (!isActive) (e.currentTarget as HTMLElement).style.color = '#B76E79'
+        if (!isActive) (e.currentTarget as HTMLElement).style.color = 'var(--sidebar-hover-color)'
       }}
       onMouseLeave={e => {
-        if (!isActive) (e.currentTarget as HTMLElement).style.color = '#9A8F7A'
+        if (!isActive) (e.currentTarget as HTMLElement).style.color = 'var(--sidebar-muted-color)'
       }}
     >
       <Icon
@@ -96,7 +96,7 @@ function NavItem({ href, label, Icon, isActive, onNavigate }: NavItemProps) {
 function NavSectionLabel({ children }: { children: React.ReactNode }) {
   return (
     <p style={{
-      color: '#6B6B65',
+      color: 'var(--sidebar-label-color)',
       fontFamily: "'Jost', sans-serif",
       fontSize: '8px',
       letterSpacing: '0.22em',
@@ -163,7 +163,7 @@ export function Sidebar({ userId }: SidebarProps) {
       {/* Logo area */}
       <div style={{
         padding: '16px 20px 12px',
-        borderBottom: '1px solid rgba(201,168,76,0.15)',
+        borderBottom: '1px solid var(--sidebar-logo-border)',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -177,7 +177,7 @@ export function Sidebar({ userId }: SidebarProps) {
           />
         </div>
         <p style={{
-          color: 'rgba(201,168,76,0.45)',
+          color: 'var(--sidebar-tagline)',
           fontFamily: "'Jost', sans-serif",
           fontSize: '8px',
           letterSpacing: '0.25em',
@@ -205,7 +205,7 @@ export function Sidebar({ userId }: SidebarProps) {
           ))}
         </div>
 
-        <div style={{ margin: '12px 20px', height: '1px', background: 'rgba(201,168,76,0.08)' }} />
+        <div style={{ margin: '12px 20px', height: '1px', background: 'var(--sidebar-divider)' }} />
 
         <NavSectionLabel>Account</NavSectionLabel>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -222,7 +222,7 @@ export function Sidebar({ userId }: SidebarProps) {
               background: 'transparent',
               border: 'none',
               cursor: 'pointer',
-              color: '#9A8F7A',
+              color: 'var(--sidebar-muted-color)',
               fontFamily: "'Jost', sans-serif",
               fontSize: '11px',
               letterSpacing: '0.14em',
@@ -231,8 +231,8 @@ export function Sidebar({ userId }: SidebarProps) {
               width: '100%',
               transition: 'color 0.2s ease',
             }}
-            onMouseEnter={e => (e.currentTarget.style.color = '#B76E79')}
-            onMouseLeave={e => (e.currentTarget.style.color = '#9A8F7A')}
+            onMouseEnter={e => (e.currentTarget.style.color = 'var(--sidebar-hover-color)')}
+            onMouseLeave={e => (e.currentTarget.style.color = 'var(--sidebar-muted-color)')}
           >
             <LogOut style={{ width: '15px', height: '15px', flexShrink: 0 }} strokeWidth={1.2} />
             <span>Sign Out</span>
@@ -241,7 +241,7 @@ export function Sidebar({ userId }: SidebarProps) {
       </nav>
 
       {/* Footer mark */}
-      <div style={{ padding: '16px 20px', borderTop: '1px solid rgba(201,168,76,0.08)' }}>
+      <div style={{ padding: '16px 20px', borderTop: '1px solid var(--sidebar-divider)' }}>
         <p style={{
           textTransform: 'uppercase',
           textAlign: 'center',
@@ -249,18 +249,16 @@ export function Sidebar({ userId }: SidebarProps) {
           fontWeight: 300,
           fontSize: '7px',
           letterSpacing: '0.35em',
-          color: 'rgba(201,168,76,0.3)',
+          color: 'var(--sidebar-footer-color)',
           margin: 0,
         }}>
-          <span style={{ display: 'inline-block', marginRight: '8px', color: 'rgba(201,168,76,0.5)' }}>◆</span>
+          <span style={{ display: 'inline-block', marginRight: '8px', color: 'var(--sidebar-footer-diamond)' }}>◆</span>
           Legacy · Luxury · Timeless
-          <span style={{ display: 'inline-block', marginLeft: '8px', color: 'rgba(201,168,76,0.5)' }}>◆</span>
+          <span style={{ display: 'inline-block', marginLeft: '8px', color: 'var(--sidebar-footer-diamond)' }}>◆</span>
         </p>
       </div>
     </div>
   )
-
-  const decoBackground = 'repeating-linear-gradient(45deg, transparent, transparent 28px, rgba(201,168,76,0.018) 28px, rgba(201,168,76,0.018) 29px), repeating-linear-gradient(-45deg, transparent, transparent 28px, rgba(201,168,76,0.018) 28px, rgba(201,168,76,0.018) 29px)'
 
   // Desktop (and the very first client render before we know the viewport):
   // keep the existing sticky 240px sidebar exactly as-is.
@@ -273,9 +271,9 @@ export function Sidebar({ userId }: SidebarProps) {
         width: '240px',
         flexShrink: 0,
         height: '100vh',
-        backgroundColor: '#080808',
-        borderRight: '1px solid rgba(201,168,76,0.12)',
-        backgroundImage: decoBackground,
+        backgroundColor: 'var(--sidebar-bg)',
+        borderRight: '1px solid var(--sidebar-border)',
+        backgroundImage: 'var(--sidebar-deco)',
         display: 'flex',
         flexDirection: 'column',
       }}>
@@ -301,12 +299,12 @@ export function Sidebar({ userId }: SidebarProps) {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background: 'rgba(8,8,8,0.85)',
+          background: 'var(--sidebar-hamburger-bg)',
           backdropFilter: 'blur(6px)',
           WebkitBackdropFilter: 'blur(6px)',
-          border: '1px solid rgba(201,168,76,0.3)',
+          border: '1px solid var(--sidebar-hamburger-border)',
           borderRadius: '2px',
-          color: '#C9A84C',
+          color: 'var(--sidebar-hamburger-color)',
           cursor: 'pointer',
         }}
       >
@@ -338,9 +336,9 @@ export function Sidebar({ userId }: SidebarProps) {
         width: '240px',
         maxWidth: '82vw',
         height: '100vh',
-        backgroundColor: '#080808',
-        borderRight: '1px solid rgba(201,168,76,0.12)',
-        backgroundImage: decoBackground,
+        backgroundColor: 'var(--sidebar-bg)',
+        borderRight: '1px solid var(--sidebar-border)',
+        backgroundImage: 'var(--sidebar-deco)',
         display: 'flex',
         flexDirection: 'column',
         transform: isOpen ? 'translateX(0)' : 'translateX(-100%)',
@@ -362,9 +360,9 @@ export function Sidebar({ userId }: SidebarProps) {
             alignItems: 'center',
             justifyContent: 'center',
             background: 'transparent',
-            border: '1px solid rgba(201,168,76,0.2)',
+            border: '1px solid var(--sidebar-close-btn-border)',
             borderRadius: '2px',
-            color: '#9A8F7A',
+            color: 'var(--sidebar-muted-color)',
             cursor: 'pointer',
           }}
         >
