@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import { useTheme } from 'next-themes'
-import { Palette, Type, KeyRound, Check } from 'lucide-react'
+import { Palette, Type, KeyRound, Check, CreditCard, Crown } from 'lucide-react'
+import Link from 'next/link'
 import { Section, SectionHeader } from '@/components/ui/section'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -161,7 +162,18 @@ function PaletteButton({
   )
 }
 
-export function SettingsPanel() {
+const PLAN_LABELS: Record<string, { label: string; price: string }> = {
+  starter:   { label: 'Starter',   price: '$29 CAD/mo' },
+  landlord:  { label: 'Landlord',  price: '$79 CAD/mo' },
+  portfolio: { label: 'Portfolio', price: '$149 CAD/mo' },
+}
+
+interface SettingsPanelProps {
+  currentPlan?: 'starter' | 'landlord' | 'portfolio'
+  hasSubscription?: boolean
+}
+
+export function SettingsPanel({ currentPlan = 'starter', hasSubscription = false }: SettingsPanelProps) {
   const { setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
   const [textSize, setTextSize] = useState<TextSize>('md')
@@ -172,6 +184,9 @@ export function SettingsPanel() {
   const [confirm, setConfirm] = useState('')
   const [pwStatus, setPwStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle')
   const [pwMessage, setPwMessage] = useState('')
+
+  // Billing portal state
+  const [portalLoading, setPortalLoading] = useState(false)
 
   useEffect(() => {
     setMounted(true)
@@ -234,6 +249,21 @@ export function SettingsPanel() {
     setPassword('')
     setConfirm('')
   }
+
+  async function handleManageBilling() {
+    setPortalLoading(true)
+    try {
+      const res = await fetch('/api/billing-portal', { method: 'POST' })
+      const data = await res.json()
+      if (data.url) {
+        window.location.href = data.url
+      }
+    } finally {
+      setPortalLoading(false)
+    }
+  }
+
+  const planInfo = PLAN_LABELS[currentPlan] ?? PLAN_LABELS.starter
 
   return (
     <div className="space-y-6">
@@ -390,6 +420,126 @@ export function SettingsPanel() {
             </Button>
           </div>
         </form>
+      </Section>
+
+      {/* ── Billing ── */}
+      <Section>
+        <SectionHeader title="Billing" description="Plan & subscription" />
+        <div className="space-y-5 px-7 py-7">
+          {/* Current plan display */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '12px',
+            padding: '16px 20px',
+            border: '1px solid rgba(201,168,76,0.18)',
+            borderRadius: '2px',
+            background: 'rgba(201,168,76,0.04)',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <Crown style={{ width: '16px', height: '16px', color: '#C9A84C' }} strokeWidth={1.4} />
+              <div>
+                <p style={{
+                  fontFamily: "'Jost', sans-serif",
+                  fontSize: '10px',
+                  letterSpacing: '0.18em',
+                  textTransform: 'uppercase',
+                  color: '#6B6B65',
+                  margin: 0,
+                }}>
+                  Current Plan
+                </p>
+                <p style={{
+                  fontFamily: "'Cormorant Garamond', serif",
+                  fontSize: '20px',
+                  fontWeight: 500,
+                  color: '#FAF7F2',
+                  margin: '4px 0 0 0',
+                  letterSpacing: '0.02em',
+                }}>
+                  {planInfo.label}
+                  <span style={{
+                    fontFamily: "'Jost', sans-serif",
+                    fontSize: '12px',
+                    fontWeight: 300,
+                    color: '#6B6B65',
+                    marginLeft: '10px',
+                  }}>
+                    {planInfo.price}
+                  </span>
+                </p>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+              {hasSubscription && (
+                <button
+                  type="button"
+                  onClick={handleManageBilling}
+                  disabled={portalLoading}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '7px',
+                    padding: '9px 16px',
+                    border: '1px solid rgba(201,168,76,0.28)',
+                    borderRadius: '1px',
+                    background: 'transparent',
+                    color: '#C9A84C',
+                    fontFamily: "'Jost', sans-serif",
+                    fontSize: '10px',
+                    letterSpacing: '0.15em',
+                    textTransform: 'uppercase',
+                    cursor: portalLoading ? 'not-allowed' : 'pointer',
+                    opacity: portalLoading ? 0.6 : 1,
+                    transition: 'all 0.2s ease',
+                  }}
+                >
+                  <CreditCard style={{ width: '12px', height: '12px' }} strokeWidth={1.4} />
+                  {portalLoading ? 'Opening…' : 'Manage Billing'}
+                </button>
+              )}
+              <Link
+                href="/upgrade"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '7px',
+                  padding: '9px 16px',
+                  border: 'none',
+                  borderRadius: '1px',
+                  background: 'linear-gradient(135deg, #C9A84C 0%, #9A7A2E 100%)',
+                  color: '#080808',
+                  fontFamily: "'Jost', sans-serif",
+                  fontSize: '10px',
+                  letterSpacing: '0.15em',
+                  textTransform: 'uppercase',
+                  fontWeight: 600,
+                  textDecoration: 'none',
+                  boxShadow: '0 4px 14px rgba(201,168,76,0.20)',
+                }}
+              >
+                <Crown style={{ width: '12px', height: '12px' }} strokeWidth={1.8} />
+                Upgrade Plan
+              </Link>
+            </div>
+          </div>
+
+          <p style={{
+            fontFamily: "'Jost', sans-serif",
+            fontWeight: 300,
+            fontSize: '11px',
+            letterSpacing: '0.04em',
+            color: '#6B6B65',
+            margin: 0,
+          }}>
+            {hasSubscription
+              ? 'Manage your payment method, download invoices, or cancel via the billing portal.'
+              : 'Subscribe to unlock more properties and advanced features.'}
+          </p>
+        </div>
       </Section>
     </div>
   )

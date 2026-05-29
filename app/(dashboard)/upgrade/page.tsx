@@ -1,10 +1,15 @@
 import { createClient } from '@/lib/supabase/server'
 import { PageHeader } from '@/components/ui/page-header'
-import { SettingsPanel } from '@/components/settings/SettingsPanel'
+import { UpgradeClient } from './UpgradeClient'
 
-export const metadata = { title: 'Settings' }
+export const metadata = { title: 'Upgrade Plan' }
 
-export default async function SettingsPage() {
+export default async function UpgradePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ success?: string; canceled?: string }>
+}) {
+  const params = await searchParams
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -14,7 +19,7 @@ export default async function SettingsPage() {
   if (user) {
     const { data: landlord } = await supabase
       .from('landlords')
-      .select('plan, stripe_subscription_id')
+      .select('plan, stripe_customer_id, stripe_subscription_id')
       .eq('auth_user_id', user.id)
       .maybeSingle()
 
@@ -27,10 +32,15 @@ export default async function SettingsPage() {
   return (
     <div className="space-y-7">
       <PageHeader
-        title="Settings"
-        subtitle="Appearance · Security · Billing"
+        title="Upgrade Plan"
+        subtitle="Choose the plan that grows with your portfolio"
       />
-      <SettingsPanel currentPlan={currentPlan} hasSubscription={hasSubscription} />
+      <UpgradeClient
+        currentPlan={currentPlan}
+        hasSubscription={hasSubscription}
+        success={params.success === 'true'}
+        canceled={params.canceled === 'true'}
+      />
     </div>
   )
 }

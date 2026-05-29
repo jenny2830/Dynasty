@@ -1,54 +1,58 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { createAdminClient } from '@/lib/supabase/admin'
 
 export const dynamic = 'force-dynamic'
 
-function getStripe() {
-  return new Stripe(process.env.STRIPE_SECRET_KEY!, {
-    apiVersion: '2026-04-22.dahlia',
-  })
-}
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
-export async function POST(request: NextRequest) {
+export async function POST(request: Request) {
   const body = await request.text()
-  const sig = request.headers.get('stripe-signature')
-
-  if (!sig) {
-    return NextResponse.json({ error: 'No signature' }, { status: 400 })
-  }
-
-  const stripe = getStripe()
+  const signature = request.headers.get('stripe-signature')!
 
   let event: Stripe.Event
+
   try {
-    event = stripe.webhooks.constructEvent(body, sig, process.env.STRIPE_WEBHOOK_SECRET!)
+    event = stripe.webhooks.constructEvent(
+      body,
+      signature,
+      process.env.STRIPE_WEBHOOK_SECRET!
+    )
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Unknown error'
-    return NextResponse.json({ error: `Webhook error: ${message}` }, { status: 400 })
+    console.error('Webhook signature verification failed:', err)
+    return NextResponse.json({ error: 'Invalid signature' }, { status: 400 })
   }
 
-  const admin = createAdminClient()
+  const supabase = createAdminClient()
 
   switch (event.type) {
-    case 'customer.subscription.created':
+    case 'checkout.session.completed': {
+      const session = event.data.object as Stripe.Checkout.Session
+      const landlordId = session.metadata?.landlord_id
+      const plan = session.metadata?.plan
+      const subscriptionId = session.subscription as string
+
+      if (landlordId && plan) {
+        await supabase
+          .from('landlords')
+          .update({
+            plan: plan as 'starter' | 'landlord' | 'portfolio',
+            stripe_subscription_id: subscriptionId,
+            stripe_customer_id: session.customer as string,
+          })
+          .eq('id', landlordId)
+      }
+      break
+    }
+
     case 'customer.subscription.updated': {
       const subscription = event.data.object as Stripe.Subscription
       const customerId = subscription.customer as string
-      const priceId = subscription.items.data[0]?.price.id
 
-      let plan: 'starter' | 'landlord' | 'portfolio' = 'starter'
-      if (priceId === process.env.STRIPE_PRICE_LANDLORD) plan = 'landlord'
-      else if (priceId === process.env.STRIPE_PRICE_PORTFOLIO) plan = 'portfolio'
-
-      await admin
+      await supabase
         .from('landlords')
-        .update({
-          stripe_subscription_id: subscription.id,
-          plan,
-        })
+        .update({ stripe_subscription_id: subscription.id })
         .eq('stripe_customer_id', customerId)
-
       break
     }
 
@@ -56,19 +60,19 @@ export async function POST(request: NextRequest) {
       const subscription = event.data.object as Stripe.Subscription
       const customerId = subscription.customer as string
 
-      await admin
+      await supabase
         .from('landlords')
-        .update({
-          stripe_subscription_id: null,
-          plan: 'starter',
-        })
+        .update({ plan: 'starter', stripe_subscription_id: null })
         .eq('stripe_customer_id', customerId)
-
       break
     }
 
-    default:
+    case 'invoice.payment_failed': {
+      const invoice = event.data.object as Stripe.Invoice
+      const customerId = invoice.customer as string
+      console.error(`Payment failed for customer: ${customerId}`)
       break
+    }
   }
 
   return NextResponse.json({ received: true })

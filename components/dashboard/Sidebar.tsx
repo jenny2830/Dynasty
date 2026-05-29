@@ -12,6 +12,7 @@ import {
   BarChart3,
   TrendingUp,
   Settings,
+  Crown,
   LogOut,
   Menu,
   X,
@@ -33,6 +34,7 @@ const NAV_INTELLIGENCE = [
 
 const NAV_ACCOUNT = [
   { href: '/settings',     label: 'Settings',      Icon: Settings },
+  { href: '/upgrade',      label: 'Upgrade',       Icon: Crown,    gold: true },
 ] as const
 
 interface NavItemProps {
@@ -40,10 +42,12 @@ interface NavItemProps {
   label: string
   Icon: React.ComponentType<{ style?: React.CSSProperties; strokeWidth?: number }>
   isActive: boolean
+  gold?: boolean
   onNavigate?: () => void
 }
 
-function NavItem({ href, label, Icon, isActive, onNavigate }: NavItemProps) {
+function NavItem({ href, label, Icon, isActive, gold, onNavigate }: NavItemProps) {
+  const defaultColor = gold ? '#C9A84C' : 'var(--sidebar-muted-color)'
   return (
     <Link
       href={href}
@@ -64,7 +68,7 @@ function NavItem({ href, label, Icon, isActive, onNavigate }: NavItemProps) {
         textDecoration: 'none',
         transition: 'color 0.2s ease',
       } : {
-        color: 'var(--sidebar-muted-color)',
+        color: defaultColor,
         fontFamily: "'Jost', sans-serif",
         fontSize: '11px',
         letterSpacing: '0.14em',
@@ -81,7 +85,7 @@ function NavItem({ href, label, Icon, isActive, onNavigate }: NavItemProps) {
         if (!isActive) (e.currentTarget as HTMLElement).style.color = 'var(--sidebar-hover-color)'
       }}
       onMouseLeave={e => {
-        if (!isActive) (e.currentTarget as HTMLElement).style.color = 'var(--sidebar-muted-color)'
+        if (!isActive) (e.currentTarget as HTMLElement).style.color = defaultColor
       }}
     >
       <Icon
@@ -224,7 +228,7 @@ export function Sidebar({ userId }: SidebarProps) {
         <NavSectionLabel>Account</NavSectionLabel>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           {NAV_ACCOUNT.map((item) => (
-            <NavItem key={item.href} {...item} isActive={isActive(item.href)} onNavigate={closeDrawer} />
+            <NavItem key={item.href} {...item} isActive={isActive(item.href)} gold={'gold' in item ? item.gold : false} onNavigate={closeDrawer} />
           ))}
           <button
             onClick={handleSignOut}
