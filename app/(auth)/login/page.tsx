@@ -50,9 +50,15 @@ export default async function LoginPage({
         <div className="deco-sunburst mb-6 flex flex-col items-center">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/images/dynasty_logo.jpg"
+            src="/dynasty_logo.jpg"
             alt="Dynasty"
-            style={{ height: '72px', objectFit: 'contain', display: 'block', margin: '0 auto' }}
+            style={{
+              width: '280px',
+              height: 'auto',
+              objectFit: 'contain',
+              display: 'block',
+              margin: '0 auto',
+            }}
           />
           <p className="mt-3 text-center font-sans text-[8px] font-light uppercase tracking-[0.35em] text-[rgba(201,168,76,0.4)]">
             <span className="inline-block mr-2">◆</span>
