@@ -1119,15 +1119,27 @@ input:-webkit-autofill:focus {
 
 /* ─────────────────────────────────────────────
    Text size preference (Settings)
-   Scales the whole content area proportionally
-   via zoom so the layout reflows cleanly instead
-   of getting crammed. "md" is the default.
+   Zooms both the sidebar and the main content
+   area so the whole dashboard scales together.
+   The sidebar height is compensated so it still
+   fills 100 vh after zoom is applied.
+   "md" is the default (no zoom applied).
    ───────────────────────────────────────────── */
 [data-text-size="sm"] .dashboard-main {
   zoom: 0.92;
 }
 [data-text-size="lg"] .dashboard-main {
   zoom: 1.1;
+}
+
+/* Sidebar zoom — height compensation keeps it full-viewport */
+[data-text-size="sm"] .dashboard-sidebar {
+  zoom: 0.92;
+  height: calc(100vh / 0.92) !important;
+}
+[data-text-size="lg"] .dashboard-sidebar {
+  zoom: 1.1;
+  height: calc(100vh / 1.1) !important;
 }
 
 /* ─────────────────────────────────────────────

@@ -278,7 +278,7 @@ export function Sidebar({ userId }: SidebarProps) {
   // Phone portrait (isMobile && !isPhoneLandscape): hamburger + drawer.
   if (!mounted || !isMobile || isPhoneLandscape) {
     return (
-      <aside style={{
+      <aside className="dashboard-sidebar" style={{
         position: 'sticky',
         top: 0,
         zIndex: 50,
@@ -343,7 +343,7 @@ export function Sidebar({ userId }: SidebarProps) {
       )}
 
       {/* Drawer */}
-      <aside style={{
+      <aside className="dashboard-sidebar" style={{
         position: 'fixed',
         top: 0,
         left: 0,
