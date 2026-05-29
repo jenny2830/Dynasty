@@ -7,9 +7,6 @@ interface PageHeaderProps {
   className?: string
 }
 
-const GOLD_GRADIENT =
-  'linear-gradient(135deg, #FBEFB0 0%, #E9C96E 18%, #CBA84C 38%, #9E7C2F 52%, #F0D483 68%, #C9A84C 84%, #856421 100%)'
-
 export function PageHeader({ title, subtitle, children, className }: PageHeaderProps) {
   return (
     <header
@@ -17,7 +14,7 @@ export function PageHeader({ title, subtitle, children, className }: PageHeaderP
       style={{
         marginBottom: '32px',
         paddingBottom: '20px',
-        borderBottom: '1px solid rgba(201,168,76,0.08)',
+        borderBottom: '1px solid var(--panel-header-border)',
       }}
     >
       <div className="page-header-row">
@@ -33,12 +30,12 @@ export function PageHeader({ title, subtitle, children, className }: PageHeaderP
             lineHeight: 1.2,
             margin: 0,
           }}>
-            <span style={{ color: '#C9A84C', fontSize: '8px', opacity: 0.7 }}>◆</span>
+            <span style={{ color: 'var(--gold)', fontSize: '8px', opacity: 0.7 }}>◆</span>
             <span style={{
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
-              background: GOLD_GRADIENT,
+              background: 'var(--gradient-title)',
               WebkitBackgroundClip: 'text',
               backgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
@@ -62,8 +59,8 @@ export function PageHeader({ title, subtitle, children, className }: PageHeaderP
             </p>
           )}
 
-          {/* Gold rule */}
-          <div style={{ width: '32px', height: '1px', background: 'rgba(201,168,76,0.5)', marginTop: '12px', marginBottom: '0' }} aria-hidden />
+          {/* Accent rule */}
+          <div style={{ width: '32px', height: '1px', background: 'var(--rule-color)', marginTop: '12px', marginBottom: '0' }} aria-hidden />
         </div>
 
         {children && (

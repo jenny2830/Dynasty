@@ -24,7 +24,7 @@ export default async function DashboardLayout({
     .maybeSingle()
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', width: '100%', backgroundColor: '#080808' }}>
+    <div className="dashboard-landscape-shell" style={{ display: 'flex', minHeight: '100vh', width: '100%', backgroundColor: '#080808' }}>
       <PreferencesInit />
       <Sidebar
         userId={user.id}

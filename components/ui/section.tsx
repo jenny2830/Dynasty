@@ -14,7 +14,7 @@ export const Section = React.forwardRef<HTMLDivElement, SectionProps>(
         className={cn('lux-panel', className)}
         style={{
           background: '#111111',
-          border: '1px solid rgba(201,168,76,0.1)',
+          border: '1px solid var(--panel-border)',
           borderRadius: '2px',
           boxShadow: '0 4px 20px rgba(0,0,0,0.35)',
           position: 'relative',
@@ -23,9 +23,9 @@ export const Section = React.forwardRef<HTMLDivElement, SectionProps>(
         {...props}
       >
         {/* Top-left corner mark */}
-        <div style={{ position: 'absolute', top: '6px', left: '6px', width: '14px', height: '14px', borderTop: '1px solid rgba(201,168,76,0.5)', borderLeft: '1px solid rgba(201,168,76,0.5)', pointerEvents: 'none', zIndex: 1 }} />
+        <div style={{ position: 'absolute', top: '6px', left: '6px', width: '14px', height: '14px', borderTop: '1px solid var(--corner-color)', borderLeft: '1px solid var(--corner-color)', pointerEvents: 'none', zIndex: 1 }} />
         {/* Bottom-right corner mark */}
-        <div style={{ position: 'absolute', bottom: '6px', right: '6px', width: '14px', height: '14px', borderBottom: '1px solid rgba(201,168,76,0.5)', borderRight: '1px solid rgba(201,168,76,0.5)', pointerEvents: 'none', zIndex: 1 }} />
+        <div style={{ position: 'absolute', bottom: '6px', right: '6px', width: '14px', height: '14px', borderBottom: '1px solid var(--corner-color)', borderRight: '1px solid var(--corner-color)', pointerEvents: 'none', zIndex: 1 }} />
         {children}
       </div>
     )
@@ -56,7 +56,7 @@ export function SectionHeader({
         justifyContent: 'space-between',
         gap: '12px',
         padding: '16px 28px',
-        borderBottom: '1px solid rgba(201,168,76,0.08)',
+        borderBottom: '1px solid var(--panel-header-border)',
       }}
       {...props}
     >
@@ -67,7 +67,7 @@ export function SectionHeader({
           fontWeight: 500,
           letterSpacing: '0.02em',
           margin: 0,
-          background: 'linear-gradient(135deg, #FBEFB0 0%, #E9C96E 18%, #CBA84C 38%, #9E7C2F 52%, #F0D483 68%, #C9A84C 84%, #856421 100%)',
+          background: 'var(--gradient-title)',
           WebkitBackgroundClip: 'text',
           backgroundClip: 'text',
           WebkitTextFillColor: 'transparent',

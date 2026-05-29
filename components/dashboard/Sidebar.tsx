@@ -119,15 +119,27 @@ export function Sidebar({ userId }: SidebarProps) {
   const router = useRouter()
   const [mounted, setMounted] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
+  const [isPhoneLandscape, setIsPhoneLandscape] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
 
   useEffect(() => {
     setMounted(true)
-    const mq = window.matchMedia('(max-width: 768px)')
-    const update = () => setIsMobile(mq.matches)
+    const mqMobile = window.matchMedia('(max-width: 768px)')
+    // Phone landscape: wide but short — height ≤ 500px catches phones in landscape
+    // while leaving tablets (taller in landscape) unaffected.
+    const mqLandscape = window.matchMedia('(orientation: landscape) and (max-height: 500px)')
+
+    const update = () => {
+      setIsMobile(mqMobile.matches)
+      setIsPhoneLandscape(mqLandscape.matches)
+    }
     update()
-    mq.addEventListener('change', update)
-    return () => mq.removeEventListener('change', update)
+    mqMobile.addEventListener('change', update)
+    mqLandscape.addEventListener('change', update)
+    return () => {
+      mqMobile.removeEventListener('change', update)
+      mqLandscape.removeEventListener('change', update)
+    }
   }, [])
 
   // Close the drawer whenever the route changes
@@ -158,11 +170,13 @@ export function Sidebar({ userId }: SidebarProps) {
 
   const closeDrawer = () => setIsOpen(false)
 
+  const compact = isPhoneLandscape
+
   const inner = (
     <div style={{ position: 'relative', display: 'flex', flex: 1, flexDirection: 'column', minHeight: 0 }}>
       {/* Logo area */}
       <div style={{
-        padding: '16px 20px 12px',
+        padding: compact ? '8px 20px 8px' : '16px 20px 12px',
         borderBottom: '1px solid var(--sidebar-logo-border)',
         display: 'flex',
         flexDirection: 'column',
@@ -173,7 +187,7 @@ export function Sidebar({ userId }: SidebarProps) {
           <img
             src="/images/dynasty_logo.jpg"
             alt="Dynasty"
-            style={{ height: '190px', width: '100%', objectFit: 'contain', display: 'block', margin: '0 auto', padding: '8px 12px' }}
+            style={{ height: compact ? '60px' : '190px', width: '100%', objectFit: 'contain', display: 'block', margin: '0 auto', padding: compact ? '4px 12px' : '8px 12px' }}
           />
         </div>
         <p style={{
@@ -260,9 +274,9 @@ export function Sidebar({ userId }: SidebarProps) {
     </div>
   )
 
-  // Desktop (and the very first client render before we know the viewport):
-  // keep the existing sticky 240px sidebar exactly as-is.
-  if (!mounted || !isMobile) {
+  // Desktop OR phone landscape: persistent sticky sidebar alongside main content.
+  // Phone portrait (isMobile && !isPhoneLandscape): hamburger + drawer.
+  if (!mounted || !isMobile || isPhoneLandscape) {
     return (
       <aside style={{
         position: 'sticky',
@@ -271,6 +285,7 @@ export function Sidebar({ userId }: SidebarProps) {
         width: '240px',
         flexShrink: 0,
         height: '100vh',
+        overflowY: 'auto',
         backgroundColor: 'var(--sidebar-bg)',
         borderRight: '1px solid var(--sidebar-border)',
         backgroundImage: 'var(--sidebar-deco)',
@@ -282,7 +297,7 @@ export function Sidebar({ userId }: SidebarProps) {
     )
   }
 
-  // Mobile: hamburger toggle + slide-in drawer + backdrop.
+  // Mobile portrait: hamburger toggle + slide-in drawer + backdrop.
   return (
     <>
       <button
