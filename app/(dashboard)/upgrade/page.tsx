@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { PageHeader } from '@/components/ui/page-header'
 import { UpgradeClient } from './UpgradeClient'
+import type { PlanId } from '@/lib/plans'
 
 export const metadata = { title: 'Upgrade Plan' }
 
@@ -13,18 +14,20 @@ export default async function UpgradePage({
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  let currentPlan: 'starter' | 'landlord' | 'portfolio' = 'starter'
+  let currentPlan: PlanId = 'free'
+  let sessionsUsed = 0
   let hasSubscription = false
 
   if (user) {
     const { data: landlord } = await supabase
       .from('landlords')
-      .select('plan, stripe_customer_id, stripe_subscription_id')
+      .select('plan, sessions_used, stripe_customer_id, stripe_subscription_id')
       .eq('auth_user_id', user.id)
       .maybeSingle()
 
     if (landlord) {
-      currentPlan = landlord.plan ?? 'starter'
+      currentPlan = (landlord.plan ?? 'free') as PlanId
+      sessionsUsed = landlord.sessions_used ?? 0
       hasSubscription = !!landlord.stripe_subscription_id
     }
   }
@@ -37,6 +40,7 @@ export default async function UpgradePage({
       />
       <UpgradeClient
         currentPlan={currentPlan}
+        sessionsUsed={sessionsUsed}
         hasSubscription={hasSubscription}
         success={params.success === 'true'}
         canceled={params.canceled === 'true'}

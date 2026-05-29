@@ -1,7 +1,10 @@
 import { redirect } from 'next/navigation'
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { Sidebar } from '@/components/dashboard/Sidebar'
 import { PreferencesInit } from '@/components/dashboard/PreferencesInit'
+import { DashboardClientWrapper } from '@/components/dashboard/DashboardClientWrapper'
+import type { PlanId } from '@/lib/plans'
 
 export default async function DashboardLayout({
   children,
@@ -13,31 +16,127 @@ export default async function DashboardLayout({
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (!user) {
-    redirect('/login')
-  }
+  if (!user) redirect('/login')
 
   const { data: landlord } = await supabase
     .from('landlords')
-    .select('theme_preference')
+    .select('id, theme_preference, plan, sessions_used, free_trial_expired, is_blocked')
     .eq('auth_user_id', user.id)
     .maybeSingle()
 
+  // Blocked accounts cannot access the dashboard
+  if (landlord?.is_blocked) {
+    redirect('/login?error=Your+account+has+been+suspended.+Contact+support.')
+  }
+
+  const plan = (landlord?.plan ?? 'free') as PlanId
+  const sessionsUsed = landlord?.sessions_used ?? 0
+  const trialExpired = landlord?.free_trial_expired ?? false
+
   return (
-    <div className="dashboard-landscape-shell" style={{ display: 'flex', minHeight: '100vh', width: '100%', backgroundColor: '#080808' }}>
+    <div
+      className="dashboard-landscape-shell"
+      style={{ display: 'flex', minHeight: '100vh', width: '100%', backgroundColor: '#080808' }}
+    >
       <PreferencesInit />
-      <Sidebar
-        userId={user.id}
-        initialTheme={landlord?.theme_preference ?? 'dark'}
-      />
-      <main className="dashboard-main" style={{
-        flex: 1,
-        minWidth: 0,
-        backgroundColor: '#0A0A0A',
-        backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 60px, rgba(201,168,76,0.008) 60px, rgba(201,168,76,0.008) 61px), repeating-linear-gradient(-45deg, transparent, transparent 60px, rgba(201,168,76,0.008) 60px, rgba(201,168,76,0.008) 61px)',
-        position: 'relative',
-      }}>
-        <div style={{ position: 'relative', zIndex: 1 }}>{children}</div>
+      <Sidebar userId={user.id} initialTheme={landlord?.theme_preference ?? 'dark'} />
+      <main
+        className="dashboard-main"
+        style={{
+          flex: 1,
+          minWidth: 0,
+          backgroundColor: '#0A0A0A',
+          backgroundImage:
+            'repeating-linear-gradient(45deg, transparent, transparent 60px, rgba(201,168,76,0.008) 60px, rgba(201,168,76,0.008) 61px), repeating-linear-gradient(-45deg, transparent, transparent 60px, rgba(201,168,76,0.008) 60px, rgba(201,168,76,0.008) 61px)',
+          position: 'relative',
+        }}
+      >
+        <div style={{ position: 'relative', zIndex: 1 }}>
+          <DashboardClientWrapper
+            landlordId={landlord?.id ?? ''}
+            plan={plan}
+            sessionsUsed={sessionsUsed}
+            trialExpired={trialExpired}
+          >
+            {children}
+          </DashboardClientWrapper>
+        </div>
+
+        {/* Full-screen upgrade wall — rendered server-side so there's no flash */}
+        {plan === 'free' && trialExpired && (
+          <div style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 100,
+            background: 'rgba(8,8,8,0.97)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '24px',
+          }}>
+            <div style={{
+              background: '#141414',
+              border: '1px solid rgba(201,168,76,0.20)',
+              borderRadius: '2px',
+              padding: '56px 48px',
+              textAlign: 'center',
+              maxWidth: '480px',
+              width: '100%',
+              position: 'relative',
+            }}>
+              {/* Corner marks */}
+              <div style={{ position: 'absolute', top: '10px', left: '10px', width: '18px', height: '18px', borderTop: '1px solid rgba(201,168,76,0.45)', borderLeft: '1px solid rgba(201,168,76,0.45)' }} />
+              <div style={{ position: 'absolute', bottom: '10px', right: '10px', width: '18px', height: '18px', borderBottom: '1px solid rgba(201,168,76,0.45)', borderRight: '1px solid rgba(201,168,76,0.45)' }} />
+
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/dynastynobg.png"
+                alt="Dynasty"
+                style={{ height: '80px', objectFit: 'contain', margin: '0 auto 20px', display: 'block' }}
+              />
+              <h2 style={{
+                fontFamily: "'Cormorant Garamond', serif",
+                fontSize: '28px',
+                fontWeight: 600,
+                color: '#FAF7F2',
+                marginBottom: '10px',
+                letterSpacing: '0.02em',
+              }}>
+                Your free trial has ended
+              </h2>
+              <p style={{
+                fontFamily: "'Jost', sans-serif",
+                fontSize: '13px',
+                fontWeight: 300,
+                color: '#6B6B65',
+                marginBottom: '32px',
+                letterSpacing: '0.04em',
+                lineHeight: 1.6,
+              }}>
+                You used all 5 sessions. Choose a plan to continue building your property empire.
+              </p>
+              <Link
+                href="/upgrade"
+                style={{
+                  display: 'inline-block',
+                  background: 'linear-gradient(135deg, #C9A84C, #9A7A2E)',
+                  color: '#080808',
+                  fontFamily: "'Jost', sans-serif",
+                  fontWeight: 600,
+                  fontSize: '11px',
+                  letterSpacing: '0.2em',
+                  textTransform: 'uppercase',
+                  padding: '14px 48px',
+                  borderRadius: '1px',
+                  textDecoration: 'none',
+                  boxShadow: '0 4px 20px rgba(201,168,76,0.25)',
+                }}
+              >
+                Choose Your Plan
+              </Link>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   )

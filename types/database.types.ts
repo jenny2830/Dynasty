@@ -18,7 +18,7 @@ export type Database = {
           phone: string | null
           country: string
           currency: string
-          plan: 'starter' | 'landlord' | 'portfolio'
+          plan: 'free' | 'starter' | 'landlord' | 'portfolio'
           stripe_customer_id: string | null
           stripe_subscription_id: string | null
           created_at: string
@@ -27,6 +27,12 @@ export type Database = {
           default_date_range: 'week' | 'month' | 'quarter' | 'year'
           notification_prefs: Json
           onboarding_completed: boolean
+          sessions_used: number
+          free_trial_started_at: string | null
+          free_trial_expired: boolean
+          signup_ip: string | null
+          signup_fingerprint: string | null
+          is_blocked: boolean
         }
         Insert: {
           id?: string
@@ -36,7 +42,7 @@ export type Database = {
           phone?: string | null
           country?: string
           currency?: string
-          plan?: 'starter' | 'landlord' | 'portfolio'
+          plan?: 'free' | 'starter' | 'landlord' | 'portfolio'
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           created_at?: string
@@ -45,6 +51,12 @@ export type Database = {
           default_date_range?: 'week' | 'month' | 'quarter' | 'year'
           notification_prefs?: Json
           onboarding_completed?: boolean
+          sessions_used?: number
+          free_trial_started_at?: string | null
+          free_trial_expired?: boolean
+          signup_ip?: string | null
+          signup_fingerprint?: string | null
+          is_blocked?: boolean
         }
         Update: {
           id?: string
@@ -54,7 +66,7 @@ export type Database = {
           phone?: string | null
           country?: string
           currency?: string
-          plan?: 'starter' | 'landlord' | 'portfolio'
+          plan?: 'free' | 'starter' | 'landlord' | 'portfolio'
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           created_at?: string
@@ -63,6 +75,39 @@ export type Database = {
           default_date_range?: 'week' | 'month' | 'quarter' | 'year'
           notification_prefs?: Json
           onboarding_completed?: boolean
+          sessions_used?: number
+          free_trial_started_at?: string | null
+          free_trial_expired?: boolean
+          signup_ip?: string | null
+          signup_fingerprint?: string | null
+          is_blocked?: boolean
+        }
+        Relationships: []
+      }
+      signup_audit: {
+        Row: {
+          id: string
+          email: string
+          ip_address: string | null
+          fingerprint: string | null
+          user_agent: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          email: string
+          ip_address?: string | null
+          fingerprint?: string | null
+          user_agent?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          email?: string
+          ip_address?: string | null
+          fingerprint?: string | null
+          user_agent?: string | null
+          created_at?: string
         }
         Relationships: []
       }
@@ -585,6 +630,7 @@ export type Database = {
 
 // Convenience row types
 export type Landlord = Database['public']['Tables']['landlords']['Row']
+export type SignupAudit = Database['public']['Tables']['signup_audit']['Row']
 export type Property = Database['public']['Tables']['properties']['Row']
 export type Unit = Database['public']['Tables']['units']['Row']
 export type Tenant = Database['public']['Tables']['tenants']['Row']

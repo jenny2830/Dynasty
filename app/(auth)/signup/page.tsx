@@ -5,15 +5,16 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { SignupCapture } from './SignupCapture'
 
 export const metadata = { title: 'Create account' }
 
 export default async function SignupPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string; success?: string }>
+  searchParams: Promise<{ error?: string; success?: string; email?: string }>
 }) {
-  const { error, success } = await searchParams
+  const { error, success, email: emailParam } = await searchParams
 
   async function signup(formData: FormData) {
     'use server'
@@ -47,7 +48,7 @@ export default async function SignupPage({
       }
     }
 
-    redirect('/signup?success=1')
+    redirect(`/signup?success=1&email=${encodeURIComponent(email)}`)
   }
 
   return (
@@ -81,6 +82,7 @@ export default async function SignupPage({
         >
           {success ? (
             <div className="text-center">
+              {emailParam && <SignupCapture email={decodeURIComponent(emailParam)} />}
               <h1 className="font-serif text-[26px] font-medium tracking-[0.04em] text-dynasty-warm-white">
                 Check Your Email
               </h1>

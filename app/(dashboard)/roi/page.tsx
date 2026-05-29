@@ -1,21 +1,24 @@
 import { createClient } from '@/lib/supabase/server'
 import { ROICalculator } from './ROICalculator'
 import { PageHeader } from '@/components/ui/page-header'
+import { FeatureGate } from '@/components/FeatureGate'
+import type { PlanId } from '@/lib/plans'
 
 export const metadata = { title: 'ROI Calculator' }
 
 export default async function ROIPage() {
   const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
 
   const { data: landlord } = await supabase
     .from('landlords')
-    .select('id')
+    .select('id, plan, free_trial_expired')
     .eq('auth_user_id', user.id)
     .single()
+
+  const plan = (landlord?.plan ?? 'free') as PlanId
+  const trialExpired = landlord?.free_trial_expired ?? false
 
   const { data: properties } = landlord
     ? await supabase
@@ -31,7 +34,9 @@ export default async function ROIPage() {
         title="ROI Calculator"
         subtitle="Cap rate · Cash-on-cash · Yield · Equity analysis"
       />
-      <ROICalculator properties={properties ?? []} />
+      <FeatureGate feature="roiCalculator" plan={plan} trialExpired={trialExpired}>
+        <ROICalculator properties={properties ?? []} />
+      </FeatureGate>
     </div>
   )
 }

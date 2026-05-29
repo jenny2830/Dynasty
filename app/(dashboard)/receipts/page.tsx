@@ -1,21 +1,24 @@
 import { createClient } from '@/lib/supabase/server'
 import { ReceiptScanner } from './ReceiptScanner'
 import { PageHeader } from '@/components/ui/page-header'
+import { FeatureGate } from '@/components/FeatureGate'
+import type { PlanId } from '@/lib/plans'
 
 export const metadata = { title: 'Receipt Scanner' }
 
 export default async function ReceiptsPage() {
   const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
 
   const { data: landlord } = await supabase
     .from('landlords')
-    .select('id')
+    .select('id, plan, free_trial_expired')
     .eq('auth_user_id', user.id)
     .single()
+
+  const plan = (landlord?.plan ?? 'free') as PlanId
+  const trialExpired = landlord?.free_trial_expired ?? false
 
   const { data: properties } = landlord
     ? await supabase
@@ -40,11 +43,12 @@ export default async function ReceiptsPage() {
         title="Receipt Scanner"
         subtitle="AI extraction · Images processed and immediately discarded"
       />
-
-      <ReceiptScanner
-        properties={properties ?? []}
-        recentReceipts={recentReceipts ?? []}
-      />
+      <FeatureGate feature="receiptScanner" plan={plan} trialExpired={trialExpired}>
+        <ReceiptScanner
+          properties={properties ?? []}
+          recentReceipts={recentReceipts ?? []}
+        />
+      </FeatureGate>
     </div>
   )
 }
