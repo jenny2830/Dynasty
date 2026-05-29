@@ -119,11 +119,12 @@ export function TransactionForm({
       {/* Type toggle — sharp art deco segmented control */}
       <div className="space-y-2">
         <Label>Transaction Type *</Label>
-        <div className="flex overflow-hidden rounded-[1px] border border-[rgba(201,168,76,0.15)]">
+        <div className="tx-type-segment flex overflow-hidden rounded-[1px] border border-[rgba(201,168,76,0.15)]">
           {(['expense', 'income'] as const).map((t) => (
             <button
               key={t}
               type="button"
+              aria-pressed={txType === t}
               onClick={() => setTxType(t)}
               className={`flex-1 py-3 font-sans text-[10px] font-light uppercase tracking-[0.22em] transition-colors ${
                 txType === t

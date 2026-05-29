@@ -429,22 +429,60 @@ html[data-color-palette="white-black"] .dashboard-sidebar p {
   color: var(--sidebar-label-color) !important;
 }
 
-/* ── White & Black: card / panel backgrounds ── */
-html[data-color-palette="white-black"] .stat-panel {
-  background: #FFFFFF !important;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.09) !important;
-}
+/* ── White & Black: card / panel backgrounds ──
+   Light grayish, close to the cream page background (#FAF7F2) for a soft,
+   low-contrast surface rather than stark white. */
+html[data-color-palette="white-black"] .stat-panel,
 html[data-color-palette="white-black"] .lux-panel {
-  background: #F5F5F0 !important;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.07) !important;
+  background: #EFEDE6 !important;
+  border-color: rgba(0,0,0,0.10) !important;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06) !important;
 }
 
-/* ── White & Black: inputs — gray medium background ── */
+/* ── White & Black: dark utility boxes → light ──
+   Drop-receipt zone and empty-state boxes use bg-dynasty-gray-900 utilities
+   that the light theme doesn't otherwise touch. Lighten them with a subtle
+   hover variation. */
+html[data-color-palette="white-black"] [class*="bg-dynasty-gray-900"] {
+  background-color: #F4F2EC !important;
+  border-color: rgba(0,0,0,0.20) !important;
+}
+html[data-color-palette="white-black"] [class*="bg-dynasty-gray-900"]:hover {
+  background-color: #E9E7DF !important;
+  border-color: rgba(0,0,0,0.32) !important;
+}
+
+/* ── White & Black: make faint gold buttons visible on light surfaces ──
+   Scoped to button/anchor elements so container borders are untouched.
+   The gold-gradient primary button uses bg-[linear-gradient] + shadow, so it
+   is not matched here and keeps its gold look. */
+html[data-color-palette="white-black"] button[class*="border-[rgba(201,168,76"],
+html[data-color-palette="white-black"] a[class*="border-[rgba(201,168,76"] {
+  border-color: rgba(0,0,0,0.28) !important;
+}
+html[data-color-palette="white-black"] button[class*="bg-[rgba(201,168,76"],
+html[data-color-palette="white-black"] a[class*="bg-[rgba(201,168,76"] {
+  background-color: rgba(0,0,0,0.05) !important;
+}
+
+/* ── White & Black: transaction type segmented control ──
+   Give the selected option a clearly darker chip for distinction. */
+html[data-color-palette="white-black"] .tx-type-segment button[aria-pressed="true"] {
+  background-color: #D8D6CE !important;
+  color: #1C1A17 !important;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.14) !important;
+}
+html[data-color-palette="white-black"] .tx-type-segment button[aria-pressed="false"] {
+  background-color: transparent !important;
+  color: #6B6B65 !important;
+}
+
+/* ── White & Black: inputs — very light gray background ── */
 html[data-color-palette="white-black"] input:not([type="checkbox"]):not([type="radio"]),
 html[data-color-palette="white-black"] select,
 html[data-color-palette="white-black"] textarea {
-  background-color: #C8C8C0 !important;
-  border-color: rgba(0,0,0,0.28) !important;
+  background-color: #F6F5F1 !important;
+  border-color: rgba(0,0,0,0.22) !important;
   color: #1C1A17 !important;
 }
 html[data-color-palette="white-black"] input:not([type="checkbox"]):not([type="radio"])::placeholder,
@@ -467,7 +505,7 @@ html[data-color-palette="white-black"] textarea:hover {
 html[data-color-palette="white-black"] input:-webkit-autofill,
 html[data-color-palette="white-black"] input:-webkit-autofill:focus {
   -webkit-text-fill-color: #1C1A17 !important;
-  -webkit-box-shadow: 0 0 0px 1000px #C8C8C0 inset !important;
+  -webkit-box-shadow: 0 0 0px 1000px #F6F5F1 inset !important;
 }
 
 /* ── White & Black: scrollbar ── */
