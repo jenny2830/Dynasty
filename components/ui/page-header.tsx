@@ -7,6 +7,9 @@ interface PageHeaderProps {
   className?: string
 }
 
+const GOLD_GRADIENT =
+  'linear-gradient(135deg, #FBEFB0 0%, #E9C96E 18%, #CBA84C 38%, #9E7C2F 52%, #F0D483 68%, #C9A84C 84%, #856421 100%)'
+
 export function PageHeader({ title, subtitle, children, className }: PageHeaderProps) {
   return (
     <header
@@ -17,7 +20,7 @@ export function PageHeader({ title, subtitle, children, className }: PageHeaderP
         borderBottom: '1px solid rgba(201,168,76,0.08)',
       }}
     >
-      <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px' }}>
+      <div className="page-header-row">
         <div style={{ minWidth: 0, flex: 1 }}>
           <h1 style={{
             fontFamily: "'Cormorant Garamond', serif",
@@ -35,11 +38,12 @@ export function PageHeader({ title, subtitle, children, className }: PageHeaderP
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
-              background: 'linear-gradient(135deg, #F0D060 0%, #E8C97A 20%, #C9A84C 55%, #B8922A 80%, #9A7A2E 100%)',
+              background: GOLD_GRADIENT,
               WebkitBackgroundClip: 'text',
               backgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               color: 'transparent',
+              textShadow: '0 1px 1px rgba(0,0,0,0.25)',
             }}>{title}</span>
           </h1>
 
@@ -63,7 +67,7 @@ export function PageHeader({ title, subtitle, children, className }: PageHeaderP
         </div>
 
         {children && (
-          <div style={{ display: 'flex', flexShrink: 0, alignItems: 'center', gap: '12px' }}>{children}</div>
+          <div className="page-header-actions" style={{ display: 'flex', flexShrink: 0, alignItems: 'center', gap: '12px' }}>{children}</div>
         )}
       </div>
     </header>

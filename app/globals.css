@@ -883,3 +883,29 @@ input:-webkit-autofill:focus {
     overflow-x: hidden;
   }
 }
+
+/* ─────────────────────────────────────────────
+   Responsive — page header layout
+   Desktop: title left, actions right (one row).
+   Mobile: title/section name stacked ABOVE the
+   action buttons.
+   ───────────────────────────────────────────── */
+.page-header-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+@media (max-width: 768px) {
+  .page-header-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .page-header-actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+}
