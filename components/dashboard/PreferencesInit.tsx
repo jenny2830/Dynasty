@@ -20,6 +20,11 @@ export function PreferencesInit() {
     if (palette === 'black-gold' || palette === 'rose-gold' || palette === 'white-black') {
       document.documentElement.dataset.colorPalette = palette
       setTheme(palette === 'white-black' ? 'light' : 'dark')
+    } else {
+      // Default to White & Black on first visit
+      document.documentElement.dataset.colorPalette = 'white-black'
+      localStorage.setItem('dynasty-color-palette', 'white-black')
+      setTheme('light')
     }
   }, [setTheme])
 

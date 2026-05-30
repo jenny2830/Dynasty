@@ -26,9 +26,15 @@ const COLOR_PALETTES: {
   swatches: string[]
 } [] = [
   {
+    value: 'white-black',
+    label: 'White & Black',
+    hint: 'Default',
+    swatches: ['#FAF7F2', '#1C1A17'],
+  },
+  {
     value: 'black-gold',
     label: 'Black & Gold',
-    hint: 'Default',
+    hint: 'Classic',
     swatches: ['#080808', '#C9A84C'],
   },
   {
@@ -36,12 +42,6 @@ const COLOR_PALETTES: {
     label: 'Rose Gold',
     hint: 'Signature',
     swatches: ['#0C0809', '#B76E79', '#D4959E'],
-  },
-  {
-    value: 'white-black',
-    label: 'White & Black',
-    hint: 'Light',
-    swatches: ['#FAF7F2', '#1C1A17'],
   },
 ]
 
@@ -177,7 +177,7 @@ export function SettingsPanel({ currentPlan = 'starter', hasSubscription = false
   const { setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
   const [textSize, setTextSize] = useState<TextSize>('md')
-  const [colorPalette, setColorPalette] = useState<ColorPalette>('black-gold')
+  const [colorPalette, setColorPalette] = useState<ColorPalette>('white-black')
 
   // Password form state
   const [password, setPassword] = useState('')

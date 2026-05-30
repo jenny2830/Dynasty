@@ -135,7 +135,7 @@
   --sidebar-border:           rgba(201,168,76,0.12);
   --sidebar-logo-border:      rgba(201,168,76,0.15);
   --sidebar-tagline:          rgba(201,168,76,0.45);
-  --sidebar-label-color:      #6B6B65;
+  --sidebar-label-color:      #8A8A82;
   --sidebar-active-color:     #C9A84C;
   --sidebar-active-border:    #C9A84C;
   --sidebar-active-bg:        rgba(201,168,76,0.07);
@@ -163,8 +163,8 @@
   --bg-sidebar:     #080808;
 
   --text-primary:   #FAF7F2;
-  --text-secondary: #8A8A82;
-  --text-muted:     #4A4A45;
+  --text-secondary: #C4C0B4;
+  --text-muted:     #8A8A82;
 
   --border-default: rgba(201, 168, 76, 0.12);
   --border-hover:   rgba(201, 168, 76, 0.35);
@@ -180,14 +180,40 @@
   --bg-sidebar:     #1C1A17;
 
   --text-primary:   #1C1A17;
-  --text-secondary: #4A4A45;
-  --text-muted:     #8A8A82;
+  --text-secondary: #3A3A35;
+  --text-muted:     #6B6B65;
 
   --border-default: rgba(201, 168, 76, 0.2);
   --border-hover:   rgba(201, 168, 76, 0.45);
 
   --gold:           #9A7A2E;
   --rose:           #8B4F58;
+}
+
+/* ── data-theme attribute equivalents (used by next-themes with attribute="data-theme") ── */
+[data-theme="dark"] {
+  --text-primary:   #FAF7F2;
+  --text-secondary: #C4C0B4;
+  --text-muted:     #8A8A82;
+}
+
+[data-theme="light"] {
+  --text-primary:   #1C1A17;
+  --text-secondary: #3A3A35;
+  --text-muted:     #6B6B65;
+}
+
+/* ─────────────────────────────────────────────
+   Dark mode secondary text — ensures muted labels,
+   descriptions, and helper text are readable on
+   the dark surface without washing out to near-black.
+   ───────────────────────────────────────────── */
+[data-theme="dark"] .text-dynasty-gray-400,
+[data-theme="dark"] .text-dynasty-gray-500 {
+  color: #B0AFA7 !important;
+}
+[data-theme="dark"] .text-dynasty-gray-300 {
+  color: #C8C6BE !important;
 }
 
 /* ─────────────────────────────────────────────
@@ -430,13 +456,40 @@ html[data-color-palette="white-black"] .dashboard-sidebar p {
 }
 
 /* ── White & Black: card / panel backgrounds ──
-   Light grayish, close to the cream page background (#FAF7F2) for a soft,
-   low-contrast surface rather than stark white. */
+   Light gray surfaces consistent across all card types.
+   Page bg is #FAF7F2 (cream), cards use #E8E7E2 (light gray)
+   so cards are clearly distinct from the page surface. */
 html[data-color-palette="white-black"] .stat-panel,
 html[data-color-palette="white-black"] .lux-panel {
-  background: #EFEDE6 !important;
+  background: #E8E7E2 !important;
   border-color: rgba(0,0,0,0.10) !important;
   box-shadow: 0 2px 12px rgba(0,0,0,0.06) !important;
+}
+
+html[data-color-palette="white-black"] .lux-card,
+html[data-color-palette="white-black"] .lux-card-rose {
+  background: #E8E7E2 !important;
+  border-color: rgba(0,0,0,0.12) !important;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06), inset 0 1px 0 rgba(0,0,0,0.04) !important;
+}
+html[data-color-palette="white-black"] .lux-card:hover {
+  border-color: rgba(0,0,0,0.24) !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.10) !important;
+}
+
+html[data-color-palette="white-black"] .stat-card {
+  background-color: #E8E7E2 !important;
+  border-color: rgba(0,0,0,0.12) !important;
+}
+html[data-color-palette="white-black"] .stat-card:hover {
+  border-color: rgba(0,0,0,0.22) !important;
+}
+
+/* Override the generic .light [class*="card"] white rule so white-black cards stay gray */
+html[data-color-palette="white-black"] [class*="card"],
+html[data-color-palette="white-black"] [class*="Card"] {
+  background: #E8E7E2 !important;
+  border-color: rgba(0,0,0,0.12) !important;
 }
 
 /* ── White & Black: dark utility boxes → light ──
@@ -551,8 +604,8 @@ body {
 
 .light [class*="card"],
 .light [class*="Card"] {
-  background: #FFFFFF !important;
-  border-color: rgba(154, 122, 46, 0.2) !important;
+  background: #E8E7E2 !important;
+  border-color: rgba(0, 0, 0, 0.12) !important;
 }
 
 .light h1, .light h2, .light h3, .light h4 {
@@ -746,7 +799,7 @@ button, label, p, span, a, input, textarea, select {
   font-size: 9px;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: #4A4A45;
+  color: var(--text-muted, #8A8A82);
 }
 
 /* ============================================
@@ -1076,12 +1129,12 @@ input:-webkit-autofill:focus {
 
 /* Stat cards */
 .light .stat-card {
-  background-color: #FFFFFF;
-  border-color: rgba(154, 122, 46, 0.2);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  background-color: #E8E7E2;
+  border-color: rgba(0, 0, 0, 0.12);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
 }
 .light .stat-card:hover {
-  border-color: rgba(154, 122, 46, 0.4);
+  border-color: rgba(0, 0, 0, 0.22);
 }
 .light .stat-card::before {
   border-top-color: rgba(154, 122, 46, 0.4);
@@ -1131,14 +1184,14 @@ input:-webkit-autofill:focus {
 /* Cards / panels */
 .light [class*="bg-[#111111]"],
 .light [class*="bg-dynasty-black-soft"] {
-  background-color: #FFFFFF;
+  background-color: #E8E7E2;
 }
 .light [class*="bg-[#161616]"],
 .light [class*="bg-dynasty-black-card"] {
-  background-color: #F5F0E8;
+  background-color: #E0DFD9;
 }
 .light [class*="bg-[#0F0F0F]"] {
-  background-color: #F0EBE3;
+  background-color: #ECEAE4;
 }
 
 /* Text */
@@ -1317,8 +1370,8 @@ input:-webkit-autofill:focus {
 }
 [data-theme="light"] .lux-panel,
 [data-theme="light"] .stat-panel {
-  background: #FFFFFF !important;
-  border-color: rgba(154,122,46,0.22) !important;
+  background: #EFEDE8 !important;
+  border-color: rgba(0,0,0,0.10) !important;
   box-shadow: 0 2px 14px rgba(0,0,0,0.06) !important;
 }
 [data-theme="light"] [class*="text-dynasty-warm-white"],
@@ -1335,7 +1388,7 @@ input:-webkit-autofill:focus {
 }
 [data-theme="light"] thead,
 [data-theme="light"] [class*="bg-dynasty-black"] {
-  background-color: #F5F0E8 !important;
+  background-color: #E0DFD9 !important;
 }
 
 /* ─────────────────────────────────────────────
