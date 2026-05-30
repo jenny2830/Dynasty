@@ -16,15 +16,23 @@ export function PreferencesInit() {
       document.documentElement.dataset.textSize = size
     }
 
+    // Respect an explicit "rose" theme chosen via the theme toggle — it is
+    // independent of the color palette and must not be clobbered on load.
+    const storedTheme = localStorage.getItem('dynasty-theme')
+
     const palette = localStorage.getItem('dynasty-color-palette')
     if (palette === 'black-gold' || palette === 'rose-gold' || palette === 'white-black') {
       document.documentElement.dataset.colorPalette = palette
-      setTheme(palette === 'white-black' ? 'light' : 'dark')
+      if (storedTheme !== 'rose') {
+        setTheme(palette === 'white-black' ? 'light' : 'dark')
+      }
     } else {
       // Default to White & Black on first visit
       document.documentElement.dataset.colorPalette = 'white-black'
       localStorage.setItem('dynasty-color-palette', 'white-black')
-      setTheme('light')
+      if (storedTheme !== 'rose') {
+        setTheme('light')
+      }
     }
   }, [setTheme])
 

@@ -18,6 +18,7 @@ import {
   X,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { ThemeToggle } from './ThemeToggle'
 
 const NAV_PRIMARY = [
   { href: '/overview',     label: 'Overview',      Icon: LayoutDashboard },
@@ -255,6 +256,9 @@ export function Sidebar({ userId }: SidebarProps) {
             <LogOut style={{ width: '15px', height: '15px', flexShrink: 0 }} strokeWidth={1.2} />
             <span>Sign Out</span>
           </button>
+
+          <div style={{ margin: '8px 20px', height: '1px', background: 'var(--sidebar-divider)' }} />
+          <ThemeToggle />
         </div>
       </nav>
 

@@ -41,7 +41,7 @@ function StatCard({ label, value, subtext, trend, icon, highlight, negative }: S
             fontWeight: 300,
             fontSize: '9px',
             letterSpacing: '0.22em',
-            color: '#4A4A45',
+            color: '#C9A84C',
             marginBottom: '10px',
             margin: '0 0 10px 0',
           }}>
@@ -74,7 +74,7 @@ function StatCard({ label, value, subtext, trend, icon, highlight, negative }: S
               fontWeight: 300,
               fontSize: '11px',
               letterSpacing: '0.04em',
-              color: '#333330',
+              color: '#B5B5AA',
               margin: '8px 0 0 0',
             }}>
               {subtext}
@@ -92,7 +92,7 @@ function StatCard({ label, value, subtext, trend, icon, highlight, negative }: S
               margin: '8px 0 0 0',
             }}>
               {trend.value >= 0 ? '↑' : '↓'} {Math.abs(trend.value)}%{' '}
-              <span style={{ color: '#333330' }}>{trend.label}</span>
+              <span style={{ color: '#8A8A82' }}>{trend.label}</span>
             </p>
           )}
         </div>

@@ -57,6 +57,7 @@ export default function RootLayout({
           attribute="data-theme"
           defaultTheme="light"
           enableSystem={false}
+          themes={['dark', 'light', 'rose']}
           storageKey="dynasty-theme"
         >
           {children}

@@ -1,7 +1,7 @@
 'use client'
 
 import { useTheme } from 'next-themes'
-import { Sun, Moon } from 'lucide-react'
+import { Sun, Moon, Sparkles } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 export function ThemeToggle() {
@@ -11,11 +11,29 @@ export function ThemeToggle() {
   useEffect(() => { setMounted(true) }, [])
   if (!mounted) return null
 
-  const isDark = resolvedTheme === 'dark'
+  const cycle = () => {
+    if (resolvedTheme === 'dark') setTheme('light')
+    else if (resolvedTheme === 'light') setTheme('rose')
+    else setTheme('dark')
+  }
+
+  const label =
+    resolvedTheme === 'dark'
+      ? 'Light Mode'
+      : resolvedTheme === 'light'
+      ? 'Rose Mode'
+      : 'Dark Mode'
+
+  const Icon =
+    resolvedTheme === 'dark'
+      ? Sun
+      : resolvedTheme === 'light'
+      ? Sparkles
+      : Moon
 
   return (
     <button
-      onClick={() => setTheme(isDark ? 'light' : 'dark')}
+      onClick={cycle}
       style={{
         display: 'flex',
         alignItems: 'center',
@@ -25,18 +43,18 @@ export function ThemeToggle() {
         background: 'transparent',
         border: 'none',
         cursor: 'pointer',
-        color: '#9A8F7A',
+        color: 'var(--sidebar-muted-color)',
         fontFamily: "'Jost', sans-serif",
         fontSize: '11px',
         letterSpacing: '0.14em',
         textTransform: 'uppercase' as const,
         transition: 'color 0.2s',
       }}
-      onMouseEnter={e => (e.currentTarget.style.color = '#C9A84C')}
-      onMouseLeave={e => (e.currentTarget.style.color = '#9A8F7A')}
+      onMouseEnter={e => (e.currentTarget.style.color = 'var(--sidebar-hover-color)')}
+      onMouseLeave={e => (e.currentTarget.style.color = 'var(--sidebar-muted-color)')}
     >
-      {isDark ? <Sun size={15} strokeWidth={1.2} /> : <Moon size={15} strokeWidth={1.2} />}
-      <span>{isDark ? 'Light Mode' : 'Dark Mode'}</span>
+      <Icon size={15} strokeWidth={1.2} />
+      <span>{label}</span>
     </button>
   )
 }
