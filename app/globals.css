@@ -391,30 +391,27 @@ html[data-color-palette="rose-gold"] [data-radix-popper-content-wrapper] {
   --border-gold: 1px solid rgba(183,110,121,0.20);
 }
 
-/* White & Black — light main content; sidebar stays dark/black with gold
-   accents for brand consistency (rule: sidebar always dark-ish). */
+/* White & Black — light main content; sidebar is light cream to match. */
 html[data-color-palette="white-black"] {
-  /* ── Sidebar variables (dark black + gold, same as default) ── */
-  --sidebar-bg:               #080808;
-  --sidebar-border:           rgba(201,168,76,0.12);
-  --sidebar-logo-border:      rgba(201,168,76,0.15);
-  --sidebar-tagline:          rgba(201,168,76,0.45);
+  /* ── Sidebar variables (light cream + darker gold accents) ── */
+  --sidebar-bg:               #F5F0E8;
+  --sidebar-border:           rgba(154,122,46,0.20);
+  --sidebar-logo-border:      rgba(154,122,46,0.18);
+  --sidebar-tagline:          rgba(154,122,46,0.50);
   --sidebar-label-color:      #8A8A82;
-  --sidebar-active-color:     #C9A84C;
-  --sidebar-active-border:    #C9A84C;
-  --sidebar-active-bg:        rgba(201,168,76,0.07);
-  --sidebar-muted-color:      #9A8F7A;
-  --sidebar-hover-color:      #C9A84C;
-  --sidebar-divider:          rgba(201,168,76,0.08);
-  --sidebar-footer-color:     rgba(201,168,76,0.30);
-  --sidebar-footer-diamond:   rgba(201,168,76,0.50);
-  --sidebar-close-btn-border: rgba(201,168,76,0.20);
-  --sidebar-hamburger-border: rgba(201,168,76,0.30);
-  --sidebar-hamburger-color:  #C9A84C;
-  --sidebar-hamburger-bg:     rgba(8,8,8,0.85);
-  --sidebar-deco:
-    repeating-linear-gradient(45deg, transparent, transparent 28px, rgba(201,168,76,0.018) 28px, rgba(201,168,76,0.018) 29px),
-    repeating-linear-gradient(-45deg, transparent, transparent 28px, rgba(201,168,76,0.018) 28px, rgba(201,168,76,0.018) 29px);
+  --sidebar-active-color:     #9A7A2E;
+  --sidebar-active-border:    #9A7A2E;
+  --sidebar-active-bg:        rgba(154,122,46,0.10);
+  --sidebar-muted-color:      #6B6B65;
+  --sidebar-hover-color:      #9A7A2E;
+  --sidebar-divider:          rgba(154,122,46,0.15);
+  --sidebar-footer-color:     rgba(154,122,46,0.40);
+  --sidebar-footer-diamond:   rgba(154,122,46,0.50);
+  --sidebar-close-btn-border: rgba(154,122,46,0.22);
+  --sidebar-hamburger-border: rgba(154,122,46,0.30);
+  --sidebar-hamburger-color:  #6B6B65;
+  --sidebar-hamburger-bg:     rgba(245,240,232,0.92);
+  --sidebar-deco: none;
 
   /* ── Component tokens (white & black) ── */
   --gradient-value:        linear-gradient(135deg, #5A5A55 0%, #2A2A25 50%, #0F0F0E 100%);
@@ -443,15 +440,10 @@ html[data-color-palette="white-black"] {
   --border-hover:   rgba(0,0,0,0.30);
 }
 
-/* ── White & Black: sidebar text & hover ──
-   The light-theme typography rules ([data-theme="light"] p/span/label)
-   use !important and would otherwise force the sidebar nav text grey and
-   kill the gold hover. These higher-specificity rules restore the
-   intended behaviour: black text, gold on hover, scoped to the sidebar. */
-html[data-color-palette="white-black"] .dashboard-sidebar a span,
-html[data-color-palette="white-black"] .dashboard-sidebar button span {
-  color: inherit !important;
-}
+/* ── White & Black: sidebar text ──
+   The [data-theme="light"] aside rules handle sidebar text color now.
+   These guards prevent the broad p/span rules from bleeding into the
+   sidebar when the white-black palette is NOT in light-theme mode. */
 html[data-color-palette="white-black"] .dashboard-sidebar p {
   color: var(--sidebar-label-color) !important;
 }
@@ -1490,70 +1482,156 @@ input:-webkit-autofill:focus {
   color: #4A4A45 !important;
 }
 
-/* Sidebar stays dark (true black) in light mode for brand consistency */
+/* Light mode — sidebar is light cream */
 [data-theme="light"] aside {
-  background-color: #080808 !important;
+  background-color: #F5F0E8 !important;
+  border-right: 1px solid rgba(154,122,46,0.2) !important;
+  background-image: none !important;
 }
 
-/* Keep sidebar nav text readable on the dark sidebar in light mode
-   (overrides the broad light-mode p/span/label rule above). */
-[data-theme="light"] .dashboard-sidebar a span,
-[data-theme="light"] .dashboard-sidebar button span {
-  color: inherit !important;
+/* Sidebar nav text in light mode */
+[data-theme="light"] aside span,
+[data-theme="light"] aside a,
+[data-theme="light"] aside button,
+[data-theme="light"] aside p {
+  color: #4A4A45 !important;
 }
-[data-theme="light"] .dashboard-sidebar p {
-  color: var(--sidebar-label-color) !important;
+
+/* Active nav item in light mode */
+[data-theme="light"] aside [style*="color: #C9A84C"],
+[data-theme="light"] aside [style*="color:#C9A84C"] {
+  color: #9A7A2E !important;
+}
+
+/* Active nav item background in light mode */
+[data-theme="light"] aside [style*="background: rgba(201,168,76"] {
+  background: rgba(154,122,46,0.1) !important;
+}
+
+/* Active nav item left border in light mode */
+[data-theme="light"] aside a[style*="borderLeft"] {
+  border-left-color: #9A7A2E !important;
+}
+
+/* Sidebar section labels in light mode */
+[data-theme="light"] aside [style*="color: #6B6B65"],
+[data-theme="light"] aside [style*="color:#6B6B65"],
+[data-theme="light"] aside [style*="color: #333330"],
+[data-theme="light"] aside [style*="color:#333330"] {
+  color: #8A8A82 !important;
+}
+
+/* Sidebar inactive nav items in light mode */
+[data-theme="light"] aside [style*="color: #9A8F7A"],
+[data-theme="light"] aside [style*="color:#9A8F7A"],
+[data-theme="light"] aside [style*="color: #4A4A45"],
+[data-theme="light"] aside [style*="color:#4A4A45"] {
+  color: #6B6B65 !important;
+}
+
+/* Tagline under logo in light mode */
+[data-theme="light"] aside [style*="color: rgba(201,168,76"] {
+  color: rgba(154,122,46,0.5) !important;
+}
+
+/* Sidebar dividers and borders in light mode */
+[data-theme="light"] aside [style*="background: rgba(201,168,76"][style*="height: 1px"],
+[data-theme="light"] aside [style*="background:rgba(201,168,76"][style*="height:1px"] {
+  background: rgba(154,122,46,0.15) !important;
+}
+
+/* Sidebar corner marks in light mode */
+[data-theme="light"] aside div[style*="borderTop: 1px solid rgba(201,168,76"],
+[data-theme="light"] aside div[style*="borderLeft: 1px solid rgba(201,168,76"],
+[data-theme="light"] aside div[style*="borderBottom: 1px solid rgba(201,168,76"],
+[data-theme="light"] aside div[style*="borderRight: 1px solid rgba(201,168,76"] {
+  border-color: rgba(154,122,46,0.25) !important;
 }
 
 /* ═════════════════════════════════════════════════════════════
-   FIX 3 — ROSE GOLD LIGHT THEME — soft, feminine luxury
+   ROSE THEME — light background with rose-gold accents
+   Sidebar: soft blush (#F5E8E6), NOT dark.
    ═════════════════════════════════════════════════════════════ */
 
-/* Sidebar variables — deep wine sidebar with light rose text,
-   gold accents remapped to rose. Applied regardless of palette. */
+/* Token overrides for var(--gold) consumers */
 html[data-theme="rose"] {
-  --sidebar-bg:               #2A1A1E;
-  --sidebar-border:           rgba(183,110,121,0.20);
-  --sidebar-logo-border:      rgba(183,110,121,0.20);
-  --sidebar-tagline:          rgba(212,149,158,0.55);
-  --sidebar-label-color:      rgba(212,149,158,0.65);
-  --sidebar-active-color:     #D4959E;
-  --sidebar-active-border:    #B76E79;
-  --sidebar-active-bg:        rgba(183,110,121,0.12);
-  --sidebar-muted-color:      #C08591;
-  --sidebar-hover-color:      #D4959E;
-  --sidebar-divider:          rgba(183,110,121,0.15);
-  --sidebar-footer-color:     rgba(212,149,158,0.45);
-  --sidebar-footer-diamond:   rgba(212,149,158,0.60);
-  --sidebar-close-btn-border: rgba(183,110,121,0.30);
-  --sidebar-hamburger-border: rgba(183,110,121,0.35);
-  --sidebar-hamburger-color:  #D4959E;
-  --sidebar-hamburger-bg:     rgba(42,26,30,0.90);
-  --sidebar-deco:
-    repeating-linear-gradient(45deg, transparent, transparent 28px, rgba(183,110,121,0.025) 28px, rgba(183,110,121,0.025) 29px),
-    repeating-linear-gradient(-45deg, transparent, transparent 28px, rgba(183,110,121,0.025) 28px, rgba(183,110,121,0.025) 29px);
-
-  /* Gold tokens → rose so var(--gold) consumers turn rose */
   --gold:                #8B4F58;
   --gradient-title:      linear-gradient(135deg, #8B4F58 0%, #B76E79 50%, #6B3A42 100%);
   --gradient-value:      linear-gradient(135deg, #B76E79 0%, #8B4F58 60%, #5C3038 100%);
-  --card-border:         rgba(183,110,121,0.30);
-  --card-shadow:         0 2px 12px rgba(139,79,88,0.08);
-  --corner-color:        rgba(183,110,121,0.50);
-  --diamond-color:       rgba(183,110,121,0.50);
-  --rule-color:          rgba(183,110,121,0.45);
-  --panel-border:        rgba(183,110,121,0.25);
-  --panel-header-border: rgba(183,110,121,0.18);
+  --card-border:         rgba(183,110,121,0.20);
+  --card-shadow:         0 2px 12px rgba(139,79,88,0.06);
+  --corner-color:        rgba(183,110,121,0.40);
+  --diamond-color:       rgba(183,110,121,0.45);
+  --rule-color:          rgba(183,110,121,0.40);
+  --panel-border:        rgba(183,110,121,0.20);
+  --panel-header-border: rgba(183,110,121,0.15);
   --trend-positive:      #8B4F58;
 }
 
 [data-theme="rose"] body,
 [data-theme="rose"] main,
 [data-theme="rose"] .dashboard-main {
-  background-color: #FBF5F3 !important; /* soft blush background */
+  background-color: #FBF5F3 !important;
   color: #3D2A2E !important;
 }
 
+/* Rose sidebar — soft blush, NOT dark */
+[data-theme="rose"] aside {
+  background-color: #F5E8E6 !important;
+  border-right: 1px solid rgba(183,110,121,0.25) !important;
+  background-image: none !important;
+}
+
+/* Rose sidebar nav text */
+[data-theme="rose"] aside span,
+[data-theme="rose"] aside a,
+[data-theme="rose"] aside button,
+[data-theme="rose"] aside p {
+  color: #5C3F44 !important;
+}
+
+/* Rose sidebar active nav item */
+[data-theme="rose"] aside [style*="color: #C9A84C"],
+[data-theme="rose"] aside [style*="color:#C9A84C"] {
+  color: #8B4F58 !important;
+}
+
+/* Rose sidebar active background */
+[data-theme="rose"] aside [style*="background: rgba(201,168,76"] {
+  background: rgba(183,110,121,0.1) !important;
+}
+
+/* Rose sidebar active left border */
+[data-theme="rose"] aside a[style*="borderLeft"] {
+  border-left-color: #B76E79 !important;
+}
+
+/* Rose sidebar section labels */
+[data-theme="rose"] aside [style*="color: #6B6B65"],
+[data-theme="rose"] aside [style*="color:#6B6B65"],
+[data-theme="rose"] aside [style*="color: #333330"],
+[data-theme="rose"] aside [style*="color:#333330"] {
+  color: #9A7A80 !important;
+}
+
+/* Rose sidebar inactive nav items */
+[data-theme="rose"] aside [style*="color: #9A8F7A"],
+[data-theme="rose"] aside [style*="color:#9A8F7A"] {
+  color: #7A5A60 !important;
+}
+
+/* Rose sidebar tagline */
+[data-theme="rose"] aside [style*="color: rgba(201,168,76"] {
+  color: rgba(183,110,121,0.55) !important;
+}
+
+/* Rose sidebar dividers */
+[data-theme="rose"] aside [style*="background: rgba(201,168,76"][style*="height: 1px"],
+[data-theme="rose"] aside [style*="background:rgba(201,168,76"][style*="height:1px"] {
+  background: rgba(183,110,121,0.15) !important;
+}
+
+/* Rose cards */
 [data-theme="rose"] [class*="card"],
 [data-theme="rose"] .lux-card,
 [data-theme="rose"] .lux-panel,
@@ -1562,80 +1640,61 @@ html[data-theme="rose"] {
 [data-theme="rose"] div[style*="background: #111111"],
 [data-theme="rose"] div[style*="background:#141414"],
 [data-theme="rose"] div[style*="background:#111111"] {
-  background: #F5E8E6 !important; /* slightly darker rose tint for card contrast */
-  border-color: rgba(183,110,121,0.30) !important;
-  box-shadow: 0 2px 12px rgba(139,79,88,0.08) !important;
+  background: #F0E0DD !important;
+  border-color: rgba(183,110,121,0.20) !important;
+  box-shadow: 0 2px 12px rgba(139,79,88,0.06) !important;
 }
 
+/* Rose headings */
 [data-theme="rose"] h1,
 [data-theme="rose"] h2,
 [data-theme="rose"] h3,
 [data-theme="rose"] h4 {
-  color: #3D2A2E !important; /* deep wine */
+  color: #3D2A2E !important;
 }
 
+/* Rose body text */
 [data-theme="rose"] p,
 [data-theme="rose"] span:not([style*="color"]),
 [data-theme="rose"] label,
 [data-theme="rose"] td {
-  color: #5C3F44 !important; /* readable warm brown */
+  color: #5C3F44 !important;
 }
 
-/* Gold becomes deep rose in rose theme */
+/* Gold values → rose-gold in rose theme */
 [data-theme="rose"] [style*="color: #C9A84C"],
-[data-theme="rose"] [style*="color:#C9A84C"],
-[data-theme="rose"] [style*="color: #B76E79"],
-[data-theme="rose"] [style*="color:#B76E79"] {
+[data-theme="rose"] [style*="color:#C9A84C"] {
   color: #8B4F58 !important;
 }
 
-/* Secondary / tertiary text */
+/* Rose secondary / tertiary text */
 [data-theme="rose"] [style*="color: #B5B5AA"],
 [data-theme="rose"] [style*="color:#B5B5AA"],
 [data-theme="rose"] [style*="color: #8A8A82"],
 [data-theme="rose"] [style*="color:#8A8A82"] {
-  color: #6B4D52 !important;
+  color: #7A5A60 !important;
 }
 
-/* Gold borders → rose-gold */
-[data-theme="rose"] [style*="border: 1px solid rgba(201,168,76"],
-[data-theme="rose"] [style*="border:1px solid rgba(201,168,76"] {
-  border-color: rgba(183,110,121,0.35) !important;
-}
-
-/* Corner marks become rose */
+/* Corner marks → rose */
 [data-theme="rose"] div[style*="borderTop: 1px solid rgba(201,168,76"],
 [data-theme="rose"] div[style*="borderLeft: 1px solid rgba(201,168,76"],
 [data-theme="rose"] div[style*="borderBottom: 1px solid rgba(201,168,76"],
 [data-theme="rose"] div[style*="borderRight: 1px solid rgba(201,168,76"] {
-  border-color: rgba(183,110,121,0.50) !important;
+  border-color: rgba(183,110,121,0.40) !important;
 }
 
-/* Top accent line in rose mode */
+/* Top accent lines → rose */
 [data-theme="rose"] div[style*="linear-gradient(90deg, transparent, #C9A84C"] {
   background: linear-gradient(90deg, transparent, #B76E79, transparent) !important;
 }
 
-/* Inputs in rose mode */
+/* Inputs */
 [data-theme="rose"] input,
 [data-theme="rose"] select,
 [data-theme="rose"] textarea {
   background: #FFFFFF !important;
   color: #3D2A2E !important;
-  border-color: rgba(183,110,121,0.30) !important;
-}
-
-/* Sidebar — soft deep-wine field, light rose text */
-[data-theme="rose"] aside {
-  background-color: #2A1A1E !important;
-  border-right: 1px solid rgba(183,110,121,0.20) !important;
-}
-[data-theme="rose"] .dashboard-sidebar a span,
-[data-theme="rose"] .dashboard-sidebar button span {
-  color: inherit !important;
-}
-[data-theme="rose"] .dashboard-sidebar p {
-  color: var(--sidebar-label-color) !important;
+  border-color: rgba(183,110,121,0.25) !important;
 }
 
 /* Primary gold-gradient buttons → rose-gradient */
@@ -1643,4 +1702,10 @@ html[data-theme="rose"] {
 [data-theme="rose"] a[style*="linear-gradient(135deg, #C9A84C"] {
   background: linear-gradient(135deg, #D4959E 0%, #B76E79 100%) !important;
   color: #FFFFFF !important;
+}
+
+/* Chart dark boxes → rose surface */
+[data-theme="rose"] div[style*="background: #0F0F0F"],
+[data-theme="rose"] div[style*="background:#0F0F0F"] {
+  background: #F0E0DD !important;
 }
