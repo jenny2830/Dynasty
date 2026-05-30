@@ -8,7 +8,7 @@ export default async function SettingsPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  let currentPlan: 'starter' | 'landlord' | 'portfolio' = 'starter'
+  let currentPlan: 'free' | 'starter' | 'landlord' | 'portfolio' = 'free'
   let hasSubscription = false
 
   if (user) {
@@ -19,7 +19,7 @@ export default async function SettingsPage() {
       .maybeSingle()
 
     if (landlord) {
-      currentPlan = landlord.plan ?? 'starter'
+      currentPlan = landlord.plan ?? 'free'
       hasSubscription = !!landlord.stripe_subscription_id
     }
   }

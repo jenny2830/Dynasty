@@ -163,17 +163,18 @@ function PaletteButton({
 }
 
 const PLAN_LABELS: Record<string, { label: string; price: string }> = {
+  free:      { label: 'Free Trial', price: 'Free' },
   starter:   { label: 'Starter',   price: '$29 CAD/mo' },
   landlord:  { label: 'Landlord',  price: '$79 CAD/mo' },
   portfolio: { label: 'Portfolio', price: '$149 CAD/mo' },
 }
 
 interface SettingsPanelProps {
-  currentPlan?: 'starter' | 'landlord' | 'portfolio'
+  currentPlan?: 'free' | 'starter' | 'landlord' | 'portfolio'
   hasSubscription?: boolean
 }
 
-export function SettingsPanel({ currentPlan = 'starter', hasSubscription = false }: SettingsPanelProps) {
+export function SettingsPanel({ currentPlan = 'free', hasSubscription = false }: SettingsPanelProps) {
   const { setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
   const [textSize, setTextSize] = useState<TextSize>('md')

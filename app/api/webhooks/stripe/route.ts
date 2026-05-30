@@ -36,7 +36,7 @@ export async function POST(request: Request) {
         await supabase
           .from('landlords')
           .update({
-            plan: plan as 'starter' | 'landlord' | 'portfolio',
+            plan: plan as 'free' | 'starter' | 'landlord' | 'portfolio',
             stripe_subscription_id: subscriptionId,
             stripe_customer_id: session.customer as string,
           })
