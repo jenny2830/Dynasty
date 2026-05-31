@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useCallback, useTransition } from 'react'
-import { ScanLine, CheckCircle2, XCircle, Loader2 } from 'lucide-react'
+import { ScanLine, CheckCircle2, XCircle, Loader2, Camera, Upload } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -170,46 +170,108 @@ export function ReceiptScanner({ properties, recentReceipts }: ReceiptScannerPro
       <div className="lg:col-span-3 space-y-5">
         {/* Upload zone */}
         {(scanState === 'idle' || scanState === 'scanning') && (
-          <div
-            onDragOver={(e) => { e.preventDefault(); setIsDragging(true) }}
-            onDragLeave={() => setIsDragging(false)}
-            onDrop={handleDrop}
-            onClick={() => scanState === 'idle' && fileInputRef.current?.click()}
-            className={`relative flex h-60 flex-col items-center justify-center rounded-[2px] border border-dashed bg-dynasty-gray-900 px-6 transition-all duration-300 ${
-              isDragging
-                ? 'border-[rgba(201,168,76,0.5)] bg-[rgba(201,168,76,0.02)]'
-                : scanState === 'scanning'
-                ? 'border-[rgba(201,168,76,0.2)] cursor-default'
-                : 'border-[rgba(201,168,76,0.2)] cursor-pointer hover:border-[rgba(201,168,76,0.5)] hover:bg-[rgba(201,168,76,0.02)]'
-            }`}
-          >
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/jpeg,image/png,image/webp,image/gif"
-              className="hidden"
-              onChange={handleFileChange}
-            />
-            {scanState === 'scanning' ? (
-              <>
-                <Loader2 className="h-8 w-8 animate-spin text-dynasty-gold/60" strokeWidth={1.2} />
-                <p className="mt-4 font-serif text-[18px] font-medium tracking-[0.02em] text-dynasty-warm-white">
-                  Extracting Receipt Data
-                </p>
-                <p className="mt-2 font-sans text-[11px] font-light uppercase tracking-[0.18em] text-dynasty-gray-500">
-                  Claude Vision · Image never stored
-                </p>
-              </>
-            ) : (
-              <>
-                <ScanLine className="h-8 w-8 text-[rgba(201,168,76,0.3)]" strokeWidth={1} />
-                <p className="mt-4 font-serif text-[18px] font-medium tracking-[0.02em] text-dynasty-warm-white">
-                  Drop Receipt Here
-                </p>
-                <p className="mt-2 font-sans text-[11px] font-light uppercase tracking-[0.18em] text-dynasty-gray-500">
-                  Or click to upload &middot; JPEG · PNG · WebP · Max 10MB
-                </p>
-              </>
+          <div>
+            {/* Drag-and-drop zone (no click handler — use buttons below instead) */}
+            <div
+              onDragOver={(e) => { e.preventDefault(); if (scanState === 'idle') setIsDragging(true) }}
+              onDragLeave={() => setIsDragging(false)}
+              onDrop={handleDrop}
+              className={`relative flex h-48 flex-col items-center justify-center rounded-[2px] border border-dashed bg-dynasty-gray-900 px-6 transition-all duration-300 ${
+                isDragging
+                  ? 'border-[rgba(201,168,76,0.5)] bg-[rgba(201,168,76,0.02)]'
+                  : scanState === 'scanning'
+                  ? 'border-[rgba(201,168,76,0.2)]'
+                  : 'border-[rgba(201,168,76,0.2)]'
+              }`}
+            >
+              {scanState === 'scanning' ? (
+                <>
+                  <Loader2 className="h-8 w-8 animate-spin text-dynasty-gold/60" strokeWidth={1.2} />
+                  <p className="mt-4 font-serif text-[18px] font-medium tracking-[0.02em] text-dynasty-warm-white">
+                    Extracting Receipt Data
+                  </p>
+                  <p className="mt-2 font-sans text-[11px] font-light uppercase tracking-[0.18em] text-dynasty-gray-500">
+                    Claude Vision · Image never stored
+                  </p>
+                </>
+              ) : (
+                <>
+                  <ScanLine className="h-8 w-8 text-[rgba(201,168,76,0.3)]" strokeWidth={1} />
+                  <p className="mt-4 font-serif text-[18px] font-medium tracking-[0.02em] text-dynasty-warm-white">
+                    Drop Receipt Here
+                  </p>
+                  <p className="mt-2 font-sans text-[11px] font-light uppercase tracking-[0.18em] text-dynasty-gray-500">
+                    JPEG · PNG · WebP · Max 10MB
+                  </p>
+                </>
+              )}
+            </div>
+
+            {/* Two action buttons — gallery pick + camera capture */}
+            {scanState === 'idle' && (
+              <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', marginTop: '16px' }}>
+                {/* Upload from gallery / file picker */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    const input = document.createElement('input')
+                    input.type = 'file'
+                    input.accept = 'image/jpeg,image/png,image/webp,image/heic'
+                    input.onchange = (e) => handleFileChange(e as unknown as React.ChangeEvent<HTMLInputElement>)
+                    input.click()
+                  }}
+                  style={{
+                    background: 'transparent',
+                    border: '1px solid rgba(201,168,76,0.3)',
+                    color: '#C9A84C',
+                    fontFamily: "'Jost', sans-serif",
+                    fontSize: '10px',
+                    letterSpacing: '0.2em',
+                    textTransform: 'uppercase',
+                    padding: '10px 20px',
+                    borderRadius: '1px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                  }}
+                >
+                  <Upload size={14} strokeWidth={1.2} />
+                  Upload Image
+                </button>
+
+                {/* Camera capture — triggers rear camera on mobile */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    const input = document.createElement('input')
+                    input.type = 'file'
+                    input.accept = 'image/jpeg,image/png,image/webp'
+                    ;(input as HTMLInputElement & { capture: string }).capture = 'environment'
+                    input.onchange = (e) => handleFileChange(e as unknown as React.ChangeEvent<HTMLInputElement>)
+                    input.click()
+                  }}
+                  style={{
+                    background: 'linear-gradient(135deg, #C9A84C 0%, #9A7A2E 100%)',
+                    color: '#080808',
+                    fontFamily: "'Jost', sans-serif",
+                    fontSize: '10px',
+                    letterSpacing: '0.2em',
+                    textTransform: 'uppercase',
+                    padding: '10px 20px',
+                    borderRadius: '1px',
+                    border: 'none',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    fontWeight: 600,
+                  }}
+                >
+                  <Camera size={14} strokeWidth={1.2} />
+                  Scan Receipt
+                </button>
+              </div>
             )}
           </div>
         )}

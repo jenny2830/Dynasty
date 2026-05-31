@@ -14,6 +14,14 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { formatCurrency, formatPercent } from '@/lib/utils'
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+} from 'recharts'
 
 interface Property {
   id: string
@@ -281,6 +289,69 @@ export function ROICalculator({ properties }: ROICalculatorProps) {
             </div>
           )}
         </Section>
+
+        {results && (
+          <Section className="px-6 py-5">
+            <p className="mb-4 font-serif text-[18px] font-medium text-dynasty-warm-white">
+              <span className="mr-2 text-[8px] text-dynasty-gold leading-none">◆</span>
+              Monthly Breakdown
+            </p>
+            {(() => {
+              const pieData = [
+                { name: 'Net Cash Flow', value: Math.max(0, results.monthlyCashFlow), color: '#C9A84C' },
+                { name: 'Mortgage', value: inputs.monthlyMortgage, color: '#B76E79' },
+                { name: 'Expenses', value: inputs.monthlyExpenses, color: '#8B4F58' },
+              ].filter((d) => d.value > 0)
+
+              if (pieData.length === 0) return null
+
+              return (
+                <ResponsiveContainer width="100%" height={260}>
+                  <PieChart>
+                    <Pie
+                      data={pieData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={55}
+                      outerRadius={90}
+                      paddingAngle={3}
+                      dataKey="value"
+                      stroke="none"
+                    >
+                      {pieData.map((entry, index) => (
+                        <Cell key={index} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      formatter={(value) => [formatCurrency(typeof value === 'number' ? value : 0), '']}
+                      contentStyle={{
+                        background: '#161616',
+                        border: '1px solid rgba(201,168,76,0.2)',
+                        borderRadius: '1px',
+                        fontFamily: "'Jost', sans-serif",
+                        fontSize: '12px',
+                        color: '#FAF7F2',
+                      }}
+                    />
+                    <Legend
+                      formatter={(value) => (
+                        <span style={{
+                          fontFamily: "'Jost', sans-serif",
+                          fontSize: '10px',
+                          letterSpacing: '0.12em',
+                          textTransform: 'uppercase',
+                          color: '#8A8A82',
+                        }}>
+                          {value}
+                        </span>
+                      )}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              )
+            })()}
+          </Section>
+        )}
 
         {results && (
           <Section className="px-6 py-5">

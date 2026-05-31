@@ -7,6 +7,7 @@ import { Section, SectionHeader } from '@/components/ui/section'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import { ChevronLeft, Edit, MapPin, Building2 } from 'lucide-react'
 import { DeletePropertyButton } from './DeletePropertyButton'
+import { UnitManager } from './UnitManager'
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -186,65 +187,9 @@ export default async function PropertyDetailPage({
       )}
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        {/* Units */}
-        <Section>
-          <SectionHeader
-            title="Units"
-            action={
-              <span className="font-sans text-[10px] font-light uppercase tracking-[0.18em] text-dynasty-gray-500">
-                {units.length} {units.length === 1 ? 'unit' : 'units'}
-              </span>
-            }
-          />
-          <div className="divide-y divide-[rgba(255,255,255,0.025)]">
-            {units.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-10 text-center">
-                <Building2 className="h-7 w-7 text-dynasty-gold/15" strokeWidth={1} />
-                <p className="mt-3 font-sans text-[12px] font-light text-dynasty-gray-500">
-                  No units added yet
-                </p>
-              </div>
-            ) : (
-              units.map((u) => (
-                <div key={u.id} className="flex items-center justify-between px-7 py-4">
-                  <div>
-                    <p className="font-sans text-[13px] text-dynasty-warm-white">
-                      Unit {u.unit_number}
-                    </p>
-                    <p className="mt-0.5 font-sans text-[11px] font-light text-dynasty-gray-500">
-                      {[
-                        u.bedrooms && `${u.bedrooms} bed`,
-                        u.bathrooms && `${u.bathrooms} bath`,
-                        u.sqft && `${u.sqft} sqft`,
-                      ]
-                        .filter(Boolean)
-                        .join(' · ')}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    {u.rent_amount && (
-                      <p className="font-mono text-[13px] font-medium text-dynasty-gold">
-                        {formatCurrency(u.rent_amount)}
-                        <span className="text-dynasty-gray-500 font-light ml-1">/mo</span>
-                      </p>
-                    )}
-                    <Badge
-                      variant={
-                        u.status === 'occupied'
-                          ? 'success'
-                          : u.status === 'maintenance'
-                          ? 'warning'
-                          : 'secondary'
-                      }
-                      className="mt-1"
-                    >
-                      {u.status}
-                    </Badge>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
+        {/* Units — interactive add/edit/delete */}
+        <Section className="px-7 py-6">
+          <UnitManager propertyId={id} initialUnits={units} />
         </Section>
 
         {/* Recent transactions */}
