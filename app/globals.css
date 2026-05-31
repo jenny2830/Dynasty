@@ -1232,6 +1232,26 @@ input:-webkit-autofill:focus {
 }
 
 /* ─────────────────────────────────────────────
+   SSR / hydration safety — shell + texture
+   The DashboardThemeShell sets inline styles after
+   mount, but during SSR and the hydration window
+   these rules ensure the shell div and main match
+   the expected theme colours. !important overrides
+   any lingering dark inline defaults.
+   ───────────────────────────────────────────── */
+[data-theme="light"] .dashboard-landscape-shell {
+  background-color: #FAF7F2 !important;
+}
+[data-theme="rose"] .dashboard-landscape-shell {
+  background-color: #FDF8F6 !important;
+}
+/* Clear the dark crosshatch texture for non-dark themes */
+[data-theme="light"] .dashboard-main,
+[data-theme="rose"]  .dashboard-main {
+  background-image: none !important;
+}
+
+/* ─────────────────────────────────────────────
    Auth pages & cards — ALWAYS dark (brand identity)
    Even in light or rose themes the login/signup
    surfaces remain on the dark, gold-accented field.
