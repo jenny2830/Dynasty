@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label'
 import { createClient } from '@/lib/supabase/client'
 
 type TextSize = 'sm' | 'md' | 'lg'
-type ColorPalette = 'black-gold' | 'rose-gold' | 'white-black'
+type ColorPalette = 'black-gold' | 'white-black'
 
 const TEXT_SIZES: { value: TextSize; label: string; hint: string }[] = [
   { value: 'sm', label: 'Compact', hint: 'Smaller' },
@@ -24,7 +24,7 @@ const COLOR_PALETTES: {
   label: string
   hint: string
   swatches: string[]
-} [] = [
+}[] = [
   {
     value: 'white-black',
     label: 'White & Black',
@@ -36,12 +36,6 @@ const COLOR_PALETTES: {
     label: 'Black & Gold',
     hint: 'Classic',
     swatches: ['#080808', '#C9A84C'],
-  },
-  {
-    value: 'rose-gold',
-    label: 'Rose Gold',
-    hint: 'Signature',
-    swatches: ['#0C0809', '#B76E79', '#D4959E'],
   },
 ]
 
@@ -198,7 +192,7 @@ export function SettingsPanel({ currentPlan = 'free', hasSubscription = false }:
     }
 
     const savedPalette = localStorage.getItem('dynasty-color-palette')
-    if (savedPalette === 'black-gold' || savedPalette === 'rose-gold' || savedPalette === 'white-black') {
+    if (savedPalette === 'black-gold' || savedPalette === 'white-black') {
       setColorPalette(savedPalette)
     }
   }, [])

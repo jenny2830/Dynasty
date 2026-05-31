@@ -19,7 +19,6 @@ import {
   X,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
-import { ThemeToggle } from './ThemeToggle'
 
 const NAV_PRIMARY = [
   { href: '/overview',     label: 'Overview',      Icon: LayoutDashboard },
@@ -144,7 +143,6 @@ interface SidebarProps {
 
 function buildColors(resolvedTheme: string | undefined, mounted: boolean): SidebarColors {
   const isDark = !mounted || resolvedTheme === 'dark'
-  const isRose = mounted && resolvedTheme === 'rose'
 
   if (isDark) {
     return {
@@ -166,29 +164,6 @@ function buildColors(resolvedTheme: string | undefined, mounted: boolean): Sideb
       hamburgerBg: 'rgba(8,8,8,0.85)',
       hamburgerBorder: 'rgba(201,168,76,0.30)',
       hamburgerColor: '#C9A84C',
-    }
-  }
-
-  if (isRose) {
-    return {
-      bg: '#F8EDE9',
-      border: 'rgba(183,110,121,0.20)',
-      logoBorder: 'rgba(183,110,121,0.18)',
-      tagline: 'rgba(183,110,121,0.50)',
-      hatch: 'none',
-      sectionLabel: '#B39A9E',
-      navText: '#7A5A60',
-      navActive: '#B76E79',
-      navActiveBg: 'rgba(183,110,121,0.10)',
-      navActiveBorder: '#B76E79',
-      hover: '#C9A84C',
-      divider: 'rgba(183,110,121,0.10)',
-      footer: 'rgba(183,110,121,0.35)',
-      footerDiamond: 'rgba(183,110,121,0.55)',
-      closeBtnBorder: 'rgba(183,110,121,0.22)',
-      hamburgerBg: 'rgba(248,237,233,0.92)',
-      hamburgerBorder: 'rgba(183,110,121,0.35)',
-      hamburgerColor: '#D4959E',
     }
   }
 
@@ -227,8 +202,6 @@ export function Sidebar({ userId }: SidebarProps) {
   useEffect(() => {
     setMounted(true)
     const mqMobile = window.matchMedia('(max-width: 768px)')
-    // Phone landscape: wide but short — height ≤ 500px catches phones in landscape
-    // while leaving tablets (taller in landscape) unaffected.
     const mqLandscape = window.matchMedia('(orientation: landscape) and (max-height: 500px)')
 
     const update = () => {
@@ -244,12 +217,10 @@ export function Sidebar({ userId }: SidebarProps) {
     }
   }, [])
 
-  // Close the drawer whenever the route changes
   useEffect(() => {
     setIsOpen(false)
   }, [pathname])
 
-  // Lock body scroll while the mobile drawer is open
   useEffect(() => {
     if (isMobile && isOpen) {
       const prev = document.body.style.overflow
@@ -363,9 +334,6 @@ export function Sidebar({ userId }: SidebarProps) {
             <LogOut style={{ width: '15px', height: '15px', flexShrink: 0 }} strokeWidth={1.2} />
             <span>Sign Out</span>
           </button>
-
-          <div style={{ margin: '8px 20px', height: '1px', background: colors.divider }} />
-          <ThemeToggle />
         </div>
       </nav>
 
@@ -389,8 +357,6 @@ export function Sidebar({ userId }: SidebarProps) {
     </div>
   )
 
-  // Desktop OR phone landscape: persistent sticky sidebar alongside main content.
-  // Phone portrait (isMobile && !isPhoneLandscape): hamburger + drawer.
   if (!mounted || !isMobile || isPhoneLandscape) {
     return (
       <aside className="dashboard-sidebar" style={{
@@ -408,7 +374,6 @@ export function Sidebar({ userId }: SidebarProps) {
     )
   }
 
-  // Mobile portrait: hamburger toggle + slide-in drawer + backdrop.
   return (
     <>
       <button
@@ -437,7 +402,6 @@ export function Sidebar({ userId }: SidebarProps) {
         <Menu style={{ width: '18px', height: '18px' }} strokeWidth={1.4} />
       </button>
 
-      {/* Backdrop */}
       {isOpen && (
         <div
           onClick={closeDrawer}
@@ -453,7 +417,6 @@ export function Sidebar({ userId }: SidebarProps) {
         />
       )}
 
-      {/* Drawer */}
       <aside className="dashboard-sidebar" style={{
         ...asideBaseStyle,
         position: 'fixed',

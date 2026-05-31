@@ -2,10 +2,8 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { SignupCapture } from './SignupCapture'
+import { SignupForm } from './SignupForm'
 
 export const metadata = { title: 'Create account' }
 
@@ -52,7 +50,6 @@ export default async function SignupPage({
   }
 
   return (
-    /* Auth page — always dark regardless of theme */
     <div style={{
       minHeight: '100vh',
       backgroundColor: '#080808',
@@ -64,58 +61,20 @@ export default async function SignupPage({
       padding: '48px 16px',
       position: 'relative',
     }}>
-      {/* Gold top accent line */}
-      <div
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          height: '1px',
-          background: 'linear-gradient(90deg, transparent 0%, #C9A84C 50%, transparent 100%)',
-        }}
-        aria-hidden
-      />
+      <div style={{ position: 'fixed', top: 0, left: 0, right: 0, height: '1px', background: 'linear-gradient(90deg, transparent 0%, #C9A84C 50%, transparent 100%)' }} aria-hidden />
 
       <div style={{ width: '100%', maxWidth: '420px' }}>
-        {/* Logo + tagline outside card */}
         <div style={{ marginBottom: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/images/dynastynobg.png"
-            alt="Dynasty"
-            style={{ width: '280px', height: 'auto', objectFit: 'contain', display: 'block', margin: '0 auto' }}
-          />
-          <p style={{
-            marginTop: '12px',
-            textAlign: 'center',
-            fontFamily: "'Jost', sans-serif",
-            fontSize: '8px',
-            fontWeight: 300,
-            textTransform: 'uppercase',
-            letterSpacing: '0.35em',
-            color: 'rgba(201,168,76,0.4)',
-          }}>
+          <img src="/images/dynastynobg.png" alt="Dynasty" style={{ width: '280px', height: 'auto', objectFit: 'contain', display: 'block', margin: '0 auto' }} />
+          <p style={{ marginTop: '12px', textAlign: 'center', fontFamily: "'Jost', sans-serif", fontSize: '8px', fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.35em', color: 'rgba(201,168,76,0.4)' }}>
             <span style={{ display: 'inline-block', marginRight: '8px' }}>◆</span>
             Legacy &middot; Luxury &middot; Timeless
             <span style={{ display: 'inline-block', marginLeft: '8px' }}>◆</span>
           </p>
         </div>
 
-        {/* Auth card — always dark */}
-        <div style={{
-          background: 'rgba(17,17,17,0.97)',
-          border: '1px solid rgba(201,168,76,0.2)',
-          borderRadius: '2px',
-          padding: '48px 44px',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          boxShadow: '0 32px 80px rgba(0,0,0,0.8)',
-          maxWidth: '420px',
-          width: '100%',
-          position: 'relative',
-        }}>
-          {/* Art Deco corner marks */}
+        <div style={{ background: 'rgba(17,17,17,0.97)', border: '1px solid rgba(201,168,76,0.2)', borderRadius: '2px', padding: '48px 44px', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', boxShadow: '0 32px 80px rgba(0,0,0,0.8)', maxWidth: '420px', width: '100%', position: 'relative' }}>
           <div style={{ position: 'absolute', top: '10px', left: '10px', width: '18px', height: '18px', borderTop: '1px solid rgba(201,168,76,0.35)', borderLeft: '1px solid rgba(201,168,76,0.35)' }} />
           <div style={{ position: 'absolute', top: '10px', right: '10px', width: '18px', height: '18px', borderTop: '1px solid rgba(201,168,76,0.35)', borderRight: '1px solid rgba(201,168,76,0.35)' }} />
           <div style={{ position: 'absolute', bottom: '10px', left: '10px', width: '18px', height: '18px', borderBottom: '1px solid rgba(201,168,76,0.35)', borderLeft: '1px solid rgba(201,168,76,0.35)' }} />
@@ -124,186 +83,49 @@ export default async function SignupPage({
           {success ? (
             <div style={{ textAlign: 'center' }}>
               {emailParam && <SignupCapture email={decodeURIComponent(emailParam)} />}
-              <h1 style={{
-                fontFamily: "'Cormorant Garamond', serif",
-                fontSize: '26px',
-                fontWeight: 500,
-                letterSpacing: '0.04em',
-                color: '#FAF7F2',
-                margin: 0,
-              }}>
+              <h1 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '26px', fontWeight: 500, letterSpacing: '0.04em', color: '#FAF7F2', margin: 0 }}>
                 Check Your Email
               </h1>
-              <p style={{
-                marginTop: '6px',
-                fontFamily: "'Jost', sans-serif",
-                fontSize: '11px',
-                fontWeight: 300,
-                textTransform: 'uppercase',
-                letterSpacing: '0.18em',
-                color: '#6B6B65',
-              }}>
+              <p style={{ marginTop: '6px', fontFamily: "'Jost', sans-serif", fontSize: '11px', fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.18em', color: '#6B6B65' }}>
                 Confirmation pending
               </p>
               <div style={{ margin: '16px auto 0', height: '1px', width: '40px', background: 'rgba(201,168,76,0.5)' }} />
-              <p style={{
-                marginTop: '28px',
-                fontFamily: "'Jost', sans-serif",
-                fontSize: '13px',
-                fontWeight: 300,
-                lineHeight: 1.6,
-                color: '#8A8A82',
-              }}>
-                We&apos;ve sent a confirmation link to your email address. Click
-                the link to activate your account and begin.
+              <p style={{ marginTop: '28px', fontFamily: "'Jost', sans-serif", fontSize: '13px', fontWeight: 300, lineHeight: 1.6, color: '#8A8A82' }}>
+                We&apos;ve sent a confirmation link to your email address. Click the link to activate your account and begin.
               </p>
-              <Button asChild variant="outline" className="mt-8 w-full">
-                <Link href="/login">Back to Sign In</Link>
-              </Button>
+              <a
+                href="/login"
+                style={{ display: 'block', marginTop: '32px', width: '100%', padding: '14px', background: 'transparent', border: '1px solid rgba(201,168,76,0.3)', color: '#C9A84C', fontFamily: "'Jost', sans-serif", fontWeight: 400, fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', textAlign: 'center', textDecoration: 'none', borderRadius: '1px' }}
+              >
+                Back to Sign In
+              </a>
             </div>
           ) : (
             <>
               <div style={{ textAlign: 'center' }}>
-                <h1 style={{
-                  fontFamily: "'Cormorant Garamond', serif",
-                  fontSize: '26px',
-                  fontWeight: 500,
-                  letterSpacing: '0.04em',
-                  color: '#FAF7F2',
-                  margin: 0,
-                }}>
+                <h1 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '26px', fontWeight: 500, letterSpacing: '0.04em', color: '#FAF7F2', margin: 0 }}>
                   Begin Your Dynasty
                 </h1>
-                <p style={{
-                  marginTop: '6px',
-                  fontFamily: "'Jost', sans-serif",
-                  fontSize: '11px',
-                  fontWeight: 300,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.18em',
-                  color: '#6B6B65',
-                }}>
+                <p style={{ marginTop: '6px', fontFamily: "'Jost', sans-serif", fontSize: '11px', fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.18em', color: '#6B6B65' }}>
                   Create your landlord account
                 </p>
               </div>
 
-              {/* Ornamental divider */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', margin: '16px 0' }}>
                 <div style={{ flex: 1, height: '1px', background: 'linear-gradient(90deg, transparent, rgba(201,168,76,0.3), transparent)' }} />
                 <span style={{ color: '#C9A84C', fontSize: '9px' }}>◆</span>
                 <div style={{ flex: 1, height: '1px', background: 'linear-gradient(90deg, transparent, rgba(201,168,76,0.3), transparent)' }} />
               </div>
 
-              {error && (
-                <div style={{
-                  marginTop: '28px',
-                  borderRadius: '1px',
-                  border: '1px solid rgba(183,110,121,0.3)',
-                  background: 'rgba(183,110,121,0.08)',
-                  padding: '12px 16px',
-                }}>
-                  <p style={{
-                    fontFamily: "'Jost', sans-serif",
-                    fontSize: '12px',
-                    fontWeight: 300,
-                    color: '#D4959E',
-                    margin: 0,
-                  }}>
-                    {decodeURIComponent(error)}
-                  </p>
-                </div>
-              )}
-
-              <form action={signup} style={{ marginTop: '32px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <Label htmlFor="full_name" style={{ color: '#8A8A82' }}>Full Name</Label>
-                  <Input
-                    id="full_name"
-                    name="full_name"
-                    type="text"
-                    placeholder="Jane Smith"
-                    autoComplete="name"
-                    required
-                    style={{ background: '#1A1A1A', color: '#FAF7F2', borderColor: 'rgba(201,168,76,0.15)' }}
-                  />
-                </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <Label htmlFor="email" style={{ color: '#8A8A82' }}>Email Address</Label>
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    placeholder="you@example.com"
-                    autoComplete="email"
-                    required
-                    style={{ background: '#1A1A1A', color: '#FAF7F2', borderColor: 'rgba(201,168,76,0.15)' }}
-                  />
-                </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <Label htmlFor="password" style={{ color: '#8A8A82' }}>Password</Label>
-                  <Input
-                    id="password"
-                    name="password"
-                    type="password"
-                    placeholder="Minimum 8 characters"
-                    autoComplete="new-password"
-                    minLength={8}
-                    required
-                    style={{ background: '#1A1A1A', color: '#FAF7F2', borderColor: 'rgba(201,168,76,0.15)' }}
-                  />
-                </div>
-
-                <Button type="submit" className="mt-3 w-full">
-                  Create Account
-                </Button>
-              </form>
-
-              <p style={{
-                marginTop: '24px',
-                textAlign: 'center',
-                fontFamily: "'Jost', sans-serif",
-                fontSize: '10px',
-                fontWeight: 300,
-                lineHeight: 1.6,
-                letterSpacing: '0.04em',
-                color: '#6B6B65',
-              }}>
-                By signing up you agree to our{' '}
-                <Link href="/terms" style={{ color: 'rgba(201,168,76,0.8)', textDecoration: 'none' }}>
-                  Terms
-                </Link>{' '}
-                and{' '}
-                <Link href="/privacy" style={{ color: 'rgba(201,168,76,0.8)', textDecoration: 'none' }}>
-                  Privacy Policy
-                </Link>
-              </p>
+              <SignupForm action={signup} error={error} />
             </>
           )}
         </div>
 
         {!success && (
-          <p style={{
-            marginTop: '28px',
-            textAlign: 'center',
-            fontFamily: "'Jost', sans-serif",
-            fontSize: '11px',
-            fontWeight: 300,
-            letterSpacing: '0.08em',
-            color: '#6B6B65',
-          }}>
+          <p style={{ marginTop: '28px', textAlign: 'center', fontFamily: "'Jost', sans-serif", fontSize: '11px', fontWeight: 300, letterSpacing: '0.08em', color: '#6B6B65' }}>
             Already a member?{' '}
-            <Link
-              href="/login"
-              style={{
-                fontWeight: 500,
-                textTransform: 'uppercase',
-                letterSpacing: '0.18em',
-                color: '#C9A84C',
-                textDecoration: 'none',
-              }}
-            >
+            <Link href="/login" style={{ fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.18em', color: '#C9A84C', textDecoration: 'none' }}>
               Sign In
             </Link>
           </p>

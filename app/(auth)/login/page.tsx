@@ -1,9 +1,7 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { LoginForm } from './LoginForm'
 
 export const metadata = { title: 'Sign in' }
 
@@ -37,7 +35,6 @@ export default async function LoginPage({
   }
 
   return (
-    /* Auth page — always dark regardless of theme */
     <div style={{
       minHeight: '100vh',
       backgroundColor: '#080808',
@@ -49,183 +46,46 @@ export default async function LoginPage({
       padding: '48px 16px',
       position: 'relative',
     }}>
-      {/* Gold top accent line */}
-      <div
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          height: '1px',
-          background: 'linear-gradient(90deg, transparent 0%, #C9A84C 50%, transparent 100%)',
-        }}
-        aria-hidden
-      />
+      <div style={{ position: 'fixed', top: 0, left: 0, right: 0, height: '1px', background: 'linear-gradient(90deg, transparent 0%, #C9A84C 50%, transparent 100%)' }} aria-hidden />
 
       <div style={{ width: '100%', maxWidth: '420px' }}>
-        {/* Logo + tagline outside card */}
-        <div style={{ marginBottom: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative' }}>
+        <div style={{ marginBottom: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/images/dynastynobg.png"
-            alt="Dynasty"
-            style={{ width: '280px', height: 'auto', objectFit: 'contain', display: 'block', margin: '0 auto' }}
-          />
-          <p style={{
-            marginTop: '12px',
-            textAlign: 'center',
-            fontFamily: "'Jost', sans-serif",
-            fontSize: '8px',
-            fontWeight: 300,
-            textTransform: 'uppercase',
-            letterSpacing: '0.35em',
-            color: 'rgba(201,168,76,0.4)',
-          }}>
+          <img src="/images/dynastynobg.png" alt="Dynasty" style={{ width: '280px', height: 'auto', objectFit: 'contain', display: 'block', margin: '0 auto' }} />
+          <p style={{ marginTop: '12px', textAlign: 'center', fontFamily: "'Jost', sans-serif", fontSize: '8px', fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.35em', color: 'rgba(201,168,76,0.4)' }}>
             <span style={{ display: 'inline-block', marginRight: '8px' }}>◆</span>
             Legacy &middot; Luxury &middot; Timeless
             <span style={{ display: 'inline-block', marginLeft: '8px' }}>◆</span>
           </p>
         </div>
 
-        {/* Auth card — always dark */}
-        <div style={{
-          background: 'rgba(17,17,17,0.97)',
-          border: '1px solid rgba(201,168,76,0.2)',
-          borderRadius: '2px',
-          padding: '48px 44px',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          boxShadow: '0 32px 80px rgba(0,0,0,0.8)',
-          maxWidth: '420px',
-          width: '100%',
-          position: 'relative',
-        }}>
-          {/* Art Deco corner marks */}
+        <div style={{ background: 'rgba(17,17,17,0.97)', border: '1px solid rgba(201,168,76,0.2)', borderRadius: '2px', padding: '48px 44px', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', boxShadow: '0 32px 80px rgba(0,0,0,0.8)', maxWidth: '420px', width: '100%', position: 'relative' }}>
           <div style={{ position: 'absolute', top: '10px', left: '10px', width: '18px', height: '18px', borderTop: '1px solid rgba(201,168,76,0.35)', borderLeft: '1px solid rgba(201,168,76,0.35)' }} />
           <div style={{ position: 'absolute', top: '10px', right: '10px', width: '18px', height: '18px', borderTop: '1px solid rgba(201,168,76,0.35)', borderRight: '1px solid rgba(201,168,76,0.35)' }} />
           <div style={{ position: 'absolute', bottom: '10px', left: '10px', width: '18px', height: '18px', borderBottom: '1px solid rgba(201,168,76,0.35)', borderLeft: '1px solid rgba(201,168,76,0.35)' }} />
           <div style={{ position: 'absolute', bottom: '10px', right: '10px', width: '18px', height: '18px', borderBottom: '1px solid rgba(201,168,76,0.35)', borderRight: '1px solid rgba(201,168,76,0.35)' }} />
 
           <div style={{ textAlign: 'center' }}>
-            <h1 style={{
-              fontFamily: "'Cormorant Garamond', serif",
-              fontSize: '26px',
-              fontWeight: 500,
-              letterSpacing: '0.04em',
-              color: '#FAF7F2',
-              margin: 0,
-            }}>
+            <h1 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '26px', fontWeight: 500, letterSpacing: '0.04em', color: '#FAF7F2', margin: 0 }}>
               Welcome Back
             </h1>
-            <p style={{
-              marginTop: '6px',
-              fontFamily: "'Jost', sans-serif",
-              fontSize: '11px',
-              fontWeight: 300,
-              textTransform: 'uppercase',
-              letterSpacing: '0.18em',
-              color: '#6B6B65',
-            }}>
+            <p style={{ marginTop: '6px', fontFamily: "'Jost', sans-serif", fontSize: '11px', fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.18em', color: '#6B6B65' }}>
               Access your portfolio
             </p>
           </div>
 
-          {/* Ornamental divider */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', margin: '16px 0' }}>
             <div style={{ flex: 1, height: '1px', background: 'linear-gradient(90deg, transparent, rgba(201,168,76,0.3), transparent)' }} />
             <span style={{ color: '#C9A84C', fontSize: '9px' }}>◆</span>
             <div style={{ flex: 1, height: '1px', background: 'linear-gradient(90deg, transparent, rgba(201,168,76,0.3), transparent)' }} />
           </div>
 
-          {error && (
-            <div style={{
-              marginTop: '28px',
-              borderRadius: '1px',
-              border: '1px solid rgba(183,110,121,0.3)',
-              background: 'rgba(183,110,121,0.08)',
-              padding: '12px 16px',
-            }}>
-              <p style={{
-                fontFamily: "'Jost', sans-serif",
-                fontSize: '12px',
-                fontWeight: 300,
-                color: '#D4959E',
-                margin: 0,
-              }}>
-                {decodeURIComponent(error)}
-              </p>
-            </div>
-          )}
-
-          <form action={login} style={{ marginTop: '32px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <Label htmlFor="email" style={{ color: '#8A8A82' }}>Email Address</Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                placeholder="you@example.com"
-                autoComplete="email"
-                required
-                style={{ background: '#1A1A1A', color: '#FAF7F2', borderColor: 'rgba(201,168,76,0.15)' }}
-              />
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <Label htmlFor="password" style={{ color: '#8A8A82' }}>Password</Label>
-                <Link
-                  href="/forgot-password"
-                  style={{
-                    fontFamily: "'Jost', sans-serif",
-                    fontSize: '10px',
-                    fontWeight: 300,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.15em',
-                    color: 'rgba(201,168,76,0.7)',
-                    textDecoration: 'none',
-                  }}
-                >
-                  Forgot?
-                </Link>
-              </div>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                placeholder="••••••••"
-                autoComplete="current-password"
-                required
-                style={{ background: '#1A1A1A', color: '#FAF7F2', borderColor: 'rgba(201,168,76,0.15)' }}
-              />
-            </div>
-
-            <Button type="submit" className="mt-3 w-full">
-              Sign In
-            </Button>
-          </form>
+          <LoginForm action={login} error={error} next={next} />
         </div>
 
-        <p style={{
-          marginTop: '28px',
-          textAlign: 'center',
-          fontFamily: "'Jost', sans-serif",
-          fontSize: '11px',
-          fontWeight: 300,
-          letterSpacing: '0.08em',
-          color: '#6B6B65',
-        }}>
+        <p style={{ marginTop: '28px', textAlign: 'center', fontFamily: "'Jost', sans-serif", fontSize: '11px', fontWeight: 300, letterSpacing: '0.08em', color: '#6B6B65' }}>
           Don&apos;t have an account?{' '}
-          <Link
-            href="/signup"
-            style={{
-              fontWeight: 500,
-              textTransform: 'uppercase',
-              letterSpacing: '0.18em',
-              color: '#C9A84C',
-              textDecoration: 'none',
-            }}
-          >
+          <Link href="/signup" style={{ fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.18em', color: '#C9A84C', textDecoration: 'none' }}>
             Create One
           </Link>
         </p>
