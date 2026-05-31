@@ -16,6 +16,7 @@ import {
 import { formatCurrency } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
+import { NumberInput } from '@/components/ui/NumberInput'
 
 interface Unit {
   id: string
@@ -30,29 +31,29 @@ interface Unit {
 
 interface UnitFormData {
   unit_number: string
-  bedrooms: string
-  bathrooms: string
-  sqft: string
-  rent_amount: string
+  bedrooms: number | null
+  bathrooms: number | null
+  sqft: number | null
+  rent_amount: number | null
   status: string
 }
 
 const EMPTY_FORM: UnitFormData = {
   unit_number: '',
-  bedrooms: '',
-  bathrooms: '',
-  sqft: '',
-  rent_amount: '',
+  bedrooms: null,
+  bathrooms: null,
+  sqft: null,
+  rent_amount: null,
   status: 'vacant',
 }
 
 function unitToForm(u: Unit): UnitFormData {
   return {
     unit_number: u.unit_number,
-    bedrooms: u.bedrooms?.toString() ?? '',
-    bathrooms: u.bathrooms?.toString() ?? '',
-    sqft: u.sqft?.toString() ?? '',
-    rent_amount: u.rent_amount?.toString() ?? '',
+    bedrooms: u.bedrooms,
+    bathrooms: u.bathrooms,
+    sqft: u.sqft,
+    rent_amount: u.rent_amount,
     status: u.status,
   }
 }
@@ -68,7 +69,7 @@ interface UnitFormProps {
 }
 
 function UnitForm({ form, setForm, onSave, onCancel, saving, error, title }: UnitFormProps) {
-  const set = (key: keyof UnitFormData) => (e: React.ChangeEvent<HTMLInputElement>) =>
+  const set = (key: 'unit_number' | 'status') => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setForm({ ...form, [key]: e.target.value })
 
   return (
@@ -104,13 +105,11 @@ function UnitForm({ form, setForm, onSave, onCancel, saving, error, title }: Uni
 
         <div>
           <Label htmlFor="bedrooms">Bedrooms</Label>
-          <Input
+          <NumberInput
             id="bedrooms"
-            type="number"
-            min="0"
-            step="1"
             value={form.bedrooms}
-            onChange={set('bedrooms')}
+            onChange={(v) => setForm({ ...form, bedrooms: v })}
+            decimals={0}
             placeholder="2"
             style={{ marginTop: '6px' }}
           />
@@ -118,13 +117,11 @@ function UnitForm({ form, setForm, onSave, onCancel, saving, error, title }: Uni
 
         <div>
           <Label htmlFor="bathrooms">Bathrooms</Label>
-          <Input
+          <NumberInput
             id="bathrooms"
-            type="number"
-            min="0"
-            step="0.5"
             value={form.bathrooms}
-            onChange={set('bathrooms')}
+            onChange={(v) => setForm({ ...form, bathrooms: v })}
+            decimals={1}
             placeholder="1.5"
             style={{ marginTop: '6px' }}
           />
@@ -132,13 +129,11 @@ function UnitForm({ form, setForm, onSave, onCancel, saving, error, title }: Uni
 
         <div>
           <Label htmlFor="sqft">Sq Ft</Label>
-          <Input
+          <NumberInput
             id="sqft"
-            type="number"
-            min="0"
-            step="1"
             value={form.sqft}
-            onChange={set('sqft')}
+            onChange={(v) => setForm({ ...form, sqft: v })}
+            decimals={0}
             placeholder="850"
             style={{ marginTop: '6px' }}
           />
@@ -146,14 +141,13 @@ function UnitForm({ form, setForm, onSave, onCancel, saving, error, title }: Uni
 
         <div>
           <Label htmlFor="rent_amount">Monthly Rent (CAD)</Label>
-          <Input
+          <NumberInput
             id="rent_amount"
-            type="number"
-            min="0"
-            step="50"
             value={form.rent_amount}
-            onChange={set('rent_amount')}
-            placeholder="1800"
+            onChange={(v) => setForm({ ...form, rent_amount: v })}
+            prefix="$"
+            decimals={2}
+            placeholder="1,800.00"
             style={{ marginTop: '6px' }}
           />
         </div>
@@ -215,10 +209,10 @@ export function UnitManager({ propertyId, initialUnits }: UnitManagerProps) {
   function parseForm(f: UnitFormData) {
     return {
       unit_number: f.unit_number.trim(),
-      bedrooms: f.bedrooms ? parseInt(f.bedrooms) : null,
-      bathrooms: f.bathrooms ? parseFloat(f.bathrooms) : null,
-      sqft: f.sqft ? parseInt(f.sqft) : null,
-      rent_amount: f.rent_amount ? parseFloat(f.rent_amount) : null,
+      bedrooms: f.bedrooms != null ? Math.round(f.bedrooms) : null,
+      bathrooms: f.bathrooms,
+      sqft: f.sqft != null ? Math.round(f.sqft) : null,
+      rent_amount: f.rent_amount,
       status: f.status as 'occupied' | 'vacant' | 'maintenance',
     }
   }

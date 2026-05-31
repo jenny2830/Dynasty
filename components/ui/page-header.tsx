@@ -22,7 +22,7 @@ export function PageHeader({ title, subtitle, children, className }: PageHeaderP
           <h1 style={{
             fontFamily: "'Cormorant Garamond', serif",
             fontWeight: 600,
-            fontSize: '30px',
+            fontSize: 'clamp(18px, 4vw, 30px)',
             letterSpacing: '0.04em',
             display: 'flex',
             alignItems: 'center',
@@ -49,11 +49,14 @@ export function PageHeader({ title, subtitle, children, className }: PageHeaderP
               marginTop: '6px',
               fontFamily: "'Jost', sans-serif",
               fontWeight: 300,
-              fontSize: '12px',
+              fontSize: '11px',
               textTransform: 'uppercase',
               letterSpacing: '0.16em',
-              color: '#6B6B65',
+              color: 'var(--text-muted, #6B6B65)',
               margin: '6px 0 0 0',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
             }}>
               {subtitle}
             </p>

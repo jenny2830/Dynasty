@@ -5,6 +5,7 @@ import { ScanLine, CheckCircle2, XCircle, Loader2, Camera, Upload } from 'lucide
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { NumberInput } from '@/components/ui/NumberInput'
 import { Badge } from '@/components/ui/badge'
 import { Section, SectionHeader } from '@/components/ui/section'
 import {
@@ -340,13 +341,12 @@ export function ReceiptScanner({ properties, recentReceipts }: ReceiptScannerPro
 
                 <div className="space-y-2">
                   <Label htmlFor="amount">Amount (CAD) *</Label>
-                  <Input
+                  <NumberInput
                     id="amount"
-                    type="number"
-                    min="0.01"
-                    step="0.01"
-                    value={editData.amount ?? ''}
-                    onChange={(e) => setEditData({ ...editData, amount: parseFloat(e.target.value) || null })}
+                    value={editData.amount}
+                    onChange={(v) => setEditData({ ...editData, amount: v })}
+                    prefix="$"
+                    decimals={2}
                     placeholder="0.00"
                     required
                   />

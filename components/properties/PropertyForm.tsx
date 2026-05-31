@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { CANADIAN_PROVINCES, PROPERTY_TYPES, PROPERTY_SUBTYPES, PROPERTY_STATUSES } from '@/lib/constants'
+import { NumberInput } from '@/components/ui/NumberInput'
 import type { Property } from '@/types/database.types'
 
 function SubmitButton({ label, className }: { label: string; className?: string }) {
@@ -201,67 +202,62 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="purchase_price">Purchase Price (CAD)</Label>
-            <Input
+            <NumberInput
               id="purchase_price"
               name="purchase_price"
-              type="number"
-              min="0"
-              step="1000"
-              placeholder="500000"
-              defaultValue={property?.purchase_price ?? ''}
+              defaultValue={property?.purchase_price ?? null}
+              prefix="$"
+              decimals={2}
+              placeholder="500,000.00"
             />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="current_value">Current Value (CAD)</Label>
-            <Input
+            <NumberInput
               id="current_value"
               name="current_value"
-              type="number"
-              min="0"
-              step="1000"
-              placeholder="600000"
-              defaultValue={property?.current_value ?? ''}
+              defaultValue={property?.current_value ?? null}
+              prefix="$"
+              decimals={2}
+              placeholder="600,000.00"
             />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="mortgage_balance">Mortgage Balance (CAD)</Label>
-            <Input
+            <NumberInput
               id="mortgage_balance"
               name="mortgage_balance"
-              type="number"
-              min="0"
-              step="100"
-              placeholder="350000"
-              defaultValue={property?.mortgage_balance ?? ''}
+              defaultValue={property?.mortgage_balance ?? null}
+              prefix="$"
+              decimals={2}
+              placeholder="350,000.00"
             />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="monthly_mortgage">Monthly Mortgage (CAD)</Label>
-            <Input
+            <NumberInput
               id="monthly_mortgage"
               name="monthly_mortgage"
-              type="number"
-              min="0"
-              step="10"
-              placeholder="2100"
-              defaultValue={property?.monthly_mortgage ?? ''}
+              defaultValue={property?.monthly_mortgage ?? null}
+              prefix="$"
+              decimals={2}
+              placeholder="2,100.00"
             />
           </div>
 
           {type === 'condo' && (
             <div className="space-y-2">
               <Label htmlFor="condo_fee">Monthly Condo Fee (CAD)</Label>
-              <Input
+              <NumberInput
                 id="condo_fee"
                 name="condo_fee"
-                type="number"
-                min="0"
-                step="10"
-                placeholder="450"
-                defaultValue={property?.condo_fee ?? ''}
+                defaultValue={property?.condo_fee ?? null}
+                prefix="$"
+                decimals={2}
+                placeholder="450.00"
               />
             </div>
           )}
@@ -269,14 +265,13 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
           {type === 'strata' && (
             <div className="space-y-2">
               <Label htmlFor="strata_fee">Monthly Strata Fee (CAD)</Label>
-              <Input
+              <NumberInput
                 id="strata_fee"
                 name="strata_fee"
-                type="number"
-                min="0"
-                step="10"
-                placeholder="350"
-                defaultValue={property?.strata_fee ?? ''}
+                defaultValue={property?.strata_fee ?? null}
+                prefix="$"
+                decimals={2}
+                placeholder="350.00"
               />
             </div>
           )}

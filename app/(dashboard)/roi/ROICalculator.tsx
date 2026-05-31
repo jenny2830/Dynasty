@@ -2,7 +2,6 @@
 
 import { useState, useMemo } from 'react'
 import { TrendingUp, Building2 } from 'lucide-react'
-import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { Section } from '@/components/ui/section'
@@ -14,6 +13,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { formatCurrency, formatPercent } from '@/lib/utils'
+import { NumberInput } from '@/components/ui/NumberInput'
 import {
   PieChart,
   Pie,
@@ -103,8 +103,8 @@ interface ROICalculatorProps {
 export function ROICalculator({ properties }: ROICalculatorProps) {
   const [inputs, setInputs] = useState<ROIInputs>(EMPTY_INPUTS)
 
-  const set = (key: keyof ROIInputs) => (e: React.ChangeEvent<HTMLInputElement>) =>
-    setInputs((prev) => ({ ...prev, [key]: parseFloat(e.target.value) || 0 }))
+  const set = (key: keyof ROIInputs) => (val: number | null) =>
+    setInputs((prev) => ({ ...prev, [key]: val ?? 0 }))
 
   function loadFromProperty(propertyId: string) {
     const p = properties.find((x) => x.id === propertyId)
@@ -199,14 +199,13 @@ export function ROICalculator({ properties }: ROICalculatorProps) {
                   {help}
                 </p>
               )}
-              <Input
+              <NumberInput
                 id={key}
-                type="number"
-                min="0"
-                step="100"
-                value={inputs[key] || ''}
+                value={inputs[key] || null}
                 onChange={set(key)}
-                placeholder="0"
+                prefix="$"
+                decimals={2}
+                placeholder="0.00"
               />
             </div>
           ))}

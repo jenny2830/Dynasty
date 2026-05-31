@@ -37,7 +37,7 @@ export default async function LoginPage({
   }
 
   return (
-    <div className="deco-marble relative flex min-h-screen flex-col items-center justify-center bg-dynasty-black px-4 py-12">
+    <div className="auth-page deco-marble relative flex min-h-screen flex-col items-center justify-center bg-dynasty-black px-4 py-12">
       {/* Gold top accent line */}
       <div
         className="fixed top-0 left-0 right-0 h-px"
@@ -69,7 +69,7 @@ export default async function LoginPage({
 
         {/* Auth card — lux-card with four-corner Art Deco frame */}
         <div
-          className="lux-card deco-corners-4 relative mx-auto px-11 py-12"
+          className="auth-card lux-card deco-corners-4 relative mx-auto px-11 py-12"
           style={{ boxShadow: 'var(--shadow-modal)' }}
         >
           <div className="text-center">

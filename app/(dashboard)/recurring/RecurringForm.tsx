@@ -10,6 +10,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { NumberInput } from '@/components/ui/NumberInput'
 import { Textarea } from '@/components/ui/textarea'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
@@ -118,14 +119,13 @@ export function RecurringForm({ mode, payment, properties }: RecurringFormProps)
 
         <div className="space-y-2">
           <Label htmlFor="amount">Amount (CAD) *</Label>
-          <Input
+          <NumberInput
             id="amount"
             name="amount"
-            type="number"
-            min="0.01"
-            step="0.01"
+            defaultValue={payment?.amount ?? null}
+            prefix="$"
+            decimals={2}
             placeholder="250.00"
-            defaultValue={payment?.amount ?? ''}
             required
           />
         </div>

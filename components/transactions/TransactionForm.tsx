@@ -6,6 +6,7 @@ import { createTransaction, updateTransaction, type TxFormState } from '@/app/ac
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { NumberInput } from '@/components/ui/NumberInput'
 import { Textarea } from '@/components/ui/textarea'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
@@ -144,14 +145,13 @@ export function TransactionForm({
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor="amount">Amount (CAD) *</Label>
-          <Input
+          <NumberInput
             id="amount"
             name="amount"
-            type="number"
-            min="0.01"
-            step="0.01"
-            placeholder="1500.00"
-            defaultValue={transaction?.amount ?? ''}
+            defaultValue={transaction?.amount ?? null}
+            prefix="$"
+            decimals={2}
+            placeholder="1,500.00"
             required
           />
           {state?.errors?.amount && (

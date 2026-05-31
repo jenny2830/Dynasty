@@ -1232,6 +1232,53 @@ input:-webkit-autofill:focus {
 }
 
 /* ─────────────────────────────────────────────
+   Auth pages & cards — ALWAYS dark (brand identity)
+   Even in light or rose themes the login/signup
+   surfaces remain on the dark, gold-accented field.
+   ───────────────────────────────────────────── */
+[data-theme="light"] .auth-page,
+[data-theme="rose"] .auth-page {
+  background-color: #080808 !important;
+}
+
+[data-theme="light"] .auth-card,
+[data-theme="rose"] .auth-card {
+  background: rgba(17,17,17,0.97) !important;
+  border-color: rgba(201,168,76,0.2) !important;
+  color: #FAF7F2 !important;
+}
+
+[data-theme="light"] .auth-card h1,
+[data-theme="light"] .auth-card h2,
+[data-theme="light"] .auth-card h3,
+[data-theme="rose"] .auth-card h1,
+[data-theme="rose"] .auth-card h2,
+[data-theme="rose"] .auth-card h3 {
+  color: #FAF7F2 !important;
+}
+
+[data-theme="light"] .auth-card p,
+[data-theme="light"] .auth-card span,
+[data-theme="light"] .auth-card label,
+[data-theme="rose"] .auth-card p,
+[data-theme="rose"] .auth-card span,
+[data-theme="rose"] .auth-card label {
+  color: #8A8A82 !important;
+}
+
+[data-theme="light"] .auth-card input,
+[data-theme="rose"] .auth-card input {
+  background: #1A1A1A !important;
+  border-color: rgba(201,168,76,0.15) !important;
+  color: #FAF7F2 !important;
+}
+
+[data-theme="light"] .auth-card input::placeholder,
+[data-theme="rose"] .auth-card input::placeholder {
+  color: #4A4A45 !important;
+}
+
+/* ─────────────────────────────────────────────
    Print — clean reports
    ───────────────────────────────────────────── */
 @media print {
@@ -1482,38 +1529,37 @@ input:-webkit-autofill:focus {
   color: #4A4A45 !important;
 }
 
-/* Light mode — sidebar is light cream */
+/* ─────────────────────────────────────────────
+   FIX 6 — LIGHT MODE SIDEBAR (matches theme)
+   ───────────────────────────────────────────── */
 [data-theme="light"] aside {
-  background-color: #F5F0E8 !important;
+  background-color: #F0EBE3 !important;
   border-right: 1px solid rgba(154,122,46,0.2) !important;
   background-image: none !important;
 }
 
-/* Sidebar nav text in light mode */
 [data-theme="light"] aside span,
 [data-theme="light"] aside a,
 [data-theme="light"] aside button,
-[data-theme="light"] aside p {
-  color: #4A4A45 !important;
+[data-theme="light"] aside p,
+[data-theme="light"] aside div {
+  color: #5C5548 !important;
 }
 
-/* Active nav item in light mode */
 [data-theme="light"] aside [style*="color: #C9A84C"],
 [data-theme="light"] aside [style*="color:#C9A84C"] {
   color: #9A7A2E !important;
 }
 
-/* Active nav item background in light mode */
 [data-theme="light"] aside [style*="background: rgba(201,168,76"] {
   background: rgba(154,122,46,0.1) !important;
 }
 
-/* Active nav item left border in light mode */
-[data-theme="light"] aside a[style*="borderLeft"] {
+[data-theme="light"] aside [style*="borderLeft: 2px solid #C9A84C"],
+[data-theme="light"] aside [style*="border-left: 2px solid #C9A84C"] {
   border-left-color: #9A7A2E !important;
 }
 
-/* Sidebar section labels in light mode */
 [data-theme="light"] aside [style*="color: #6B6B65"],
 [data-theme="light"] aside [style*="color:#6B6B65"],
 [data-theme="light"] aside [style*="color: #333330"],
@@ -1521,7 +1567,6 @@ input:-webkit-autofill:focus {
   color: #8A8A82 !important;
 }
 
-/* Sidebar inactive nav items in light mode */
 [data-theme="light"] aside [style*="color: #9A8F7A"],
 [data-theme="light"] aside [style*="color:#9A8F7A"],
 [data-theme="light"] aside [style*="color: #4A4A45"],
@@ -1529,123 +1574,115 @@ input:-webkit-autofill:focus {
   color: #6B6B65 !important;
 }
 
-/* Tagline under logo in light mode */
 [data-theme="light"] aside [style*="color: rgba(201,168,76"] {
-  color: rgba(154,122,46,0.5) !important;
+  color: rgba(154,122,46,0.6) !important;
 }
 
-/* Sidebar dividers and borders in light mode */
 [data-theme="light"] aside [style*="background: rgba(201,168,76"][style*="height: 1px"],
 [data-theme="light"] aside [style*="background:rgba(201,168,76"][style*="height:1px"] {
   background: rgba(154,122,46,0.15) !important;
 }
 
-/* Sidebar corner marks in light mode */
 [data-theme="light"] aside div[style*="borderTop: 1px solid rgba(201,168,76"],
 [data-theme="light"] aside div[style*="borderLeft: 1px solid rgba(201,168,76"],
 [data-theme="light"] aside div[style*="borderBottom: 1px solid rgba(201,168,76"],
 [data-theme="light"] aside div[style*="borderRight: 1px solid rgba(201,168,76"] {
-  border-color: rgba(154,122,46,0.25) !important;
+  border-color: rgba(154,122,46,0.2) !important;
 }
 
-/* ═════════════════════════════════════════════════════════════
-   ROSE THEME — light background with rose-gold accents
-   Sidebar: soft blush (#F5E8E6), NOT dark.
-   ═════════════════════════════════════════════════════════════ */
+/* ============================================
+   FIX 3 — ROSE-GOLD THEME (light cream + rose-gold)
+   ============================================ */
 
-/* Token overrides for var(--gold) consumers */
 html[data-theme="rose"] {
-  --gold:                #8B4F58;
+  --gold:                #B76E79;
+  --gold-light:          #D4959E;
+  --gold-dark:           #8B4F58;
   --gradient-title:      linear-gradient(135deg, #8B4F58 0%, #B76E79 50%, #6B3A42 100%);
-  --gradient-value:      linear-gradient(135deg, #B76E79 0%, #8B4F58 60%, #5C3038 100%);
+  --gradient-value:      linear-gradient(135deg, #D4959E 0%, #B76E79 50%, #8B4F58 100%);
   --card-border:         rgba(183,110,121,0.20);
   --card-shadow:         0 2px 12px rgba(139,79,88,0.06);
-  --corner-color:        rgba(183,110,121,0.40);
+  --corner-color:        rgba(183,110,121,0.45);
   --diamond-color:       rgba(183,110,121,0.45);
   --rule-color:          rgba(183,110,121,0.40);
   --panel-border:        rgba(183,110,121,0.20);
   --panel-header-border: rgba(183,110,121,0.15);
-  --trend-positive:      #8B4F58;
+  --trend-positive:      #B76E79;
+  --accent-top:          linear-gradient(90deg, transparent, #B76E79, transparent);
 }
 
 [data-theme="rose"] body,
 [data-theme="rose"] main,
-[data-theme="rose"] .dashboard-main {
-  background-color: #FBF5F3 !important;
+[data-theme="rose"] .flex-1 {
+  background-color: #FDF8F6 !important;
   color: #3D2A2E !important;
 }
 
-/* Rose sidebar — soft blush, NOT dark */
+/* Rose sidebar — light blush, matches theme */
 [data-theme="rose"] aside {
-  background-color: #F5E8E6 !important;
+  background-color: #F8EDE9 !important;
   border-right: 1px solid rgba(183,110,121,0.25) !important;
   background-image: none !important;
 }
 
-/* Rose sidebar nav text */
 [data-theme="rose"] aside span,
 [data-theme="rose"] aside a,
 [data-theme="rose"] aside button,
-[data-theme="rose"] aside p {
-  color: #5C3F44 !important;
-}
-
-/* Rose sidebar active nav item */
-[data-theme="rose"] aside [style*="color: #C9A84C"],
-[data-theme="rose"] aside [style*="color:#C9A84C"] {
-  color: #8B4F58 !important;
-}
-
-/* Rose sidebar active background */
-[data-theme="rose"] aside [style*="background: rgba(201,168,76"] {
-  background: rgba(183,110,121,0.1) !important;
-}
-
-/* Rose sidebar active left border */
-[data-theme="rose"] aside a[style*="borderLeft"] {
-  border-left-color: #B76E79 !important;
-}
-
-/* Rose sidebar section labels */
-[data-theme="rose"] aside [style*="color: #6B6B65"],
-[data-theme="rose"] aside [style*="color:#6B6B65"],
-[data-theme="rose"] aside [style*="color: #333330"],
-[data-theme="rose"] aside [style*="color:#333330"] {
-  color: #9A7A80 !important;
-}
-
-/* Rose sidebar inactive nav items */
-[data-theme="rose"] aside [style*="color: #9A8F7A"],
-[data-theme="rose"] aside [style*="color:#9A8F7A"] {
+[data-theme="rose"] aside p,
+[data-theme="rose"] aside div {
   color: #7A5A60 !important;
 }
 
-/* Rose sidebar tagline */
+[data-theme="rose"] aside [style*="color: #C9A84C"],
+[data-theme="rose"] aside [style*="color:#C9A84C"] {
+  color: #B76E79 !important;
+}
+
+[data-theme="rose"] aside [style*="background: rgba(201,168,76"] {
+  background: rgba(183,110,121,0.12) !important;
+}
+
+[data-theme="rose"] aside [style*="borderLeft: 2px solid #C9A84C"],
+[data-theme="rose"] aside [style*="border-left: 2px solid #C9A84C"] {
+  border-left-color: #B76E79 !important;
+}
+
+[data-theme="rose"] aside [style*="color: #6B6B65"],
+[data-theme="rose"] aside [style*="color:#6B6B65"],
+[data-theme="rose"] aside [style*="color: #333330"],
+[data-theme="rose"] aside [style*="color:#333330"],
+[data-theme="rose"] aside [style*="letterSpacing"] {
+  color: #B39A9E !important;
+}
+
 [data-theme="rose"] aside [style*="color: rgba(201,168,76"] {
-  color: rgba(183,110,121,0.55) !important;
+  color: rgba(183,110,121,0.6) !important;
 }
 
-/* Rose sidebar dividers */
-[data-theme="rose"] aside [style*="background: rgba(201,168,76"][style*="height: 1px"],
-[data-theme="rose"] aside [style*="background:rgba(201,168,76"][style*="height:1px"] {
-  background: rgba(183,110,121,0.15) !important;
+[data-theme="rose"] aside div[style*="borderTop: 1px solid rgba(201,168,76"],
+[data-theme="rose"] aside div[style*="borderLeft: 1px solid rgba(201,168,76"],
+[data-theme="rose"] aside div[style*="borderBottom: 1px solid rgba(201,168,76"],
+[data-theme="rose"] aside div[style*="borderRight: 1px solid rgba(201,168,76"] {
+  border-color: rgba(183,110,121,0.3) !important;
 }
 
-/* Rose cards */
-[data-theme="rose"] [class*="card"],
-[data-theme="rose"] .lux-card,
-[data-theme="rose"] .lux-panel,
-[data-theme="rose"] .stat-panel,
+/* Rose cards — slightly darker cream than background */
 [data-theme="rose"] div[style*="background: linear-gradient(160deg, #141414"],
 [data-theme="rose"] div[style*="background: #111111"],
 [data-theme="rose"] div[style*="background:#141414"],
-[data-theme="rose"] div[style*="background:#111111"] {
-  background: #F0E0DD !important;
-  border-color: rgba(183,110,121,0.20) !important;
+[data-theme="rose"] div[style*="background:#111111"],
+[data-theme="rose"] div[style*="background: #0F0F0F"],
+[data-theme="rose"] div[style*="background:#0F0F0F"],
+[data-theme="rose"] div[style*="background: linear-gradient(160deg"],
+[data-theme="rose"] [class*="card"],
+[data-theme="rose"] .lux-card,
+[data-theme="rose"] .lux-panel,
+[data-theme="rose"] .stat-panel {
+  background: #F2E4E0 !important;
+  border-color: rgba(183,110,121,0.2) !important;
   box-shadow: 0 2px 12px rgba(139,79,88,0.06) !important;
 }
 
-/* Rose headings */
 [data-theme="rose"] h1,
 [data-theme="rose"] h2,
 [data-theme="rose"] h3,
@@ -1653,42 +1690,54 @@ html[data-theme="rose"] {
   color: #3D2A2E !important;
 }
 
-/* Rose body text */
 [data-theme="rose"] p,
-[data-theme="rose"] span:not([style*="color"]),
-[data-theme="rose"] label,
-[data-theme="rose"] td {
+[data-theme="rose"] td,
+[data-theme="rose"] label {
   color: #5C3F44 !important;
 }
 
-/* Gold values → rose-gold in rose theme */
 [data-theme="rose"] [style*="color: #C9A84C"],
 [data-theme="rose"] [style*="color:#C9A84C"] {
-  color: #8B4F58 !important;
+  color: #B76E79 !important;
 }
 
-/* Rose secondary / tertiary text */
 [data-theme="rose"] [style*="color: #B5B5AA"],
 [data-theme="rose"] [style*="color:#B5B5AA"],
 [data-theme="rose"] [style*="color: #8A8A82"],
-[data-theme="rose"] [style*="color:#8A8A82"] {
-  color: #7A5A60 !important;
+[data-theme="rose"] [style*="color:#8A8A82"],
+[data-theme="rose"] [style*="color: #9A8F7A"],
+[data-theme="rose"] [style*="color:#9A8F7A"] {
+  color: #8A6A70 !important;
 }
 
-/* Corner marks → rose */
+[data-theme="rose"] [style*="color: #FAF7F2"],
+[data-theme="rose"] [style*="color:#FAF7F2"] {
+  color: #3D2A2E !important;
+}
+
 [data-theme="rose"] div[style*="borderTop: 1px solid rgba(201,168,76"],
 [data-theme="rose"] div[style*="borderLeft: 1px solid rgba(201,168,76"],
 [data-theme="rose"] div[style*="borderBottom: 1px solid rgba(201,168,76"],
 [data-theme="rose"] div[style*="borderRight: 1px solid rgba(201,168,76"] {
-  border-color: rgba(183,110,121,0.40) !important;
+  border-color: rgba(183,110,121,0.45) !important;
 }
 
-/* Top accent lines → rose */
 [data-theme="rose"] div[style*="linear-gradient(90deg, transparent, #C9A84C"] {
   background: linear-gradient(90deg, transparent, #B76E79, transparent) !important;
 }
 
-/* Inputs */
+[data-theme="rose"] button[style*="linear-gradient(135deg, #C9A84C"],
+[data-theme="rose"] button[style*="linear-gradient(135deg,#C9A84C"] {
+  background: linear-gradient(135deg, #D4959E 0%, #B76E79 100%) !important;
+  color: #FFFFFF !important;
+}
+
+[data-theme="rose"] button[style*="border: 1px solid rgba(201,168,76"],
+[data-theme="rose"] button[style*="border:1px solid rgba(201,168,76"] {
+  border-color: rgba(183,110,121,0.35) !important;
+  color: #B76E79 !important;
+}
+
 [data-theme="rose"] input,
 [data-theme="rose"] select,
 [data-theme="rose"] textarea {
@@ -1697,15 +1746,44 @@ html[data-theme="rose"] {
   border-color: rgba(183,110,121,0.25) !important;
 }
 
-/* Primary gold-gradient buttons → rose-gradient */
-[data-theme="rose"] button[style*="linear-gradient(135deg, #C9A84C"],
-[data-theme="rose"] a[style*="linear-gradient(135deg, #C9A84C"] {
-  background: linear-gradient(135deg, #D4959E 0%, #B76E79 100%) !important;
-  color: #FFFFFF !important;
+[data-theme="rose"] input:focus,
+[data-theme="rose"] select:focus,
+[data-theme="rose"] textarea:focus {
+  border-color: rgba(183,110,121,0.5) !important;
+  box-shadow: 0 0 0 3px rgba(183,110,121,0.08) !important;
 }
 
-/* Chart dark boxes → rose surface */
-[data-theme="rose"] div[style*="background: #0F0F0F"],
-[data-theme="rose"] div[style*="background:#0F0F0F"] {
-  background: #F0E0DD !important;
+[data-theme="rose"] th {
+  background: #EDD8D4 !important;
+  color: #7A5A60 !important;
+}
+
+[data-theme="rose"] tr:hover td {
+  background: rgba(183,110,121,0.04) !important;
+}
+
+[data-theme="rose"] [style*="background: rgba(201,168,76,0.08)"],
+[data-theme="rose"] [style*="background:rgba(201,168,76,0.08)"] {
+  background: rgba(183,110,121,0.1) !important;
+  color: #8B4F58 !important;
+  border-color: rgba(183,110,121,0.25) !important;
+}
+
+[data-theme="rose"] ::-webkit-scrollbar-track {
+  background: #FDF8F6 !important;
+}
+[data-theme="rose"] ::-webkit-scrollbar-thumb {
+  background: rgba(183,110,121,0.3) !important;
+}
+
+[data-theme="rose"] ::selection {
+  background: rgba(183,110,121,0.2) !important;
+  color: #3D2A2E !important;
+}
+
+[data-theme="rose"] [style*="-webkit-text-fill-color: transparent"] {
+  background: linear-gradient(135deg, #D4959E 0%, #B76E79 50%, #8B4F58 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
 }
