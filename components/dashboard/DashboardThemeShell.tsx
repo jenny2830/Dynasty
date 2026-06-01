@@ -77,6 +77,17 @@ function ThemedInner({ sidebar, children }: { sidebar: React.ReactNode; children
 
     /* ── Accent text overlay ── */
     '--text-on-accent': theme.textOnAccent,
+
+    /* ── Input focus / placeholder ── */
+    '--placeholder-c': theme.inputPlaceholder,
+    '--input-focus-border': theme.inputFocusBorder,
+    '--input-focus-shadow': theme.inputFocusShadow,
+
+    /* ── Gradient hover & button shadows ── */
+    '--gradient-value-hover': theme.accentGradientHover,
+    '--accent-shadow': `0 4px 16px ${theme.accent}2E`,
+    '--accent-shadow-hover': `0 6px 24px ${theme.accent}47`,
+    '--focus-ring': `${theme.accent}66`,
   } as React.CSSProperties
 
   return (

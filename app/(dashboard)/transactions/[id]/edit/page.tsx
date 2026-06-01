@@ -50,7 +50,7 @@ export default async function EditTransactionPage({
         <DeleteTransactionButton txId={id} />
       </PageHeader>
 
-      <div className="rounded-[2px] border border-[rgba(201,168,76,0.08)] bg-dynasty-black-soft px-9 py-9 shadow-[var(--shadow-card)]">
+      <div className="rounded-[2px] border border-[var(--card-border-color)] px-9 py-9" style={{ background: 'var(--card-bg)', boxShadow: 'var(--card-shadow)' }}>
         <TransactionForm
           mode="edit"
           transaction={txResult.data}

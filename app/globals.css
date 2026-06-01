@@ -1399,3 +1399,42 @@ input:-webkit-autofill:focus {
   border-color: rgba(154,122,46,0.2) !important;
 }
 
+/* ═════════════════════════════════════════════════════════════
+   DYNAMIC THEME — Tailwind color token remapping
+   The DashboardThemeShell injects CSS vars for each theme.
+   Here we remap all legacy Tailwind dynasty-* color tokens to
+   those dynamic vars so every component auto-adapts.
+   In Tailwind v4, `text-dynasty-warm-white` compiles to
+   `color: var(--color-dynasty-warm-white)`. Overriding that
+   variable here changes every usage in the subtree.
+   ═════════════════════════════════════════════════════════════ */
+.dashboard-landscape-shell {
+  /* ── Text tokens ── */
+  --color-dynasty-warm-white:   var(--text-primary-c);
+  --color-dynasty-cream:        var(--text-secondary-c);
+  --color-dynasty-gray-200:     var(--text-secondary-c);
+  --color-dynasty-gray-300:     var(--text-secondary-c);
+  --color-dynasty-gray-400:     var(--text-muted-c);
+  --color-dynasty-gray-500:     var(--text-muted-c);
+  --color-dynasty-gray-600:     var(--placeholder-c, var(--text-muted-c));
+
+  /* ── Surface / background tokens ── */
+  --color-dynasty-black-soft:   var(--input-bg);          /* inputs, form card wrappers */
+  --color-dynasty-black-card:   var(--section-bg);        /* select dropdowns, secondary btn */
+  --color-dynasty-black-warm:   var(--table-header-bg);   /* hover states */
+  --color-dynasty-gray-900:     var(--section-bg);        /* table bg */
+  --color-dynasty-gray-800:     var(--table-header-bg);   /* table header */
+  --color-dynasty-gray-700:     var(--section-bg);
+
+  /* ── Accent tokens ── */
+  --color-dynasty-gold:         var(--accent-c);
+  --color-dynasty-gold-dark:    var(--accent-c);
+  --color-dynasty-gold-muted:   var(--text-muted-c);
+  --color-dynasty-rose-gold:    var(--value-neg-c);
+  --color-dynasty-rose-dark:    var(--value-neg-c);
+  --color-dynasty-rose-light:   var(--value-neg-c);
+
+  /* ── Text-on-accent (button labels on gradient backgrounds) ── */
+  --color-dynasty-black:        var(--text-on-accent);
+}
+

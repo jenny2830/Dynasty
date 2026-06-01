@@ -43,7 +43,7 @@ export default async function NewTransactionPage({
 
       <PageHeader title="Add Transaction" subtitle="Record income or expense" />
 
-      <div className="rounded-[2px] border border-[rgba(201,168,76,0.08)] bg-dynasty-black-soft px-9 py-9 shadow-[var(--shadow-card)]">
+      <div className="rounded-[2px] border border-[var(--card-border-color)] px-9 py-9" style={{ background: 'var(--card-bg)', boxShadow: 'var(--card-shadow)' }}>
         <TransactionForm
           mode="create"
           properties={properties ?? []}

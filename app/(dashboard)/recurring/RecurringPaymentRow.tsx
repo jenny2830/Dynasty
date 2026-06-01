@@ -116,10 +116,10 @@ export function RecurringPaymentRow({ payment }: { payment: RecurringPayment }) 
                   className="fixed inset-0 z-10"
                   onClick={() => setShowMenu(false)}
                 />
-                <div className="absolute right-0 top-10 z-20 min-w-44 rounded-[1px] border border-[rgba(201,168,76,0.18)] bg-dynasty-black-card py-1 shadow-[var(--shadow-card)]">
+                <div className="absolute right-0 top-10 z-20 min-w-44 rounded-[1px] border border-[var(--card-border-color)] bg-dynasty-black-card py-1 shadow-[var(--card-shadow)]">
                   <Link
                     href={`/recurring/${payment.id}/edit`}
-                    className="flex items-center gap-2 px-4 py-2.5 font-sans text-[11px] font-light uppercase tracking-[0.14em] text-dynasty-gray-300 transition-colors hover:bg-[rgba(201,168,76,0.06)] hover:text-dynasty-gold"
+                    className="flex items-center gap-2 px-4 py-2.5 font-sans text-[11px] font-light uppercase tracking-[0.14em] text-dynasty-gray-300 transition-colors hover:bg-[var(--table-row-hover-bg)] hover:text-dynasty-gold"
                     onClick={() => setShowMenu(false)}
                   >
                     <Edit className="h-3.5 w-3.5" strokeWidth={1.2} /> Edit
@@ -127,12 +127,12 @@ export function RecurringPaymentRow({ payment }: { payment: RecurringPayment }) 
                   <button
                     onClick={handleToggleActive}
                     disabled={isPending}
-                    className="flex w-full items-center gap-2 px-4 py-2.5 font-sans text-[11px] font-light uppercase tracking-[0.14em] text-dynasty-gray-300 transition-colors hover:bg-[rgba(201,168,76,0.06)] hover:text-dynasty-gold"
+                    className="flex w-full items-center gap-2 px-4 py-2.5 font-sans text-[11px] font-light uppercase tracking-[0.14em] text-dynasty-gray-300 transition-colors hover:bg-[var(--table-row-hover-bg)] hover:text-dynasty-gold"
                   >
                     <Power className="h-3.5 w-3.5" strokeWidth={1.2} />
                     {payment.is_active ? 'Deactivate' : 'Activate'}
                   </button>
-                  <div className="my-1 h-px bg-[rgba(201,168,76,0.08)]" />
+                  <div className="my-1 h-px bg-[var(--divider-c)]" />
                   <button
                     onClick={handleDelete}
                     disabled={isPending}
