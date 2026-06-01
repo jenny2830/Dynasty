@@ -5,6 +5,7 @@ import { Sidebar } from '@/components/dashboard/Sidebar'
 import { PreferencesInit } from '@/components/dashboard/PreferencesInit'
 import { DashboardClientWrapper } from '@/components/dashboard/DashboardClientWrapper'
 import { DashboardThemeShell } from '@/components/dashboard/DashboardThemeShell'
+import { toThemeId } from '@/lib/themes'
 import type { PlanId } from '@/lib/plans'
 
 export default async function DashboardLayout({
@@ -36,10 +37,11 @@ export default async function DashboardLayout({
 
   return (
     <DashboardThemeShell
+      initialThemeId={toThemeId(landlord?.theme_preference)}
       sidebar={
         <>
           <PreferencesInit />
-          <Sidebar userId={user.id} initialTheme={landlord?.theme_preference ?? 'dark'} />
+          <Sidebar userId={user.id} />
         </>
       }
     >

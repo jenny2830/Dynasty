@@ -22,7 +22,7 @@ export type Database = {
           stripe_customer_id: string | null
           stripe_subscription_id: string | null
           created_at: string
-          theme_preference: 'dark' | 'light'
+          theme_preference: 'dark-gold' | 'light-gold' | 'dark-rose' | 'light-rose' | 'dark' | 'light'
           last_selected_property_id: string | null
           default_date_range: 'week' | 'month' | 'quarter' | 'year'
           notification_prefs: Json
@@ -46,7 +46,7 @@ export type Database = {
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           created_at?: string
-          theme_preference?: 'dark' | 'light'
+          theme_preference?: 'dark-gold' | 'light-gold' | 'dark-rose' | 'light-rose' | 'dark' | 'light'
           last_selected_property_id?: string | null
           default_date_range?: 'week' | 'month' | 'quarter' | 'year'
           notification_prefs?: Json
@@ -70,7 +70,7 @@ export type Database = {
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           created_at?: string
-          theme_preference?: 'dark' | 'light'
+          theme_preference?: 'dark-gold' | 'light-gold' | 'dark-rose' | 'light-rose' | 'dark' | 'light'
           last_selected_property_id?: string | null
           default_date_range?: 'week' | 'month' | 'quarter' | 'year'
           notification_prefs?: Json

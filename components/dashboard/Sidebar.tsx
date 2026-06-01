@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { useTheme } from 'next-themes'
+import { useAppTheme } from '@/lib/theme-context'
 import {
   LayoutDashboard,
   Building2,
@@ -38,27 +38,6 @@ const NAV_ACCOUNT = [
   { href: '/upgrade',      label: 'Upgrade',       Icon: Crown,    gold: true },
 ] as const
 
-interface SidebarColors {
-  bg: string
-  border: string
-  logoBorder: string
-  tagline: string
-  hatch: string
-  sectionLabel: string
-  navText: string
-  navActive: string
-  navActiveBg: string
-  navActiveBorder: string
-  hover: string
-  divider: string
-  footer: string
-  footerDiamond: string
-  closeBtnBorder: string
-  hamburgerBg: string
-  hamburgerBorder: string
-  hamburgerColor: string
-}
-
 interface NavItemProps {
   href: string
   label: string
@@ -66,18 +45,22 @@ interface NavItemProps {
   isActive: boolean
   gold?: boolean
   onNavigate?: () => void
-  colors: SidebarColors
+  navText: string
+  navActive: string
+  navActiveBg: string
+  navActiveBorder: string
+  accentColor: string
 }
 
-function NavItem({ href, label, Icon, isActive, gold, onNavigate, colors }: NavItemProps) {
-  const defaultColor = gold ? '#C9A84C' : colors.navText
+function NavItem({ href, label, Icon, isActive, gold, onNavigate, navText, navActive, navActiveBg, navActiveBorder, accentColor }: NavItemProps) {
+  const defaultColor = gold ? accentColor : navText
   return (
     <Link
       href={href}
       prefetch={true}
       onClick={onNavigate}
       style={isActive ? {
-        color: colors.navActive,
+        color: navActive,
         fontFamily: "'Jost', sans-serif",
         fontSize: '11px',
         letterSpacing: '0.14em',
@@ -86,8 +69,8 @@ function NavItem({ href, label, Icon, isActive, gold, onNavigate, colors }: NavI
         display: 'flex',
         alignItems: 'center',
         gap: '12px',
-        borderLeft: `2px solid ${colors.navActiveBorder}`,
-        background: colors.navActiveBg,
+        borderLeft: `2px solid ${navActiveBorder}`,
+        background: navActiveBg,
         textDecoration: 'none',
         transition: 'color 0.2s ease',
       } : {
@@ -105,7 +88,7 @@ function NavItem({ href, label, Icon, isActive, gold, onNavigate, colors }: NavI
         textDecoration: 'none',
       }}
       onMouseEnter={e => {
-        if (!isActive) (e.currentTarget as HTMLElement).style.color = colors.hover
+        if (!isActive) (e.currentTarget as HTMLElement).style.color = navActive
       }}
       onMouseLeave={e => {
         if (!isActive) (e.currentTarget as HTMLElement).style.color = defaultColor
@@ -138,69 +121,17 @@ function NavSectionLabel({ children, color }: { children: React.ReactNode; color
 
 interface SidebarProps {
   userId?: string
-  initialTheme?: string
-}
-
-function buildColors(resolvedTheme: string | undefined, mounted: boolean): SidebarColors {
-  const isDark = !mounted || resolvedTheme === 'dark'
-
-  if (isDark) {
-    return {
-      bg: '#080808',
-      border: 'rgba(201,168,76,0.12)',
-      logoBorder: 'rgba(201,168,76,0.15)',
-      tagline: 'rgba(201,168,76,0.45)',
-      hatch: 'repeating-linear-gradient(45deg, transparent, transparent 28px, rgba(201,168,76,0.018) 28px, rgba(201,168,76,0.018) 29px), repeating-linear-gradient(-45deg, transparent, transparent 28px, rgba(201,168,76,0.018) 28px, rgba(201,168,76,0.018) 29px)',
-      sectionLabel: '#6B6B65',
-      navText: '#9A8F7A',
-      navActive: '#C9A84C',
-      navActiveBg: 'rgba(201,168,76,0.07)',
-      navActiveBorder: '#C9A84C',
-      hover: '#B76E79',
-      divider: 'rgba(201,168,76,0.08)',
-      footer: 'rgba(201,168,76,0.30)',
-      footerDiamond: 'rgba(201,168,76,0.50)',
-      closeBtnBorder: 'rgba(201,168,76,0.20)',
-      hamburgerBg: 'rgba(8,8,8,0.85)',
-      hamburgerBorder: 'rgba(201,168,76,0.30)',
-      hamburgerColor: '#C9A84C',
-    }
-  }
-
-  // Light
-  return {
-    bg: '#F0EBE3',
-    border: 'rgba(154,122,46,0.18)',
-    logoBorder: 'rgba(154,122,46,0.18)',
-    tagline: 'rgba(154,122,46,0.50)',
-    hatch: 'none',
-    sectionLabel: '#8A8A82',
-    navText: '#5C5548',
-    navActive: '#9A7A2E',
-    navActiveBg: 'rgba(154,122,46,0.08)',
-    navActiveBorder: '#9A7A2E',
-    hover: '#9A7A2E',
-    divider: 'rgba(154,122,46,0.12)',
-    footer: 'rgba(154,122,46,0.40)',
-    footerDiamond: 'rgba(154,122,46,0.50)',
-    closeBtnBorder: 'rgba(154,122,46,0.22)',
-    hamburgerBg: 'rgba(245,240,232,0.92)',
-    hamburgerBorder: 'rgba(154,122,46,0.30)',
-    hamburgerColor: '#6B6B65',
-  }
 }
 
 export function Sidebar({ userId }: SidebarProps) {
   const pathname = usePathname()
   const router = useRouter()
-  const { resolvedTheme } = useTheme()
-  const [mounted, setMounted] = useState(false)
+  const { theme } = useAppTheme()
   const [isMobile, setIsMobile] = useState(false)
   const [isPhoneLandscape, setIsPhoneLandscape] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
 
   useEffect(() => {
-    setMounted(true)
     const mqMobile = window.matchMedia('(max-width: 768px)')
     const mqLandscape = window.matchMedia('(orientation: landscape) and (max-height: 500px)')
 
@@ -244,12 +175,11 @@ export function Sidebar({ userId }: SidebarProps) {
   const closeDrawer = () => setIsOpen(false)
 
   const compact = isPhoneLandscape
-  const colors = buildColors(resolvedTheme, mounted)
 
   const asideBaseStyle: React.CSSProperties = {
-    backgroundColor: colors.bg,
-    borderRight: `1px solid ${colors.border}`,
-    backgroundImage: colors.hatch,
+    backgroundColor: theme.sidebarBg,
+    borderRight: theme.sidebarBorder,
+    backgroundImage: theme.sidebarHatch === 'none' ? undefined : theme.sidebarHatch,
     transition: 'background-color 0.3s ease, border-color 0.3s ease',
     display: 'flex',
     flexDirection: 'column',
@@ -260,7 +190,7 @@ export function Sidebar({ userId }: SidebarProps) {
       {/* Logo area */}
       <div style={{
         padding: compact ? '8px 20px 8px' : '16px 20px 12px',
-        borderBottom: `1px solid ${colors.logoBorder}`,
+        borderBottom: theme.sidebarBorder,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -274,7 +204,7 @@ export function Sidebar({ userId }: SidebarProps) {
           />
         </div>
         <p style={{
-          color: colors.tagline,
+          color: theme.tagline,
           fontFamily: "'Jost', sans-serif",
           fontSize: '8px',
           letterSpacing: '0.25em',
@@ -288,26 +218,57 @@ export function Sidebar({ userId }: SidebarProps) {
 
       {/* Navigation */}
       <nav style={{ display: 'flex', flex: 1, flexDirection: 'column', overflowY: 'auto', paddingTop: '8px', paddingBottom: '12px' }}>
-        <NavSectionLabel color={colors.sectionLabel}>Portfolio</NavSectionLabel>
+        <NavSectionLabel color={theme.sectionLabel}>Portfolio</NavSectionLabel>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           {NAV_PRIMARY.map((item) => (
-            <NavItem key={item.href} {...item} isActive={isActive(item.href)} onNavigate={closeDrawer} colors={colors} />
+            <NavItem
+              key={item.href}
+              {...item}
+              isActive={isActive(item.href)}
+              onNavigate={closeDrawer}
+              navText={theme.navText}
+              navActive={theme.navActive}
+              navActiveBg={theme.navActiveBg}
+              navActiveBorder={theme.navActiveBorder}
+              accentColor={theme.accent}
+            />
           ))}
         </div>
 
-        <NavSectionLabel color={colors.sectionLabel}>Intelligence</NavSectionLabel>
+        <NavSectionLabel color={theme.sectionLabel}>Intelligence</NavSectionLabel>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           {NAV_INTELLIGENCE.map((item) => (
-            <NavItem key={item.href} {...item} isActive={isActive(item.href)} onNavigate={closeDrawer} colors={colors} />
+            <NavItem
+              key={item.href}
+              {...item}
+              isActive={isActive(item.href)}
+              onNavigate={closeDrawer}
+              navText={theme.navText}
+              navActive={theme.navActive}
+              navActiveBg={theme.navActiveBg}
+              navActiveBorder={theme.navActiveBorder}
+              accentColor={theme.accent}
+            />
           ))}
         </div>
 
-        <div style={{ margin: '12px 20px', height: '1px', background: colors.divider }} />
+        <div style={{ margin: '12px 20px', height: '1px', background: theme.dividerColor }} />
 
-        <NavSectionLabel color={colors.sectionLabel}>Account</NavSectionLabel>
+        <NavSectionLabel color={theme.sectionLabel}>Account</NavSectionLabel>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           {NAV_ACCOUNT.map((item) => (
-            <NavItem key={item.href} {...item} isActive={isActive(item.href)} gold={'gold' in item ? item.gold : false} onNavigate={closeDrawer} colors={colors} />
+            <NavItem
+              key={item.href}
+              {...item}
+              isActive={isActive(item.href)}
+              gold={'gold' in item ? item.gold : false}
+              onNavigate={closeDrawer}
+              navText={theme.navText}
+              navActive={theme.navActive}
+              navActiveBg={theme.navActiveBg}
+              navActiveBorder={theme.navActiveBorder}
+              accentColor={theme.accent}
+            />
           ))}
           <button
             onClick={handleSignOut}
@@ -319,7 +280,7 @@ export function Sidebar({ userId }: SidebarProps) {
               background: 'transparent',
               border: 'none',
               cursor: 'pointer',
-              color: colors.navText,
+              color: theme.navText,
               fontFamily: "'Jost', sans-serif",
               fontSize: '11px',
               letterSpacing: '0.14em',
@@ -328,8 +289,8 @@ export function Sidebar({ userId }: SidebarProps) {
               width: '100%',
               transition: 'color 0.2s ease',
             }}
-            onMouseEnter={e => (e.currentTarget.style.color = colors.hover)}
-            onMouseLeave={e => (e.currentTarget.style.color = colors.navText)}
+            onMouseEnter={e => (e.currentTarget.style.color = theme.navActive)}
+            onMouseLeave={e => (e.currentTarget.style.color = theme.navText)}
           >
             <LogOut style={{ width: '15px', height: '15px', flexShrink: 0 }} strokeWidth={1.2} />
             <span>Sign Out</span>
@@ -338,7 +299,7 @@ export function Sidebar({ userId }: SidebarProps) {
       </nav>
 
       {/* Footer mark */}
-      <div style={{ padding: '16px 20px', borderTop: `1px solid ${colors.divider}` }}>
+      <div style={{ padding: '16px 20px', borderTop: `1px solid ${theme.dividerColor}` }}>
         <p style={{
           textTransform: 'uppercase',
           textAlign: 'center',
@@ -346,18 +307,18 @@ export function Sidebar({ userId }: SidebarProps) {
           fontWeight: 300,
           fontSize: '7px',
           letterSpacing: '0.35em',
-          color: colors.footer,
+          color: theme.tagline,
           margin: 0,
         }}>
-          <span style={{ display: 'inline-block', marginRight: '8px', color: colors.footerDiamond }}>◆</span>
+          <span style={{ display: 'inline-block', marginRight: '8px', color: theme.cornerMark }}>◆</span>
           Legacy · Luxury · Timeless
-          <span style={{ display: 'inline-block', marginLeft: '8px', color: colors.footerDiamond }}>◆</span>
+          <span style={{ display: 'inline-block', marginLeft: '8px', color: theme.cornerMark }}>◆</span>
         </p>
       </div>
     </div>
   )
 
-  if (!mounted || !isMobile || isPhoneLandscape) {
+  if (!isMobile || isPhoneLandscape) {
     return (
       <aside className="dashboard-sidebar" style={{
         ...asideBaseStyle,
@@ -390,12 +351,12 @@ export function Sidebar({ userId }: SidebarProps) {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background: colors.hamburgerBg,
+          background: theme.sidebarBg,
           backdropFilter: 'blur(6px)',
           WebkitBackdropFilter: 'blur(6px)',
-          border: `1px solid ${colors.hamburgerBorder}`,
+          border: theme.sidebarBorder,
           borderRadius: '2px',
-          color: colors.hamburgerColor,
+          color: theme.navActive,
           cursor: 'pointer',
         }}
       >
@@ -445,9 +406,9 @@ export function Sidebar({ userId }: SidebarProps) {
             alignItems: 'center',
             justifyContent: 'center',
             background: 'transparent',
-            border: `1px solid ${colors.closeBtnBorder}`,
+            border: theme.sidebarBorder,
             borderRadius: '2px',
-            color: colors.navText,
+            color: theme.navText,
             cursor: 'pointer',
           }}
         >

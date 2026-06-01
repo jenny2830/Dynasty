@@ -1,31 +1,37 @@
+'use client'
+
 import * as React from 'react'
 import { cn } from '@/lib/utils'
+import { useAppTheme } from '@/lib/theme-context'
 
 interface SectionProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: 'default' | 'warm'
 }
 
 export const Section = React.forwardRef<HTMLDivElement, SectionProps>(
-  ({ className, variant = 'default', children, ...props }, ref) => {
+  ({ className, variant = 'default', children, style, ...props }, ref) => {
     void variant
+    const { theme } = useAppTheme()
     return (
       <div
         ref={ref}
         className={cn('lux-panel', className)}
         style={{
-          background: '#111111',
-          border: '1px solid var(--panel-border)',
+          background: theme.cardBg,
+          border: theme.cardBorder,
           borderRadius: '2px',
-          boxShadow: '0 4px 20px rgba(0,0,0,0.35)',
+          boxShadow: theme.cardShadow,
           position: 'relative',
           overflow: 'hidden',
+          transition: 'background 0.3s, border-color 0.3s',
+          ...style,
         }}
         {...props}
       >
         {/* Top-left corner mark */}
-        <div style={{ position: 'absolute', top: '6px', left: '6px', width: '14px', height: '14px', borderTop: '1px solid var(--corner-color)', borderLeft: '1px solid var(--corner-color)', pointerEvents: 'none', zIndex: 1 }} />
+        <div style={{ position: 'absolute', top: '6px', left: '6px', width: '14px', height: '14px', borderTop: `1px solid ${theme.cornerMark}`, borderLeft: `1px solid ${theme.cornerMark}`, pointerEvents: 'none', zIndex: 1 }} />
         {/* Bottom-right corner mark */}
-        <div style={{ position: 'absolute', bottom: '6px', right: '6px', width: '14px', height: '14px', borderBottom: '1px solid var(--corner-color)', borderRight: '1px solid var(--corner-color)', pointerEvents: 'none', zIndex: 1 }} />
+        <div style={{ position: 'absolute', bottom: '6px', right: '6px', width: '14px', height: '14px', borderBottom: `1px solid ${theme.cornerMark}`, borderRight: `1px solid ${theme.cornerMark}`, pointerEvents: 'none', zIndex: 1 }} />
         {children}
       </div>
     )
@@ -46,6 +52,7 @@ export function SectionHeader({
   className,
   ...props
 }: SectionHeaderProps) {
+  const { theme } = useAppTheme()
   return (
     <div
       className={cn(className)}
@@ -56,7 +63,7 @@ export function SectionHeader({
         justifyContent: 'space-between',
         gap: '12px',
         padding: '16px 28px',
-        borderBottom: '1px solid var(--panel-header-border)',
+        borderBottom: `1px solid ${theme.dividerColor}`,
       }}
       {...props}
     >
@@ -67,12 +74,11 @@ export function SectionHeader({
           fontWeight: 500,
           letterSpacing: '0.02em',
           margin: 0,
-          background: 'var(--gradient-title)',
+          background: theme.accentGradient,
           WebkitBackgroundClip: 'text',
           backgroundClip: 'text',
           WebkitTextFillColor: 'transparent',
           color: 'transparent',
-          textShadow: '0 1px 1px rgba(0,0,0,0.25)',
         }}>
           {title}
         </h2>
@@ -84,7 +90,7 @@ export function SectionHeader({
             fontSize: '11px',
             textTransform: 'uppercase',
             letterSpacing: '0.12em',
-            color: '#4A4A45',
+            color: theme.textMuted,
             margin: '2px 0 0 0',
           }}>
             {description}

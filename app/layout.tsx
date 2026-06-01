@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import { Cormorant_Garamond, Jost, Bebas_Neue, JetBrains_Mono } from 'next/font/google'
-import { ThemeProvider } from 'next-themes'
 import './globals.css'
 
 const cormorant = Cormorant_Garamond({
@@ -53,15 +52,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="bg-dynasty-black text-dynasty-warm-white antialiased">
-        <ThemeProvider
-          attribute="data-theme"
-          defaultTheme="dark"
-          enableSystem={false}
-          themes={['dark', 'light']}
-          storageKey="dynasty-theme"
-        >
-          {children}
-        </ThemeProvider>
+        {children}
       </body>
     </html>
   )

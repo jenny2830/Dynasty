@@ -10,6 +10,7 @@ import {
   ResponsiveContainer,
   Legend,
 } from 'recharts'
+import { useAppTheme } from '@/lib/theme-context'
 
 interface ChartDataPoint {
   month: string
@@ -21,35 +22,65 @@ interface IncomeExpenseChartProps {
   data: ChartDataPoint[]
 }
 
-const CustomTooltip = ({
+interface TooltipPayloadEntry {
+  value: number
+  name: string
+  color: string
+}
+
+function CustomTooltip({
   active,
   payload,
   label,
+  tooltipBg,
+  tooltipBorder,
+  axisText,
+  textPrimary,
+  textSecondary,
 }: {
   active?: boolean
-  payload?: { value: number; name: string; color: string }[]
+  payload?: TooltipPayloadEntry[]
   label?: string
-}) => {
+  tooltipBg: string
+  tooltipBorder: string
+  axisText: string
+  textPrimary: string
+  textSecondary: string
+}) {
   if (!active || !payload?.length) return null
 
   return (
-    <div
-      className="rounded-[1px] border bg-dynasty-black-card px-4 py-3 shadow-[var(--shadow-card)]"
-      style={{ borderColor: 'rgba(201, 168, 76, 0.2)' }}
-    >
-      <p className="mb-2 font-sans text-[9px] font-light uppercase tracking-[0.2em] text-dynasty-gray-400">
+    <div style={{
+      borderRadius: '1px',
+      border: `1px solid ${tooltipBorder}`,
+      background: tooltipBg,
+      padding: '12px 16px',
+      boxShadow: '0 4px 16px rgba(0,0,0,0.3)',
+    }}>
+      <p style={{
+        marginBottom: '8px',
+        fontFamily: "'Jost', sans-serif",
+        fontSize: '9px',
+        fontWeight: 300,
+        textTransform: 'uppercase',
+        letterSpacing: '0.2em',
+        color: axisText,
+      }}>
         {label}
       </p>
       {payload.map((entry) => (
-        <div key={entry.name} className="flex items-center gap-2 text-[12px]">
-          <span
-            className="h-2 w-2 rounded-[1px]"
-            style={{ backgroundColor: entry.color }}
-          />
-          <span className="font-light text-dynasty-gray-300 capitalize">
+        <div key={entry.name} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px' }}>
+          <span style={{
+            width: '8px',
+            height: '8px',
+            borderRadius: '1px',
+            backgroundColor: entry.color,
+            flexShrink: 0,
+          }} />
+          <span style={{ fontFamily: "'Jost', sans-serif", fontWeight: 300, color: textSecondary, textTransform: 'capitalize' }}>
             {entry.name}:
           </span>
-          <span className="font-mono font-medium text-dynasty-warm-white">
+          <span style={{ fontFamily: "'JetBrains Mono', monospace", fontWeight: 500, color: textPrimary }}>
             ${entry.value.toLocaleString('en-CA', { minimumFractionDigits: 0 })}
           </span>
         </div>
@@ -59,10 +90,18 @@ const CustomTooltip = ({
 }
 
 export function IncomeExpenseChart({ data }: IncomeExpenseChartProps) {
+  const { theme } = useAppTheme()
+
   if (data.length === 0) {
     return (
-      <div className="flex h-48 items-center justify-center">
-        <p className="font-sans text-[12px] font-light tracking-[0.06em] text-dynasty-gray-500">
+      <div style={{ display: 'flex', height: '192px', alignItems: 'center', justifyContent: 'center' }}>
+        <p style={{
+          fontFamily: "'Jost', sans-serif",
+          fontSize: '12px',
+          fontWeight: 300,
+          letterSpacing: '0.06em',
+          color: theme.textMuted,
+        }}>
           No transaction data yet
         </p>
       </div>
@@ -74,18 +113,18 @@ export function IncomeExpenseChart({ data }: IncomeExpenseChartProps) {
       <BarChart data={data} barGap={6} barCategoryGap="30%">
         <CartesianGrid
           strokeDasharray="2 4"
-          stroke="rgba(255,255,255,0.03)"
+          stroke={theme.chartGrid}
           vertical={false}
         />
         <XAxis
           dataKey="month"
-          tick={{ fill: '#333330', fontSize: 10, fontFamily: 'var(--font-jost)', letterSpacing: '0.1em' }}
+          tick={{ fill: theme.chartAxisText, fontSize: 10, fontFamily: 'var(--font-jost)', letterSpacing: '0.1em' }}
           axisLine={false}
           tickLine={false}
           tickMargin={8}
         />
         <YAxis
-          tick={{ fill: '#333330', fontSize: 10, fontFamily: 'var(--font-jost)' }}
+          tick={{ fill: theme.chartAxisText, fontSize: 10, fontFamily: 'var(--font-jost)' }}
           axisLine={false}
           tickLine={false}
           tickFormatter={(v: number) =>
@@ -93,11 +132,22 @@ export function IncomeExpenseChart({ data }: IncomeExpenseChartProps) {
           }
           width={48}
         />
-        <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(201,168,76,0.04)' }} />
+        <Tooltip
+          content={
+            <CustomTooltip
+              tooltipBg={theme.chartTooltipBg}
+              tooltipBorder={theme.chartTooltipBorder}
+              axisText={theme.chartAxisText}
+              textPrimary={theme.textPrimary}
+              textSecondary={theme.textSecondary}
+            />
+          }
+          cursor={{ fill: `${theme.accent}08` }}
+        />
         <Legend
           wrapperStyle={{
             fontSize: 10,
-            color: '#6B6B65',
+            color: theme.chartAxisText,
             paddingTop: 12,
             fontFamily: 'var(--font-jost)',
             letterSpacing: '0.18em',
@@ -106,20 +156,18 @@ export function IncomeExpenseChart({ data }: IncomeExpenseChartProps) {
           iconType="square"
           iconSize={8}
           formatter={(value: string) => (
-            <span
-              style={{
-                color: value === 'expenses' ? '#B76E79' : '#C9A84C',
-                textTransform: 'uppercase',
-                letterSpacing: '0.18em',
-                fontSize: 10,
-              }}
-            >
+            <span style={{
+              color: value === 'expenses' ? theme.chartExpense : theme.chartIncome,
+              textTransform: 'uppercase',
+              letterSpacing: '0.18em',
+              fontSize: 10,
+            }}>
               {value}
             </span>
           )}
         />
-        <Bar dataKey="income" fill="#C9A84C" radius={[1, 1, 0, 0]} name="income" />
-        <Bar dataKey="expenses" fill="#B76E79" radius={[1, 1, 0, 0]} name="expenses" />
+        <Bar dataKey="income" fill={theme.chartIncome} radius={[1, 1, 0, 0]} name="income" />
+        <Bar dataKey="expenses" fill={theme.chartExpense} radius={[1, 1, 0, 0]} name="expenses" />
       </BarChart>
     </ResponsiveContainer>
   )

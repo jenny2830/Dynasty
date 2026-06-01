@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useTheme } from 'next-themes'
 import { Palette, Type, KeyRound, Check, CreditCard, Crown } from 'lucide-react'
 import Link from 'next/link'
 import { Section, SectionHeader } from '@/components/ui/section'
@@ -9,152 +8,16 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { createClient } from '@/lib/supabase/client'
+import { useAppTheme } from '@/lib/theme-context'
+import { type ThemeId, THEMES, THEME_META } from '@/lib/themes'
 
 type TextSize = 'sm' | 'md' | 'lg'
-type ColorPalette = 'black-gold' | 'white-black'
 
 const TEXT_SIZES: { value: TextSize; label: string; hint: string }[] = [
   { value: 'sm', label: 'Compact', hint: 'Smaller' },
   { value: 'md', label: 'Standard', hint: 'Default' },
   { value: 'lg', label: 'Large', hint: 'Bigger' },
 ]
-
-const COLOR_PALETTES: {
-  value: ColorPalette
-  label: string
-  hint: string
-  swatches: string[]
-}[] = [
-  {
-    value: 'white-black',
-    label: 'White & Black',
-    hint: 'Default',
-    swatches: ['#FAF7F2', '#1C1A17'],
-  },
-  {
-    value: 'black-gold',
-    label: 'Black & Gold',
-    hint: 'Classic',
-    swatches: ['#080808', '#C9A84C'],
-  },
-]
-
-function SegButton({
-  active,
-  onClick,
-  children,
-}: {
-  active: boolean
-  onClick: () => void
-  children: React.ReactNode
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      style={{
-        flex: 1,
-        minWidth: '92px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: '8px',
-        padding: '11px 14px',
-        background: active ? 'rgba(201,168,76,0.10)' : 'transparent',
-        border: active
-          ? '1px solid rgba(201,168,76,0.45)'
-          : '1px solid rgba(201,168,76,0.15)',
-        borderRadius: '2px',
-        color: active ? '#C9A84C' : '#9A8F7A',
-        fontFamily: "'Jost', sans-serif",
-        fontSize: '11px',
-        letterSpacing: '0.12em',
-        textTransform: 'uppercase',
-        cursor: 'pointer',
-        transition: 'all 0.2s ease',
-      }}
-    >
-      {children}
-    </button>
-  )
-}
-
-function PaletteButton({
-  active,
-  onClick,
-  label,
-  hint,
-  swatches,
-}: {
-  active: boolean
-  onClick: () => void
-  label: string
-  hint: string
-  swatches: string[]
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      style={{
-        flex: 1,
-        minWidth: '110px',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'flex-start',
-        gap: '9px',
-        padding: '13px 14px',
-        background: active ? 'rgba(201,168,76,0.08)' : 'transparent',
-        border: active
-          ? '1px solid rgba(201,168,76,0.45)'
-          : '1px solid rgba(201,168,76,0.15)',
-        borderRadius: '2px',
-        cursor: 'pointer',
-        transition: 'all 0.2s ease',
-        textAlign: 'left',
-      }}
-    >
-      {/* Color swatch row */}
-      <div style={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
-        {swatches.map((color, i) => (
-          <div
-            key={i}
-            style={{
-              width: '11px',
-              height: '11px',
-              borderRadius: '50%',
-              background: color,
-              border: '1px solid rgba(201,168,76,0.18)',
-              flexShrink: 0,
-            }}
-          />
-        ))}
-      </div>
-      {/* Labels */}
-      <div>
-        <div style={{
-          fontFamily: "'Jost', sans-serif",
-          fontSize: '10px',
-          letterSpacing: '0.13em',
-          textTransform: 'uppercase',
-          color: active ? '#C9A84C' : '#9A8F7A',
-          lineHeight: 1.2,
-        }}>
-          {label}
-        </div>
-        <div style={{
-          fontFamily: "'Jost', sans-serif",
-          fontSize: '9px',
-          letterSpacing: '0.06em',
-          color: active ? 'rgba(201,168,76,0.55)' : '#6B6B65',
-          marginTop: '3px',
-        }}>
-          {hint}
-        </div>
-      </div>
-    </button>
-  )
-}
 
 const PLAN_LABELS: Record<string, { label: string; price: string }> = {
   free:      { label: 'Free Trial', price: 'Free' },
@@ -169,10 +32,9 @@ interface SettingsPanelProps {
 }
 
 export function SettingsPanel({ currentPlan = 'free', hasSubscription = false }: SettingsPanelProps) {
-  const { setTheme } = useTheme()
+  const { themeId, theme, setThemeId } = useAppTheme()
   const [mounted, setMounted] = useState(false)
   const [textSize, setTextSize] = useState<TextSize>('md')
-  const [colorPalette, setColorPalette] = useState<ColorPalette>('white-black')
 
   // Password form state
   const [password, setPassword] = useState('')
@@ -185,15 +47,9 @@ export function SettingsPanel({ currentPlan = 'free', hasSubscription = false }:
 
   useEffect(() => {
     setMounted(true)
-
     const savedSize = localStorage.getItem('dynasty-text-size')
     if (savedSize === 'sm' || savedSize === 'md' || savedSize === 'lg') {
       setTextSize(savedSize)
-    }
-
-    const savedPalette = localStorage.getItem('dynasty-color-palette')
-    if (savedPalette === 'black-gold' || savedPalette === 'white-black') {
-      setColorPalette(savedPalette)
     }
   }, [])
 
@@ -201,17 +57,6 @@ export function SettingsPanel({ currentPlan = 'free', hasSubscription = false }:
     setTextSize(size)
     localStorage.setItem('dynasty-text-size', size)
     document.documentElement.dataset.textSize = size
-  }
-
-  function applyColorPalette(palette: ColorPalette) {
-    setColorPalette(palette)
-    localStorage.setItem('dynasty-color-palette', palette)
-    document.documentElement.dataset.colorPalette = palette
-    if (palette === 'white-black') {
-      setTheme('light')
-    } else {
-      setTheme('dark')
-    }
   }
 
   async function handlePasswordChange(e: React.FormEvent) {
@@ -264,9 +109,10 @@ export function SettingsPanel({ currentPlan = 'free', hasSubscription = false }:
     <div className="space-y-6">
       {/* ── Appearance ── */}
       <Section>
-        <SectionHeader title="Appearance" description="Color palette & text size" />
+        <SectionHeader title="Appearance" description="Color theme & text size" />
         <div className="space-y-8 px-7 py-7">
-          {/* Color palette */}
+
+          {/* Color Theme — 4-theme selector */}
           <div>
             <p style={{
               display: 'flex',
@@ -276,33 +122,108 @@ export function SettingsPanel({ currentPlan = 'free', hasSubscription = false }:
               fontSize: '10px',
               letterSpacing: '0.18em',
               textTransform: 'uppercase',
-              color: '#6B6B65',
-              margin: '0 0 12px 0',
+              color: theme.textMuted,
+              margin: '0 0 16px 0',
             }}>
               <Palette style={{ width: '13px', height: '13px' }} strokeWidth={1.4} />
               Color Theme
             </p>
-            <div className="flex flex-col sm:flex-row gap-3">
-              {COLOR_PALETTES.map((p) => (
-                <PaletteButton
-                  key={p.value}
-                  active={mounted && colorPalette === p.value}
-                  onClick={() => applyColorPalette(p.value)}
-                  label={p.label}
-                  hint={p.hint}
-                  swatches={p.swatches}
-                />
-              ))}
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px' }}>
+              {(Object.keys(THEMES) as ThemeId[]).map((id) => {
+                const meta = THEME_META[id]
+                const t = THEMES[id]
+                const isSelected = mounted && id === themeId
+
+                return (
+                  <button
+                    key={id}
+                    onClick={() => setThemeId(id)}
+                    style={{
+                      position: 'relative',
+                      background: t.cardBg,
+                      border: isSelected
+                        ? `2px solid ${t.accent}`
+                        : t.cardBorder,
+                      borderRadius: '2px',
+                      padding: '16px',
+                      cursor: 'pointer',
+                      textAlign: 'left',
+                      transition: 'all 0.3s',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    {/* Top accent line preview */}
+                    <div style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: '15%',
+                      right: '15%',
+                      height: isSelected ? '2px' : '1px',
+                      background: t.topLine,
+                    }} />
+
+                    {/* Color swatches */}
+                    <div style={{ display: 'flex', gap: '6px', marginBottom: '10px' }}>
+                      <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: t.sidebarBg, border: '1px solid rgba(128,128,128,0.3)', flexShrink: 0 }} />
+                      <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: t.accent, border: '1px solid rgba(128,128,128,0.3)', flexShrink: 0 }} />
+                      <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: t.pageBg, border: '1px solid rgba(128,128,128,0.3)', flexShrink: 0 }} />
+                    </div>
+
+                    <p style={{
+                      fontFamily: "'Jost', sans-serif",
+                      fontSize: '11px',
+                      fontWeight: 500,
+                      color: t.textPrimary,
+                      letterSpacing: '0.08em',
+                      margin: '0 0 3px 0',
+                      textTransform: 'uppercase',
+                    }}>
+                      {meta.name}
+                    </p>
+                    <p style={{
+                      fontFamily: "'Jost', sans-serif",
+                      fontSize: '10px',
+                      color: t.textMuted,
+                      letterSpacing: '0.04em',
+                      margin: 0,
+                    }}>
+                      {meta.description}
+                    </p>
+
+                    {isSelected && (
+                      <div style={{
+                        position: 'absolute',
+                        top: '8px',
+                        right: '8px',
+                        fontSize: '8px',
+                        letterSpacing: '0.15em',
+                        textTransform: 'uppercase',
+                        padding: '3px 8px',
+                        borderRadius: '1px',
+                        background: `${t.accent}20`,
+                        color: t.accent,
+                        border: `1px solid ${t.accent}40`,
+                        fontFamily: "'Jost', sans-serif",
+                        fontWeight: 500,
+                      }}>
+                        Active
+                      </div>
+                    )}
+                  </button>
+                )
+              })}
             </div>
+
             <p style={{
-              marginTop: '10px',
+              marginTop: '12px',
               fontFamily: "'Jost', sans-serif",
               fontWeight: 300,
               fontSize: '11px',
               letterSpacing: '0.04em',
-              color: '#6B6B65',
+              color: theme.textMuted,
             }}>
-              Changes the accent color and sidebar throughout the dashboard.
+              Changes the entire interface — sidebar, cards, accents, and all text.
             </p>
           </div>
 
@@ -316,7 +237,7 @@ export function SettingsPanel({ currentPlan = 'free', hasSubscription = false }:
               fontSize: '10px',
               letterSpacing: '0.18em',
               textTransform: 'uppercase',
-              color: '#6B6B65',
+              color: theme.textMuted,
               margin: '0 0 12px 0',
             }}>
               <Type style={{ width: '13px', height: '13px' }} strokeWidth={1.4} />
@@ -324,13 +245,34 @@ export function SettingsPanel({ currentPlan = 'free', hasSubscription = false }:
             </p>
             <div className="flex flex-col sm:flex-row gap-3">
               {TEXT_SIZES.map((s) => (
-                <SegButton
+                <button
                   key={s.value}
-                  active={mounted && textSize === s.value}
+                  type="button"
                   onClick={() => applyTextSize(s.value)}
+                  style={{
+                    flex: 1,
+                    minWidth: '92px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    padding: '11px 14px',
+                    background: mounted && textSize === s.value ? `${theme.accent}1A` : 'transparent',
+                    border: mounted && textSize === s.value
+                      ? `1px solid ${theme.accent}73`
+                      : `1px solid ${theme.accent}26`,
+                    borderRadius: '2px',
+                    color: mounted && textSize === s.value ? theme.accent : theme.textMuted,
+                    fontFamily: "'Jost', sans-serif",
+                    fontSize: '11px',
+                    letterSpacing: '0.12em',
+                    textTransform: 'uppercase',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                  }}
                 >
                   {s.label}
-                </SegButton>
+                </button>
               ))}
             </div>
             <p style={{
@@ -339,7 +281,7 @@ export function SettingsPanel({ currentPlan = 'free', hasSubscription = false }:
               fontWeight: 300,
               fontSize: '11px',
               letterSpacing: '0.04em',
-              color: '#6B6B65',
+              color: theme.textMuted,
             }}>
               Scales the content area proportionally so the layout stays intact.
             </p>
@@ -389,15 +331,13 @@ export function SettingsPanel({ currentPlan = 'free', hasSubscription = false }:
                 gap: '8px',
                 borderRadius: '1px',
                 padding: '10px 14px',
-                border:
-                  pwStatus === 'success'
-                    ? '1px solid rgba(201,168,76,0.3)'
-                    : '1px solid rgba(183,110,121,0.3)',
-                background:
-                  pwStatus === 'success'
-                    ? 'rgba(201,168,76,0.08)'
-                    : 'rgba(183,110,121,0.08)',
-                color: pwStatus === 'success' ? '#C9A84C' : '#D4959E',
+                border: pwStatus === 'success'
+                  ? `1px solid ${theme.badgePositiveBorder}`
+                  : `1px solid ${theme.badgeNegativeBorder}`,
+                background: pwStatus === 'success'
+                  ? theme.badgePositiveBg
+                  : theme.badgeNegativeBg,
+                color: pwStatus === 'success' ? theme.badgePositiveText : theme.badgeNegativeText,
                 fontFamily: "'Jost', sans-serif",
                 fontSize: '12px',
                 fontWeight: 300,
@@ -429,19 +369,19 @@ export function SettingsPanel({ currentPlan = 'free', hasSubscription = false }:
             flexWrap: 'wrap',
             gap: '12px',
             padding: '16px 20px',
-            border: '1px solid rgba(201,168,76,0.18)',
+            border: theme.cardBorder,
             borderRadius: '2px',
-            background: 'rgba(201,168,76,0.04)',
+            background: `${theme.accent}08`,
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <Crown style={{ width: '16px', height: '16px', color: '#C9A84C' }} strokeWidth={1.4} />
+              <Crown style={{ width: '16px', height: '16px', color: theme.accent }} strokeWidth={1.4} />
               <div>
                 <p style={{
                   fontFamily: "'Jost', sans-serif",
                   fontSize: '10px',
                   letterSpacing: '0.18em',
                   textTransform: 'uppercase',
-                  color: '#6B6B65',
+                  color: theme.textMuted,
                   margin: 0,
                 }}>
                   Current Plan
@@ -450,7 +390,7 @@ export function SettingsPanel({ currentPlan = 'free', hasSubscription = false }:
                   fontFamily: "'Cormorant Garamond', serif",
                   fontSize: '20px',
                   fontWeight: 500,
-                  color: '#FAF7F2',
+                  color: theme.textPrimary,
                   margin: '4px 0 0 0',
                   letterSpacing: '0.02em',
                 }}>
@@ -459,7 +399,7 @@ export function SettingsPanel({ currentPlan = 'free', hasSubscription = false }:
                     fontFamily: "'Jost', sans-serif",
                     fontSize: '12px',
                     fontWeight: 300,
-                    color: '#6B6B65',
+                    color: theme.textMuted,
                     marginLeft: '10px',
                   }}>
                     {planInfo.price}
@@ -479,10 +419,10 @@ export function SettingsPanel({ currentPlan = 'free', hasSubscription = false }:
                     alignItems: 'center',
                     gap: '7px',
                     padding: '9px 16px',
-                    border: '1px solid rgba(201,168,76,0.28)',
+                    border: `1px solid ${theme.accent}47`,
                     borderRadius: '1px',
                     background: 'transparent',
-                    color: '#C9A84C',
+                    color: theme.accent,
                     fontFamily: "'Jost', sans-serif",
                     fontSize: '10px',
                     letterSpacing: '0.15em',
@@ -505,15 +445,15 @@ export function SettingsPanel({ currentPlan = 'free', hasSubscription = false }:
                   padding: '9px 16px',
                   border: 'none',
                   borderRadius: '1px',
-                  background: 'linear-gradient(135deg, #C9A84C 0%, #9A7A2E 100%)',
-                  color: '#080808',
+                  background: theme.accentGradient,
+                  color: theme.textOnAccent,
                   fontFamily: "'Jost', sans-serif",
                   fontSize: '10px',
                   letterSpacing: '0.15em',
                   textTransform: 'uppercase',
                   fontWeight: 600,
                   textDecoration: 'none',
-                  boxShadow: '0 4px 14px rgba(201,168,76,0.20)',
+                  boxShadow: `0 4px 14px ${theme.accent}33`,
                 }}
               >
                 <Crown style={{ width: '12px', height: '12px' }} strokeWidth={1.8} />
@@ -527,7 +467,7 @@ export function SettingsPanel({ currentPlan = 'free', hasSubscription = false }:
             fontWeight: 300,
             fontSize: '11px',
             letterSpacing: '0.04em',
-            color: '#6B6B65',
+            color: theme.textMuted,
             margin: 0,
           }}>
             {hasSubscription

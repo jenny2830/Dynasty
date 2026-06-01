@@ -1,5 +1,8 @@
+'use client'
+
 import { Building2, TrendingUp, DollarSign, Bell } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
+import { useAppTheme } from '@/lib/theme-context'
 
 interface StatCardProps {
   label: string
@@ -12,22 +15,29 @@ interface StatCardProps {
 }
 
 function StatCard({ label, value, subtext, trend, icon, highlight, negative }: StatCardProps) {
+  const { theme } = useAppTheme()
+
+  const negativeGradient = theme.accentGradient.includes('rose') || theme.accent.includes('8B')
+    ? `linear-gradient(135deg, ${theme.accentLight} 0%, ${theme.accent} 50%, ${theme.accentDark} 100%)`
+    : `linear-gradient(135deg, #D4959E 0%, #B76E79 50%, #8B4F58 100%)`
+
   return (
-    <div className="stat-panel" style={{
+    <div style={{
       position: 'relative',
-      background: 'linear-gradient(160deg, #141414 0%, #1A1815 100%)',
-      border: '1px solid var(--card-border)',
+      background: theme.cardBg,
+      border: theme.cardBorder,
       borderRadius: '2px',
-      boxShadow: 'var(--card-shadow)',
+      boxShadow: theme.cardShadow,
       padding: '28px',
       overflow: 'hidden',
+      transition: 'background 0.3s, border-color 0.3s',
     }}>
       {/* Top-left corner mark */}
-      <div style={{ position: 'absolute', top: '6px', left: '6px', width: '14px', height: '14px', borderTop: '1px solid var(--corner-color)', borderLeft: '1px solid var(--corner-color)', pointerEvents: 'none' }} />
+      <div style={{ position: 'absolute', top: '6px', left: '6px', width: '14px', height: '14px', borderTop: `1px solid ${theme.cornerMark}`, borderLeft: `1px solid ${theme.cornerMark}`, pointerEvents: 'none' }} />
       {/* Bottom-right corner mark */}
-      <div style={{ position: 'absolute', bottom: '6px', right: '6px', width: '14px', height: '14px', borderBottom: '1px solid var(--corner-color)', borderRight: '1px solid var(--corner-color)', pointerEvents: 'none' }} />
+      <div style={{ position: 'absolute', bottom: '6px', right: '6px', width: '14px', height: '14px', borderBottom: `1px solid ${theme.cornerMark}`, borderRight: `1px solid ${theme.cornerMark}`, pointerEvents: 'none' }} />
       {/* Top accent line */}
-      <div style={{ position: 'absolute', top: 0, left: '15%', right: '15%', height: '1px', background: 'var(--accent-line)' }} />
+      <div style={{ position: 'absolute', top: 0, left: '15%', right: '15%', height: '1px', background: theme.topLine }} />
 
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px' }}>
         <div style={{ minWidth: 0, flex: 1 }}>
@@ -41,11 +51,10 @@ function StatCard({ label, value, subtext, trend, icon, highlight, negative }: S
             fontWeight: 300,
             fontSize: '9px',
             letterSpacing: '0.22em',
-            color: '#C9A84C',
-            marginBottom: '10px',
+            color: theme.accent,
             margin: '0 0 10px 0',
           }}>
-            <span style={{ fontSize: '6px', color: 'var(--diamond-color)', lineHeight: 1 }}>◆</span>
+            <span style={{ fontSize: '6px', color: theme.cornerMark, lineHeight: 1 }}>◆</span>
             <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{label}</span>
           </p>
 
@@ -55,9 +64,7 @@ function StatCard({ label, value, subtext, trend, icon, highlight, negative }: S
             fontSize: '40px',
             lineHeight: 1,
             letterSpacing: '0.04em',
-            background: negative
-              ? 'linear-gradient(135deg, #D4959E 0%, #B76E79 50%, #8B4F58 100%)'
-              : 'var(--gradient-value)',
+            background: negative ? negativeGradient : theme.accentGradient,
             WebkitBackgroundClip: 'text',
             backgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
@@ -74,7 +81,7 @@ function StatCard({ label, value, subtext, trend, icon, highlight, negative }: S
               fontWeight: 300,
               fontSize: '11px',
               letterSpacing: '0.04em',
-              color: '#B5B5AA',
+              color: theme.textSecondary,
               margin: '8px 0 0 0',
             }}>
               {subtext}
@@ -88,11 +95,11 @@ function StatCard({ label, value, subtext, trend, icon, highlight, negative }: S
               fontWeight: 300,
               fontSize: '11px',
               letterSpacing: '0.04em',
-              color: trend.value >= 0 ? 'var(--trend-positive)' : '#B76E79',
+              color: trend.value >= 0 ? theme.valuePositive : theme.valueNegative,
               margin: '8px 0 0 0',
             }}>
               {trend.value >= 0 ? '↑' : '↓'} {Math.abs(trend.value)}%{' '}
-              <span style={{ color: '#8A8A82' }}>{trend.label}</span>
+              <span style={{ color: theme.textMuted }}>{trend.label}</span>
             </p>
           )}
         </div>
@@ -106,9 +113,9 @@ function StatCard({ label, value, subtext, trend, icon, highlight, negative }: S
           alignItems: 'center',
           justifyContent: 'center',
           borderRadius: '1px',
-          border: highlight ? '1px solid var(--icon-border-hi)' : '1px solid var(--icon-border)',
-          background: highlight ? 'var(--icon-bg-hi)' : 'var(--icon-bg)',
-          color: highlight ? 'var(--icon-color-hi)' : 'var(--icon-color)',
+          border: highlight ? `1px solid ${theme.accent}40` : `1px solid ${theme.accent}1F`,
+          background: highlight ? `${theme.accent}0F` : `${theme.accent}0A`,
+          color: highlight ? theme.accent : `${theme.accent}99`,
         }}>
           {icon}
         </div>
