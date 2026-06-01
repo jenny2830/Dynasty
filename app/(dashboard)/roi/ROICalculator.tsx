@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/select'
 import { formatCurrency, formatPercent } from '@/lib/utils'
 import { NumberInput } from '@/components/ui/NumberInput'
+import { useAppTheme } from '@/lib/theme-context'
 import {
   PieChart,
   Pie,
@@ -101,6 +102,7 @@ interface ROICalculatorProps {
 }
 
 export function ROICalculator({ properties }: ROICalculatorProps) {
+  const { theme } = useAppTheme()
   const [inputs, setInputs] = useState<ROIInputs>(EMPTY_INPUTS)
 
   const set = (key: keyof ROIInputs) => (val: number | null) =>
@@ -167,10 +169,13 @@ export function ROICalculator({ properties }: ROICalculatorProps) {
       {/* Inputs panel */}
       <div className="space-y-6">
         {properties.length > 0 && (
-          <div className="rounded-[2px] border border-[rgba(201,168,76,0.18)] bg-[rgba(201,168,76,0.04)] px-5 py-4">
+          <div
+            className="rounded-[2px] px-5 py-4"
+            style={{ border: `1px solid ${theme.accent}2E`, background: `${theme.accent}0A` }}
+          >
             <div className="mb-3 flex items-center gap-2">
-              <Building2 className="h-3.5 w-3.5 text-dynasty-gold" strokeWidth={1.2} />
-              <p className="font-sans text-[10px] font-light uppercase tracking-[0.2em] text-dynasty-gold">
+              <Building2 className="h-3.5 w-3.5" strokeWidth={1.2} style={{ color: theme.accent }} />
+              <p className="font-sans text-[10px] font-light uppercase tracking-[0.2em]" style={{ color: theme.accent }}>
                 Load From Property
               </p>
             </div>
@@ -188,7 +193,10 @@ export function ROICalculator({ properties }: ROICalculatorProps) {
         )}
 
         <Section className="px-7 py-6 space-y-5">
-          <h2 className="pb-3 border-b border-[rgba(201,168,76,0.08)] font-sans text-[9px] font-light uppercase tracking-[0.2em] text-dynasty-gray-500">
+          <h2
+            className="pb-3 font-sans text-[9px] font-light uppercase tracking-[0.2em]"
+            style={{ borderBottom: `1px solid ${theme.dividerColor}`, color: theme.textMuted }}
+          >
             Inputs
           </h2>
           {inputFields.map(({ key, label, help }) => (
@@ -223,7 +231,10 @@ export function ROICalculator({ properties }: ROICalculatorProps) {
       {/* Results panel */}
       <div className="space-y-5">
         <Section variant="warm" className="px-7 py-6">
-          <h2 className="mb-5 pb-3 border-b border-[rgba(201,168,76,0.08)] font-sans text-[9px] font-light uppercase tracking-[0.2em] text-dynasty-gray-500">
+          <h2
+            className="mb-5 pb-3 font-sans text-[9px] font-light uppercase tracking-[0.2em]"
+            style={{ borderBottom: `1px solid ${theme.dividerColor}`, color: theme.textMuted }}
+          >
             Results
           </h2>
 
@@ -244,20 +255,20 @@ export function ROICalculator({ properties }: ROICalculatorProps) {
                 {headlineMetrics.map((m) => (
                   <div
                     key={m.label}
-                    className="rounded-[1px] border border-[rgba(201,168,76,0.12)] bg-[rgba(201,168,76,0.04)] px-5 py-4"
+                    className="rounded-[1px] px-5 py-4"
+                    style={{ border: `1px solid ${theme.accent}1F`, background: `${theme.accent}0A` }}
                   >
-                    <p className="font-sans text-[9px] font-light uppercase tracking-[0.2em] text-dynasty-gray-500">
+                    <p className="font-sans text-[9px] font-light uppercase tracking-[0.2em]" style={{ color: theme.textMuted }}>
                       {m.label}
                     </p>
                     <p
-                      className={`mt-2 font-display text-[44px] leading-none tracking-[0.04em] ${
-                        m.positive ? 'text-dynasty-gold' : 'text-dynasty-rose-gold'
-                      }`}
+                      className="mt-2 font-display text-[44px] leading-none tracking-[0.04em]"
+                      style={{ color: m.positive ? theme.accent : theme.valueNegative }}
                     >
                       {m.value}
                     </p>
                     {m.help && (
-                      <p className="mt-2 font-sans text-[10px] font-light tracking-[0.04em] text-dynasty-gray-500">
+                      <p className="mt-2 font-sans text-[10px] font-light tracking-[0.04em]" style={{ color: theme.textMuted }}>
                         {m.help}
                       </p>
                     )}
@@ -270,15 +281,15 @@ export function ROICalculator({ properties }: ROICalculatorProps) {
                 {subMetrics.map((m) => (
                   <div
                     key={m.label}
-                    className="rounded-[1px] border border-[rgba(201,168,76,0.06)] bg-dynasty-black-soft px-4 py-3"
+                    className="rounded-[1px] px-4 py-3"
+                    style={{ border: `1px solid ${theme.accent}0F`, background: theme.inputBg }}
                   >
-                    <p className="font-sans text-[9px] font-light uppercase tracking-[0.2em] text-dynasty-gray-500">
+                    <p className="font-sans text-[9px] font-light uppercase tracking-[0.2em]" style={{ color: theme.textMuted }}>
                       {m.label}
                     </p>
                     <p
-                      className={`mt-1 font-mono text-[16px] font-medium tracking-tight ${
-                        m.positive ? 'text-dynasty-gold' : 'text-dynasty-rose-gold'
-                      }`}
+                      className="mt-1 font-mono text-[16px] font-medium tracking-tight"
+                      style={{ color: m.positive ? theme.accent : theme.valueNegative }}
                     >
                       {m.value}
                     </p>
@@ -297,9 +308,9 @@ export function ROICalculator({ properties }: ROICalculatorProps) {
             </p>
             {(() => {
               const pieData = [
-                { name: 'Net Cash Flow', value: Math.max(0, results.monthlyCashFlow), color: '#C9A84C' },
-                { name: 'Mortgage', value: inputs.monthlyMortgage, color: '#B76E79' },
-                { name: 'Expenses', value: inputs.monthlyExpenses, color: '#8B4F58' },
+                { name: 'Net Cash Flow', value: Math.max(0, results.monthlyCashFlow), color: theme.accent },
+                { name: 'Mortgage', value: inputs.monthlyMortgage, color: theme.valueNegative },
+                { name: 'Expenses', value: inputs.monthlyExpenses, color: `${theme.valueNegative}88` },
               ].filter((d) => d.value > 0)
 
               if (pieData.length === 0) return null
@@ -324,12 +335,12 @@ export function ROICalculator({ properties }: ROICalculatorProps) {
                     <Tooltip
                       formatter={(value) => [formatCurrency(typeof value === 'number' ? value : 0), '']}
                       contentStyle={{
-                        background: '#161616',
-                        border: '1px solid rgba(201,168,76,0.2)',
+                        background: theme.cardBg,
+                        border: theme.cardBorder,
                         borderRadius: '1px',
                         fontFamily: "'Jost', sans-serif",
                         fontSize: '12px',
-                        color: '#FAF7F2',
+                        color: theme.textPrimary,
                       }}
                     />
                     <Legend
@@ -339,7 +350,7 @@ export function ROICalculator({ properties }: ROICalculatorProps) {
                           fontSize: '10px',
                           letterSpacing: '0.12em',
                           textTransform: 'uppercase',
-                          color: '#8A8A82',
+                          color: theme.textMuted,
                         }}>
                           {value}
                         </span>

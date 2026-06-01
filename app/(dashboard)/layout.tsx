@@ -62,15 +62,15 @@ export default async function DashboardLayout({
           position: 'fixed',
           inset: 0,
           zIndex: 100,
-          background: 'rgba(8,8,8,0.97)',
+          background: 'rgba(0,0,0,0.92)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           padding: '24px',
         }}>
           <div style={{
-            background: '#141414',
-            border: '1px solid rgba(201,168,76,0.20)',
+            background: 'var(--card-bg)',
+            border: '1px solid var(--card-border-color)',
             borderRadius: '2px',
             padding: '56px 48px',
             textAlign: 'center',
@@ -79,8 +79,8 @@ export default async function DashboardLayout({
             position: 'relative',
           }}>
             {/* Corner marks */}
-            <div style={{ position: 'absolute', top: '10px', left: '10px', width: '18px', height: '18px', borderTop: '1px solid rgba(201,168,76,0.45)', borderLeft: '1px solid rgba(201,168,76,0.45)' }} />
-            <div style={{ position: 'absolute', bottom: '10px', right: '10px', width: '18px', height: '18px', borderBottom: '1px solid rgba(201,168,76,0.45)', borderRight: '1px solid rgba(201,168,76,0.45)' }} />
+            <div style={{ position: 'absolute', top: '10px', left: '10px', width: '18px', height: '18px', borderTop: '1px solid var(--corner-color)', borderLeft: '1px solid var(--corner-color)' }} />
+            <div style={{ position: 'absolute', bottom: '10px', right: '10px', width: '18px', height: '18px', borderBottom: '1px solid var(--corner-color)', borderRight: '1px solid var(--corner-color)' }} />
 
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -92,7 +92,7 @@ export default async function DashboardLayout({
               fontFamily: "'Cormorant Garamond', serif",
               fontSize: '28px',
               fontWeight: 600,
-              color: '#FAF7F2',
+              color: 'var(--text-primary-c)',
               marginBottom: '10px',
               letterSpacing: '0.02em',
             }}>
@@ -102,7 +102,7 @@ export default async function DashboardLayout({
               fontFamily: "'Jost', sans-serif",
               fontSize: '13px',
               fontWeight: 300,
-              color: '#6B6B65',
+              color: 'var(--text-muted-c)',
               marginBottom: '32px',
               letterSpacing: '0.04em',
               lineHeight: 1.6,
@@ -113,8 +113,8 @@ export default async function DashboardLayout({
               href="/upgrade"
               style={{
                 display: 'inline-block',
-                background: 'linear-gradient(135deg, #C9A84C, #9A7A2E)',
-                color: '#080808',
+                background: 'var(--gradient-value)',
+                color: 'var(--text-on-accent)',
                 fontFamily: "'Jost', sans-serif",
                 fontWeight: 600,
                 fontSize: '11px',
@@ -123,7 +123,7 @@ export default async function DashboardLayout({
                 padding: '14px 48px',
                 borderRadius: '1px',
                 textDecoration: 'none',
-                boxShadow: '0 4px 20px rgba(201,168,76,0.25)',
+                boxShadow: `0 4px 20px var(--accent-c, rgba(201,168,76,0.25))`,
               }}
             >
               Choose Your Plan

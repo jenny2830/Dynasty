@@ -50,12 +50,21 @@ export default async function RecurringPage() {
       </PageHeader>
 
       {!payments?.length ? (
-        <div className="flex min-h-[50vh] flex-col items-center justify-center rounded-[2px] border border-dashed border-[rgba(201,168,76,0.18)] bg-dynasty-gray-900/40 px-6 py-16 text-center">
-          <RefreshCw className="h-7 w-7 text-dynasty-gold/15" strokeWidth={1} />
-          <h2 className="mt-5 font-serif text-[22px] font-medium tracking-[0.04em] text-dynasty-gray-300">
+        <div
+          className="flex min-h-[50vh] flex-col items-center justify-center rounded-[2px] border border-dashed px-6 py-16 text-center"
+          style={{ background: 'var(--section-bg)', borderColor: 'var(--card-border-color)' }}
+        >
+          <RefreshCw className="h-7 w-7" strokeWidth={1} style={{ color: 'var(--accent-c)', opacity: 0.15 }} />
+          <h2
+            className="mt-5 font-serif text-[22px] font-medium tracking-[0.04em]"
+            style={{ color: 'var(--text-primary-c)' }}
+          >
             No recurring payments
           </h2>
-          <p className="mt-2 max-w-sm font-sans text-[12px] font-light tracking-[0.06em] text-dynasty-gray-500">
+          <p
+            className="mt-2 max-w-sm font-sans text-[12px] font-light tracking-[0.06em]"
+            style={{ color: 'var(--text-muted-c)' }}
+          >
             Set up recurring payments for mortgage, insurance, taxes, and other regular expenses.
           </p>
           <Button asChild variant="outline" className="mt-7">

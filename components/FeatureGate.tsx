@@ -3,6 +3,7 @@
 import { ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 import { PlanFeatures, PlanId, PLAN_FEATURES } from '@/lib/plans'
+import { useAppTheme } from '@/lib/theme-context'
 
 interface FeatureGateProps {
   feature: keyof PlanFeatures
@@ -37,26 +38,27 @@ const FEATURE_NAMES: Record<string, string> = {
 
 function UpgradePrompt({ feature }: { feature: string }) {
   const router = useRouter()
+  const { theme } = useAppTheme()
 
   return (
     <div style={{
-      background: 'linear-gradient(160deg, #141414, #1A1815)',
-      border: '1px solid rgba(201,168,76,0.15)',
+      background: theme.cardBg,
+      border: theme.cardBorder,
       borderRadius: '2px',
       padding: '48px',
       textAlign: 'center',
       position: 'relative',
       overflow: 'hidden',
     }}>
-      <div style={{ position: 'absolute', top: '6px', left: '6px', width: '14px', height: '14px', borderTop: '1px solid rgba(201,168,76,0.5)', borderLeft: '1px solid rgba(201,168,76,0.5)' }} />
-      <div style={{ position: 'absolute', bottom: '6px', right: '6px', width: '14px', height: '14px', borderBottom: '1px solid rgba(201,168,76,0.5)', borderRight: '1px solid rgba(201,168,76,0.5)' }} />
+      <div style={{ position: 'absolute', top: '6px', left: '6px', width: '14px', height: '14px', borderTop: `1px solid ${theme.cornerMark}`, borderLeft: `1px solid ${theme.cornerMark}` }} />
+      <div style={{ position: 'absolute', bottom: '6px', right: '6px', width: '14px', height: '14px', borderBottom: `1px solid ${theme.cornerMark}`, borderRight: `1px solid ${theme.cornerMark}` }} />
 
-      <div style={{ fontSize: '32px', marginBottom: '12px' }}>◆</div>
+      <div style={{ fontSize: '32px', marginBottom: '12px', color: theme.accent }}>◆</div>
       <h3 style={{
         fontFamily: "'Cormorant Garamond', serif",
         fontSize: '22px',
         fontWeight: 600,
-        color: '#FAF7F2',
+        color: theme.textPrimary,
         marginBottom: '8px',
         letterSpacing: '0.02em',
       }}>
@@ -66,7 +68,7 @@ function UpgradePrompt({ feature }: { feature: string }) {
         fontFamily: "'Jost', sans-serif",
         fontSize: '13px',
         fontWeight: 300,
-        color: '#6B6B65',
+        color: theme.textMuted,
         marginBottom: '24px',
         letterSpacing: '0.04em',
       }}>
@@ -75,8 +77,8 @@ function UpgradePrompt({ feature }: { feature: string }) {
       <button
         onClick={() => router.push('/upgrade')}
         style={{
-          background: 'linear-gradient(135deg, #C9A84C 0%, #9A7A2E 100%)',
-          color: '#080808',
+          background: theme.accentGradient,
+          color: theme.textOnAccent,
           fontFamily: "'Jost', sans-serif",
           fontWeight: 600,
           fontSize: '10px',
@@ -86,7 +88,7 @@ function UpgradePrompt({ feature }: { feature: string }) {
           borderRadius: '1px',
           border: 'none',
           cursor: 'pointer',
-          boxShadow: '0 4px 16px rgba(201,168,76,0.2)',
+          boxShadow: `0 4px 16px ${theme.accent}33`,
         }}
       >
         View Plans

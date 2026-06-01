@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { getSessionsRemaining, FREE_TRIAL_MAX_SESSIONS } from '@/lib/plans'
+import { useAppTheme } from '@/lib/theme-context'
 
 interface TrialBannerProps {
   plan: string
@@ -11,6 +12,7 @@ interface TrialBannerProps {
 
 export function TrialBanner({ plan, sessionsUsed, trialExpired }: TrialBannerProps) {
   const router = useRouter()
+  const { theme } = useAppTheme()
   if (plan !== 'free') return null
 
   const remaining = getSessionsRemaining(sessionsUsed)
@@ -18,8 +20,8 @@ export function TrialBanner({ plan, sessionsUsed, trialExpired }: TrialBannerPro
   if (trialExpired) {
     return (
       <div style={{
-        background: 'linear-gradient(135deg, rgba(183,110,121,0.15), rgba(183,110,121,0.05))',
-        border: '1px solid rgba(183,110,121,0.3)',
+        background: `linear-gradient(135deg, ${theme.valueNegative}26, ${theme.valueNegative}0D)`,
+        border: `1px solid ${theme.valueNegative}4D`,
         borderRadius: '2px',
         padding: '14px 24px',
         marginBottom: '24px',
@@ -30,18 +32,18 @@ export function TrialBanner({ plan, sessionsUsed, trialExpired }: TrialBannerPro
         gap: '12px',
       }}>
         <div>
-          <span style={{ fontFamily: "'Jost', sans-serif", fontSize: '13px', color: '#B76E79', fontWeight: 500 }}>
+          <span style={{ fontFamily: "'Jost', sans-serif", fontSize: '13px', color: theme.valueNegative, fontWeight: 500 }}>
             Your free trial has ended.
           </span>
-          <span style={{ fontFamily: "'Jost', sans-serif", fontSize: '13px', color: '#6B6B65', marginLeft: '8px' }}>
+          <span style={{ fontFamily: "'Jost', sans-serif", fontSize: '13px', color: theme.textMuted, marginLeft: '8px' }}>
             Upgrade to continue using Dynasty.
           </span>
         </div>
         <button
           onClick={() => router.push('/upgrade')}
           style={{
-            background: 'linear-gradient(135deg, #C9A84C, #9A7A2E)',
-            color: '#080808',
+            background: theme.accentGradient,
+            color: theme.textOnAccent,
             fontFamily: "'Jost', sans-serif",
             fontWeight: 600,
             fontSize: '10px',
@@ -62,8 +64,8 @@ export function TrialBanner({ plan, sessionsUsed, trialExpired }: TrialBannerPro
 
   return (
     <div style={{
-      background: 'linear-gradient(135deg, rgba(201,168,76,0.10), rgba(201,168,76,0.03))',
-      border: '1px solid rgba(201,168,76,0.20)',
+      background: `linear-gradient(135deg, ${theme.accent}1A, ${theme.accent}08)`,
+      border: `1px solid ${theme.accent}33`,
       borderRadius: '2px',
       padding: '12px 24px',
       marginBottom: '24px',
@@ -76,7 +78,7 @@ export function TrialBanner({ plan, sessionsUsed, trialExpired }: TrialBannerPro
       <span style={{
         fontFamily: "'Jost', sans-serif",
         fontSize: '12px',
-        color: '#C9A84C',
+        color: theme.accent,
         letterSpacing: '0.06em',
       }}>
         ◆ Free trial — {remaining} of {FREE_TRIAL_MAX_SESSIONS} sessions remaining
@@ -85,8 +87,8 @@ export function TrialBanner({ plan, sessionsUsed, trialExpired }: TrialBannerPro
         onClick={() => router.push('/upgrade')}
         style={{
           background: 'transparent',
-          border: '1px solid rgba(201,168,76,0.3)',
-          color: '#C9A84C',
+          border: `1px solid ${theme.accent}4D`,
+          color: theme.accent,
           fontFamily: "'Jost', sans-serif",
           fontSize: '10px',
           letterSpacing: '0.18em',

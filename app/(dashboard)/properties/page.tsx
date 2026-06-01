@@ -62,7 +62,7 @@ export default async function PropertiesPage() {
                 fontFamily: "'Jost', sans-serif",
                 fontSize: '10px',
                 letterSpacing: '0.12em',
-                color: '#6B6B65',
+                color: 'var(--text-muted-c)',
               }}>
                 {count}/{maxProperties} properties
               </span>
@@ -78,12 +78,24 @@ export default async function PropertiesPage() {
       </PageHeader>
 
       {!properties?.length ? (
-        <div className="flex min-h-[50vh] flex-col items-center justify-center rounded-[2px] border border-dashed border-[rgba(201,168,76,0.18)] bg-dynasty-gray-900/40 px-6 py-16 text-center">
-          <Building2 className="h-8 w-8 text-dynasty-gold/15" strokeWidth={1} />
-          <h2 className="mt-5 font-serif text-[22px] font-medium tracking-[0.04em] text-dynasty-gray-300">
+        <div
+          className="flex min-h-[50vh] flex-col items-center justify-center rounded-[2px] border border-dashed px-6 py-16 text-center"
+          style={{
+            background: 'var(--section-bg)',
+            borderColor: 'var(--card-border-color)',
+          }}
+        >
+          <Building2 className="h-8 w-8" strokeWidth={1} style={{ color: 'var(--accent-c)', opacity: 0.15 }} />
+          <h2
+            className="mt-5 font-serif text-[22px] font-medium tracking-[0.04em]"
+            style={{ color: 'var(--text-primary-c)' }}
+          >
             No properties yet
           </h2>
-          <p className="mt-2 max-w-sm font-sans text-[12px] font-light tracking-[0.06em] text-dynasty-gray-500">
+          <p
+            className="mt-2 max-w-sm font-sans text-[12px] font-light tracking-[0.06em]"
+            style={{ color: 'var(--text-muted-c)' }}
+          >
             Add your first property to start tracking income, expenses, and ROI.
           </p>
           {canAdd && (
@@ -100,21 +112,37 @@ export default async function PropertiesPage() {
             <Link
               key={p.id}
               href={`/properties/${p.id}`}
-              className="group relative overflow-hidden rounded-[2px] border border-[rgba(201,168,76,0.1)] bg-[linear-gradient(135deg,#161616_0%,#1C1A17_100%)] px-6 py-6 shadow-[var(--shadow-card)] transition-all duration-300 ease-out hover:border-[rgba(201,168,76,0.35)] hover:shadow-[var(--shadow-card-hover)]"
+              className="group relative overflow-hidden rounded-[2px] transition-all duration-300 ease-out"
+              style={{
+                background: 'var(--card-bg)',
+                border: '1px solid var(--card-border-color)',
+                boxShadow: 'var(--card-shadow)',
+                padding: '24px',
+                display: 'block',
+              }}
             >
-              <div className="pointer-events-none absolute top-0 left-[10%] right-[10%] h-px" style={{ background: 'var(--accent-top)' }} aria-hidden />
-              <div className="pointer-events-none absolute top-0 left-0 h-[60px] w-[60px]" style={{ background: 'var(--accent-corner-tl)' }} aria-hidden />
+              <div className="pointer-events-none absolute top-0 left-[10%] right-[10%] h-px" style={{ background: 'var(--accent-line)' }} aria-hidden />
+              <div className="pointer-events-none absolute top-0 left-0 h-[60px] w-[60px]" style={{ background: `radial-gradient(circle at top left, var(--corner-color) 0%, transparent 70%)` }} aria-hidden />
 
               <div className="relative mb-4 flex items-start justify-between gap-3">
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[1px] border border-[rgba(201,168,76,0.2)] bg-[rgba(201,168,76,0.06)]">
-                    <Building2 className="h-4 w-4 text-dynasty-gold" strokeWidth={1.2} />
+                  <div
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[1px]"
+                    style={{ border: '1px solid var(--icon-border-hi)', background: 'var(--icon-bg-hi)' }}
+                  >
+                    <Building2 className="h-4 w-4" strokeWidth={1.2} style={{ color: 'var(--accent-c)' }} />
                   </div>
                   <div className="min-w-0">
-                    <p className="truncate font-serif text-[16px] font-medium leading-tight tracking-[0.02em] text-dynasty-warm-white transition-colors group-hover:text-dynasty-gold">
+                    <p
+                      className="truncate font-serif text-[16px] font-medium leading-tight tracking-[0.02em] transition-colors"
+                      style={{ color: 'var(--text-primary-c)' }}
+                    >
                       {p.name}
                     </p>
-                    <p className="mt-0.5 font-sans text-[10px] font-light uppercase tracking-[0.14em] text-dynasty-gray-500">
+                    <p
+                      className="mt-0.5 font-sans text-[10px] font-light uppercase tracking-[0.14em]"
+                      style={{ color: 'var(--text-muted-c)' }}
+                    >
                       {p.type} &middot; {p.property_subtype}
                     </p>
                   </div>
@@ -124,34 +152,50 @@ export default async function PropertiesPage() {
                 </Badge>
               </div>
 
-              <div className="relative mb-5 flex items-center gap-1.5 font-sans text-[11px] font-light tracking-[0.04em] text-dynasty-gray-500">
+              <div
+                className="relative mb-5 flex items-center gap-1.5 font-sans text-[11px] font-light tracking-[0.04em]"
+                style={{ color: 'var(--text-muted-c)' }}
+              >
                 <MapPin className="h-3 w-3 shrink-0" strokeWidth={1.2} />
                 <span className="truncate">{p.address}, {p.city}, {p.province}</span>
               </div>
 
-              <div className="relative grid grid-cols-2 gap-x-4 gap-y-3 pt-4 border-t border-[rgba(201,168,76,0.06)]">
+              <div
+                className="relative grid grid-cols-2 gap-x-4 gap-y-3 pt-4"
+                style={{ borderTop: '1px solid var(--divider-c)' }}
+              >
                 <div>
-                  <p className="font-sans text-[9px] font-light uppercase tracking-[0.2em] text-dynasty-gray-500">Current Value</p>
-                  <p className="mt-1 font-mono text-[14px] font-medium text-dynasty-gold">
+                  <p className="font-sans text-[9px] font-light uppercase tracking-[0.2em]" style={{ color: 'var(--text-muted-c)' }}>
+                    Current Value
+                  </p>
+                  <p className="mt-1 font-mono text-[14px] font-medium" style={{ color: 'var(--accent-c)' }}>
                     {p.current_value ? formatCurrency(p.current_value) : '—'}
                   </p>
                 </div>
                 <div>
-                  <p className="font-sans text-[9px] font-light uppercase tracking-[0.2em] text-dynasty-gray-500">Units</p>
-                  <p className="mt-1 font-mono text-[14px] font-medium text-dynasty-warm-white">{p.num_units}</p>
+                  <p className="font-sans text-[9px] font-light uppercase tracking-[0.2em]" style={{ color: 'var(--text-muted-c)' }}>
+                    Units
+                  </p>
+                  <p className="mt-1 font-mono text-[14px] font-medium" style={{ color: 'var(--text-primary-c)' }}>
+                    {p.num_units}
+                  </p>
                 </div>
                 {p.monthly_mortgage && (
                   <div>
-                    <p className="font-sans text-[9px] font-light uppercase tracking-[0.2em] text-dynasty-gray-500">Monthly Mortgage</p>
-                    <p className="mt-1 font-mono text-[13px] font-light text-dynasty-cream">{formatCurrency(p.monthly_mortgage)}</p>
+                    <p className="font-sans text-[9px] font-light uppercase tracking-[0.2em]" style={{ color: 'var(--text-muted-c)' }}>
+                      Monthly Mortgage
+                    </p>
+                    <p className="mt-1 font-mono text-[13px] font-light" style={{ color: 'var(--text-secondary-c)' }}>
+                      {formatCurrency(p.monthly_mortgage)}
+                    </p>
                   </div>
                 )}
                 {(p.condo_fee ?? p.strata_fee) && (
                   <div>
-                    <p className="font-sans text-[9px] font-light uppercase tracking-[0.2em] text-dynasty-gray-500">
+                    <p className="font-sans text-[9px] font-light uppercase tracking-[0.2em]" style={{ color: 'var(--text-muted-c)' }}>
                       {p.type === 'condo' ? 'Condo Fee' : 'Strata Fee'}
                     </p>
-                    <p className="mt-1 font-mono text-[13px] font-light text-dynasty-cream">
+                    <p className="mt-1 font-mono text-[13px] font-light" style={{ color: 'var(--text-secondary-c)' }}>
                       {formatCurrency(p.condo_fee ?? p.strata_fee ?? 0)}
                     </p>
                   </div>

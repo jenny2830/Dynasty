@@ -113,28 +113,35 @@ export default async function PropertyDetailPage({
       {/* Financial stats */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         {[
-          { label: 'Purchase Price', value: property.purchase_price ? formatCurrency(property.purchase_price) : '—', gold: false },
-          { label: 'Current Value', value: property.current_value ? formatCurrency(property.current_value) : '—', gold: true },
-          { label: 'Mortgage Balance', value: property.mortgage_balance ? formatCurrency(property.mortgage_balance) : '—', gold: false },
-          { label: 'Equity', value: equity ? formatCurrency(equity) : '—', gold: true },
+          { label: 'Purchase Price', value: property.purchase_price ? formatCurrency(property.purchase_price) : '—', accent: false },
+          { label: 'Current Value', value: property.current_value ? formatCurrency(property.current_value) : '—', accent: true },
+          { label: 'Mortgage Balance', value: property.mortgage_balance ? formatCurrency(property.mortgage_balance) : '—', accent: false },
+          { label: 'Equity', value: equity ? formatCurrency(equity) : '—', accent: true },
         ].map((stat) => (
           <div
             key={stat.label}
-            className="relative overflow-hidden rounded-[2px] border border-[rgba(201,168,76,0.1)] bg-[linear-gradient(135deg,#161616_0%,#1C1A17_100%)] px-5 py-5 shadow-[var(--shadow-card)]"
+            className="relative overflow-hidden rounded-[2px] px-5 py-5"
+            style={{
+              background: 'var(--card-bg)',
+              border: '1px solid var(--card-border-color)',
+              boxShadow: 'var(--card-shadow)',
+            }}
           >
             <div
               className="pointer-events-none absolute top-0 left-[10%] right-[10%] h-px"
-              style={{ background: 'var(--accent-top)' }}
+              style={{ background: 'var(--accent-line)' }}
               aria-hidden
             />
-            <p className="flex items-center gap-2 font-sans text-[9px] font-light uppercase tracking-[0.22em] text-dynasty-gray-500">
-              <span className="text-[6px] text-[rgba(201,168,76,0.5)] leading-none">◆</span>
+            <p
+              className="flex items-center gap-2 font-sans text-[9px] font-light uppercase tracking-[0.22em]"
+              style={{ color: 'var(--text-muted-c)' }}
+            >
+              <span className="text-[6px] leading-none" style={{ color: 'var(--diamond-color)' }}>◆</span>
               {stat.label}
             </p>
             <p
-              className={`mt-2.5 font-mono text-[18px] font-medium tracking-tight ${
-                stat.gold ? 'text-dynasty-gold' : 'text-dynasty-warm-white'
-              }`}
+              className="mt-2.5 font-mono text-[18px] font-medium tracking-tight"
+              style={{ color: stat.accent ? 'var(--accent-c)' : 'var(--text-primary-c)' }}
             >
               {stat.value}
             </p>

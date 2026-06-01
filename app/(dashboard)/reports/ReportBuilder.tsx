@@ -24,6 +24,7 @@ import { Section, SectionHeader } from '@/components/ui/section'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
 import { format, startOfMonth, endOfMonth, startOfQuarter, endOfQuarter, startOfYear, endOfYear, subMonths } from 'date-fns'
+import { useAppTheme } from '@/lib/theme-context'
 
 interface Property {
   id: string
@@ -85,6 +86,7 @@ function downloadCSV(content: string, filename: string) {
 }
 
 export function ReportBuilder({ properties }: ReportBuilderProps) {
+  const { theme } = useAppTheme()
   const [reportType, setReportType] = useState<ReportType>('pl')
   const [propertyId, setPropertyId] = useState<string>('all')
   const [preset, setPreset] = useState<string>('this_year')
@@ -248,7 +250,7 @@ export function ReportBuilder({ properties }: ReportBuilderProps) {
       {generated && (
         <div className="space-y-7" id="report-output">
           {/* Report header */}
-          <div className="flex flex-wrap items-center justify-between gap-4 pb-5 border-b border-[rgba(201,168,76,0.08)]">
+          <div className="flex flex-wrap items-center justify-between gap-4 pb-5" style={{ borderBottom: `1px solid ${theme.dividerColor}` }}>
             <div>
               <h2 className="flex items-center gap-3 font-serif text-[26px] font-semibold tracking-[0.04em] text-dynasty-warm-white">
                 <span className="text-[10px] text-dynasty-gold/70 leading-none">◆</span>
@@ -285,26 +287,31 @@ export function ReportBuilder({ properties }: ReportBuilderProps) {
                 <div className="space-y-5">
                   <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
                     {[
-                      { label: 'Total Income', value: totalIncome, color: 'text-dynasty-gold', icon: TrendingUp, positive: true },
-                      { label: 'Total Expenses', value: totalExpenses, color: 'text-dynasty-rose-gold', icon: TrendingDown, positive: false },
-                      { label: 'Net Income', value: netIncome, color: netIncome >= 0 ? 'text-dynasty-gold' : 'text-dynasty-rose-gold', icon: Minus, positive: netIncome >= 0 },
-                    ].map(({ label, value, color, icon: Icon }) => (
+                      { label: 'Total Income', value: totalIncome, isNeg: false, icon: TrendingUp },
+                      { label: 'Total Expenses', value: totalExpenses, isNeg: true, icon: TrendingDown },
+                      { label: 'Net Income', value: netIncome, isNeg: netIncome < 0, icon: Minus },
+                    ].map(({ label, value, isNeg, icon: Icon }) => (
                       <div
                         key={label}
-                        className="relative overflow-hidden rounded-[2px] border border-[rgba(201,168,76,0.1)] bg-[linear-gradient(135deg,#161616_0%,#1C1A17_100%)] px-6 py-5 shadow-[var(--shadow-card)]"
+                        className="relative overflow-hidden rounded-[2px] px-6 py-5"
+                        style={{
+                          background: theme.cardBg,
+                          border: theme.cardBorder,
+                          boxShadow: theme.cardShadow,
+                        }}
                       >
                         <div
                           className="pointer-events-none absolute top-0 left-[10%] right-[10%] h-px"
-                          style={{ background: 'var(--accent-top)' }}
+                          style={{ background: theme.topLine }}
                         />
                         <div className="flex items-center justify-between">
-                          <p className="flex items-center gap-2 font-sans text-[9px] font-light uppercase tracking-[0.22em] text-dynasty-gray-500">
-                            <span className="text-[6px] text-[rgba(201,168,76,0.5)] leading-none">◆</span>
+                          <p className="flex items-center gap-2 font-sans text-[9px] font-light uppercase tracking-[0.22em]" style={{ color: theme.textMuted }}>
+                            <span className="text-[6px] leading-none" style={{ color: theme.cornerMark }}>◆</span>
                             {label}
                           </p>
-                          <Icon className={`h-4 w-4 ${color}`} strokeWidth={1.2} />
+                          <Icon className="h-4 w-4" strokeWidth={1.2} style={{ color: isNeg ? theme.valueNegative : theme.accent }} />
                         </div>
-                        <p className={`mt-3 font-display text-[36px] leading-none tracking-[0.04em] ${color}`}>
+                        <p className="mt-3 font-display text-[36px] leading-none tracking-[0.04em]" style={{ color: isNeg ? theme.valueNegative : theme.accent }}>
                           {formatCurrency(value)}
                         </p>
                       </div>
@@ -323,12 +330,13 @@ export function ReportBuilder({ properties }: ReportBuilderProps) {
                   <SectionHeader title="Monthly Cash Flow" />
                   <div className="overflow-x-auto">
                     <table className="w-full">
-                      <thead className="bg-dynasty-black border-b border-[rgba(201,168,76,0.1)]">
+                      <thead style={{ background: theme.tableHeaderBg, borderBottom: `1px solid ${theme.dividerColor}` }}>
                         <tr>
                           {['Month', 'Income', 'Expenses', 'Net Cash Flow'].map((h) => (
                             <th
                               key={h}
-                              className="px-6 py-3.5 text-left font-sans text-[9px] font-light uppercase tracking-[0.2em] text-dynasty-gray-500"
+                              className="px-6 py-3.5 text-left font-sans text-[9px] font-light uppercase tracking-[0.2em]"
+                              style={{ color: theme.textMuted }}
                             >
                               {h}
                             </th>
@@ -341,17 +349,17 @@ export function ReportBuilder({ properties }: ReportBuilderProps) {
                           .map(([month, data]) => {
                             const net = data.income - data.expenses
                             return (
-                              <tr key={month} className="border-b border-[rgba(255,255,255,0.025)] transition-colors hover:bg-[rgba(201,168,76,0.025)]">
-                                <td className="px-6 py-3.5 font-sans text-[13px] text-dynasty-warm-white">
+                              <tr key={month} className="transition-colors" style={{ borderBottom: `1px solid ${theme.tableRowBorder}` }}>
+                                <td className="px-6 py-3.5 font-sans text-[13px]" style={{ color: theme.textPrimary }}>
                                   {format(new Date(month + '-01'), 'MMMM yyyy')}
                                 </td>
-                                <td className="px-6 py-3.5 font-mono text-[13px] font-medium text-dynasty-gold">
+                                <td className="px-6 py-3.5 font-mono text-[13px] font-medium" style={{ color: theme.accent }}>
                                   {formatCurrency(data.income)}
                                 </td>
-                                <td className="px-6 py-3.5 font-mono text-[13px] font-medium text-dynasty-rose-gold">
+                                <td className="px-6 py-3.5 font-mono text-[13px] font-medium" style={{ color: theme.valueNegative }}>
                                   {formatCurrency(data.expenses)}
                                 </td>
-                                <td className={`px-6 py-3.5 font-mono text-[13px] font-medium ${net >= 0 ? 'text-dynasty-gold' : 'text-dynasty-rose-gold'}`}>
+                                <td className="px-6 py-3.5 font-mono text-[13px] font-medium" style={{ color: net >= 0 ? theme.accent : theme.valueNegative }}>
                                   {formatCurrency(net)}
                                 </td>
                               </tr>
@@ -365,19 +373,22 @@ export function ReportBuilder({ properties }: ReportBuilderProps) {
 
               {reportType === 'tax_summary' && (
                 <div className="space-y-5">
-                  <div className="relative overflow-hidden rounded-[2px] border border-[rgba(201,168,76,0.2)] bg-[linear-gradient(135deg,#161616_0%,#1C1A17_100%)] px-7 py-6 shadow-[var(--shadow-card)]">
+                  <div
+                    className="relative overflow-hidden rounded-[2px] px-7 py-6"
+                    style={{ background: theme.cardBg, border: theme.cardBorder, boxShadow: theme.cardShadow }}
+                  >
                     <div
                       className="pointer-events-none absolute top-0 left-[10%] right-[10%] h-px"
-                      style={{ background: 'var(--accent-top)' }}
+                      style={{ background: theme.topLine }}
                     />
-                    <p className="flex items-center gap-2 font-sans text-[9px] font-light uppercase tracking-[0.22em] text-dynasty-gray-500">
-                      <span className="text-[6px] text-[rgba(201,168,76,0.5)] leading-none">◆</span>
+                    <p className="flex items-center gap-2 font-sans text-[9px] font-light uppercase tracking-[0.22em]" style={{ color: theme.textMuted }}>
+                      <span className="text-[6px] leading-none" style={{ color: theme.cornerMark }}>◆</span>
                       Total Tax-Deductible Expenses
                     </p>
-                    <p className="mt-3 font-display text-[48px] leading-none tracking-[0.04em] text-dynasty-gold">
+                    <p className="mt-3 font-display text-[48px] leading-none tracking-[0.04em]" style={{ color: theme.accent }}>
                       {formatCurrency(totalDeductible)}
                     </p>
-                    <p className="mt-2 font-sans text-[11px] font-light tracking-[0.06em] text-dynasty-gray-500">
+                    <p className="mt-2 font-sans text-[11px] font-light tracking-[0.06em]" style={{ color: theme.textMuted }}>
                       {taxDeductible.length} deductible transaction{taxDeductible.length !== 1 ? 's' : ''}
                     </p>
                   </div>
@@ -415,44 +426,48 @@ function CategoryTable({
   color: 'gold' | 'rose'
   showBar?: boolean
 }) {
+  const { theme } = useAppTheme()
   const sorted = Object.entries(data).sort(([, a], [, b]) => b - a)
-  const colorClass = color === 'gold' ? 'text-dynasty-gold' : 'text-dynasty-rose-gold'
-  const barClass = color === 'gold' ? 'bg-dynasty-gold' : 'bg-dynasty-rose-gold'
+  const valueColor = color === 'gold' ? theme.accent : theme.valueNegative
+  const barBg = color === 'gold' ? theme.accent : theme.valueNegative
 
   return (
     <Section>
       <SectionHeader title={title} />
-      <div className="divide-y divide-[rgba(255,255,255,0.025)]">
+      <div style={{ borderTop: `1px solid ${theme.dividerColor}` }}>
         {sorted.map(([category, amount]) => {
           const pct = total > 0 ? (amount / total) * 100 : 0
           return (
-            <div key={category} className="flex items-center gap-4 px-7 py-3.5">
+            <div key={category} className="flex items-center gap-4 px-7 py-3.5" style={{ borderBottom: `1px solid ${theme.tableRowBorder}` }}>
               <div className="min-w-0 flex-1">
                 <div className="mb-1 flex items-center justify-between">
-                  <span className="font-sans text-[13px] text-dynasty-warm-white">
+                  <span className="font-sans text-[13px]" style={{ color: theme.textPrimary }}>
                     {category}
                   </span>
-                  <span className={`font-mono text-[13px] font-medium ${colorClass}`}>
+                  <span className="font-mono text-[13px] font-medium" style={{ color: valueColor }}>
                     {formatCurrency(amount)}
                   </span>
                 </div>
                 {showBar && (
-                  <div className="h-[2px] w-full overflow-hidden bg-dynasty-gray-700">
-                    <div className={`h-full ${barClass}`} style={{ width: `${pct}%` }} />
+                  <div className="h-[2px] w-full overflow-hidden" style={{ background: theme.tableRowBorder }}>
+                    <div className="h-full" style={{ width: `${pct}%`, background: barBg }} />
                   </div>
                 )}
               </div>
-              <span className="w-10 text-right font-mono text-[11px] font-light text-dynasty-gray-500">
+              <span className="w-10 text-right font-mono text-[11px] font-light" style={{ color: theme.textMuted }}>
                 {pct.toFixed(0)}%
               </span>
             </div>
           )
         })}
-        <div className="flex items-center justify-between px-7 py-3.5 bg-[rgba(201,168,76,0.04)]">
-          <span className="font-sans text-[12px] font-light uppercase tracking-[0.18em] text-dynasty-warm-white">
+        <div
+          className="flex items-center justify-between px-7 py-3.5"
+          style={{ background: `${theme.accent}0A` }}
+        >
+          <span className="font-sans text-[12px] font-light uppercase tracking-[0.18em]" style={{ color: theme.textPrimary }}>
             Total
           </span>
-          <span className={`font-mono text-[14px] font-medium ${colorClass}`}>
+          <span className="font-mono text-[14px] font-medium" style={{ color: valueColor }}>
             {formatCurrency(total)}
           </span>
         </div>
@@ -468,17 +483,19 @@ function TransactionTable({
   transactions: Transaction[]
   title: string
 }) {
+  const { theme } = useAppTheme()
   return (
     <Section>
       <SectionHeader title={title} />
       <div className="overflow-x-auto">
         <table className="w-full">
-          <thead className="bg-dynasty-black border-b border-[rgba(201,168,76,0.1)]">
+          <thead style={{ background: theme.tableHeaderBg, borderBottom: `1px solid ${theme.dividerColor}` }}>
             <tr>
               {['Date', 'Category', 'Description', 'Amount'].map((h) => (
                 <th
                   key={h}
-                  className="px-6 py-3.5 text-left font-sans text-[9px] font-light uppercase tracking-[0.2em] text-dynasty-gray-500"
+                  className="px-6 py-3.5 text-left font-sans text-[9px] font-light uppercase tracking-[0.2em]"
+                  style={{ color: theme.textMuted }}
                 >
                   {h}
                 </th>
@@ -487,17 +504,17 @@ function TransactionTable({
           </thead>
           <tbody>
             {transactions.map((t) => (
-              <tr key={t.id} className="border-b border-[rgba(255,255,255,0.025)] transition-colors hover:bg-[rgba(201,168,76,0.025)]">
-                <td className="whitespace-nowrap px-6 py-3 font-sans text-[12px] font-light text-dynasty-gray-400">
+              <tr key={t.id} className="transition-colors" style={{ borderBottom: `1px solid ${theme.tableRowBorder}` }}>
+                <td className="whitespace-nowrap px-6 py-3 font-sans text-[12px] font-light" style={{ color: theme.textSecondary }}>
                   {formatDate(t.transaction_date)}
                 </td>
                 <td className="px-6 py-3">
                   <Badge>{t.category}</Badge>
                 </td>
-                <td className="px-6 py-3 font-sans text-[13px] text-dynasty-warm-white">
+                <td className="px-6 py-3 font-sans text-[13px]" style={{ color: theme.textPrimary }}>
                   {t.description ?? '—'}
                 </td>
-                <td className="px-6 py-3 font-mono text-[13px] font-medium text-dynasty-gold">
+                <td className="px-6 py-3 font-mono text-[13px] font-medium" style={{ color: theme.accent }}>
                   {formatCurrency(t.amount)}
                 </td>
               </tr>

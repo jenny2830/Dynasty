@@ -19,6 +19,7 @@ import { EXPENSE_ONLY_CATEGORIES } from '@/lib/constants'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import { confirmReceipt, rejectReceipt } from '@/app/actions/receipts'
 import { useRouter } from 'next/navigation'
+import { useAppTheme } from '@/lib/theme-context'
 
 interface Property {
   id: string
@@ -52,6 +53,7 @@ interface ReceiptScannerProps {
 }
 
 export function ReceiptScanner({ properties, recentReceipts }: ReceiptScannerProps) {
+  const { theme } = useAppTheme()
   const [scanState, setScanState] = useState<ScanState>('idle')
   const [receiptId, setReceiptId] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -177,31 +179,29 @@ export function ReceiptScanner({ properties, recentReceipts }: ReceiptScannerPro
               onDragOver={(e) => { e.preventDefault(); if (scanState === 'idle') setIsDragging(true) }}
               onDragLeave={() => setIsDragging(false)}
               onDrop={handleDrop}
-              className={`relative flex h-48 flex-col items-center justify-center rounded-[2px] border border-dashed bg-dynasty-gray-900 px-6 transition-all duration-300 ${
-                isDragging
-                  ? 'border-[rgba(201,168,76,0.5)] bg-[rgba(201,168,76,0.02)]'
-                  : scanState === 'scanning'
-                  ? 'border-[rgba(201,168,76,0.2)]'
-                  : 'border-[rgba(201,168,76,0.2)]'
-              }`}
+              className="relative flex h-48 flex-col items-center justify-center rounded-[2px] border border-dashed px-6 transition-all duration-300"
+              style={{
+                background: isDragging ? `${theme.accent}05` : theme.tableBg,
+                borderColor: isDragging ? theme.accent : theme.cornerMark,
+              }}
             >
               {scanState === 'scanning' ? (
                 <>
-                  <Loader2 className="h-8 w-8 animate-spin text-dynasty-gold/60" strokeWidth={1.2} />
-                  <p className="mt-4 font-serif text-[18px] font-medium tracking-[0.02em] text-dynasty-warm-white">
+                  <Loader2 className="h-8 w-8 animate-spin" strokeWidth={1.2} style={{ color: `${theme.accent}99` }} />
+                  <p className="mt-4 font-serif text-[18px] font-medium tracking-[0.02em]" style={{ color: theme.textPrimary }}>
                     Extracting Receipt Data
                   </p>
-                  <p className="mt-2 font-sans text-[11px] font-light uppercase tracking-[0.18em] text-dynasty-gray-500">
+                  <p className="mt-2 font-sans text-[11px] font-light uppercase tracking-[0.18em]" style={{ color: theme.textMuted }}>
                     Claude Vision · Image never stored
                   </p>
                 </>
               ) : (
                 <>
-                  <ScanLine className="h-8 w-8 text-[rgba(201,168,76,0.3)]" strokeWidth={1} />
-                  <p className="mt-4 font-serif text-[18px] font-medium tracking-[0.02em] text-dynasty-warm-white">
+                  <ScanLine className="h-8 w-8" strokeWidth={1} style={{ color: `${theme.accent}4D` }} />
+                  <p className="mt-4 font-serif text-[18px] font-medium tracking-[0.02em]" style={{ color: theme.textPrimary }}>
                     Drop Receipt Here
                   </p>
-                  <p className="mt-2 font-sans text-[11px] font-light uppercase tracking-[0.18em] text-dynasty-gray-500">
+                  <p className="mt-2 font-sans text-[11px] font-light uppercase tracking-[0.18em]" style={{ color: theme.textMuted }}>
                     JPEG · PNG · WebP · Max 10MB
                   </p>
                 </>
@@ -223,8 +223,8 @@ export function ReceiptScanner({ properties, recentReceipts }: ReceiptScannerPro
                   }}
                   style={{
                     background: 'transparent',
-                    border: '1px solid rgba(201,168,76,0.3)',
-                    color: '#C9A84C',
+                    border: `1px solid ${theme.accent}4D`,
+                    color: theme.accent,
                     fontFamily: "'Jost', sans-serif",
                     fontSize: '10px',
                     letterSpacing: '0.2em',
@@ -253,8 +253,8 @@ export function ReceiptScanner({ properties, recentReceipts }: ReceiptScannerPro
                     input.click()
                   }}
                   style={{
-                    background: 'linear-gradient(135deg, #C9A84C 0%, #9A7A2E 100%)',
-                    color: '#080808',
+                    background: theme.accentGradient,
+                    color: theme.textOnAccent,
                     fontFamily: "'Jost', sans-serif",
                     fontSize: '10px',
                     letterSpacing: '0.2em',

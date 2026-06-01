@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
+import { useAppTheme } from '@/lib/theme-context'
 
 interface NumberInputProps {
   /** Controlled mode: current numeric value */
@@ -34,6 +35,7 @@ export function NumberInput({
   id,
   required,
 }: NumberInputProps) {
+  const { theme } = useAppTheme()
   const isControlled = value !== undefined || onChange !== undefined
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -106,10 +108,10 @@ export function NumberInput({
 
   const inputStyle: React.CSSProperties = {
     width: '100%',
-    background: '#111111',
-    border: '1px solid rgba(201,168,76,0.12)',
+    background: theme.inputBg,
+    border: `1px solid ${theme.inputBorder}`,
     borderRadius: '1px',
-    color: '#FAF7F2',
+    color: theme.textPrimary,
     padding: prefix ? '11px 15px 11px 28px' : '11px 15px',
     fontSize: '13px',
     fontFamily: "'JetBrains Mono', monospace",
@@ -126,7 +128,7 @@ export function NumberInput({
           left: '12px',
           top: '50%',
           transform: 'translateY(-50%)',
-          color: '#C9A84C',
+          color: theme.accent,
           fontFamily: "'JetBrains Mono', monospace",
           fontSize: '13px',
           pointerEvents: 'none',

@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { useAppTheme } from '@/lib/theme-context'
 import {
   Select,
   SelectContent,
@@ -194,6 +195,7 @@ interface UnitManagerProps {
 }
 
 export function UnitManager({ propertyId, initialUnits }: UnitManagerProps) {
+  const { theme } = useAppTheme()
   const router = useRouter()
   const [units, setUnits] = useState<Unit[]>(initialUnits)
   const [showAdd, setShowAdd] = useState(false)
@@ -294,8 +296,8 @@ export function UnitManager({ propertyId, initialUnits }: UnitManagerProps) {
           <button
             onClick={() => { setShowAdd(true); setEditingId(null); setError(null) }}
             style={{
-              background: 'linear-gradient(135deg, #C9A84C, #9A7A2E)',
-              color: '#080808',
+              background: theme.accentGradient,
+              color: theme.textOnAccent,
               fontFamily: "'Jost', sans-serif",
               fontWeight: 600,
               fontSize: '10px',

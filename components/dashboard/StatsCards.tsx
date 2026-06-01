@@ -17,9 +17,9 @@ interface StatCardProps {
 function StatCard({ label, value, subtext, trend, icon, highlight, negative }: StatCardProps) {
   const { theme } = useAppTheme()
 
-  const negativeGradient = theme.accentGradient.includes('rose') || theme.accent.includes('8B')
-    ? `linear-gradient(135deg, ${theme.accentLight} 0%, ${theme.accent} 50%, ${theme.accentDark} 100%)`
-    : `linear-gradient(135deg, #D4959E 0%, #B76E79 50%, #8B4F58 100%)`
+  // Negative gradient: fade using valueNegative as the base color
+  const neg = theme.valueNegative
+  const negativeGradient = `linear-gradient(135deg, ${neg}DD 0%, ${neg} 60%, ${neg}88 100%)`
 
   return (
     <div style={{
