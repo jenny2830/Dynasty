@@ -7,6 +7,7 @@ import { DashboardClientWrapper } from '@/components/dashboard/DashboardClientWr
 import { DashboardThemeShell } from '@/components/dashboard/DashboardThemeShell'
 import { toThemeId } from '@/lib/themes'
 import type { PlanId } from '@/lib/plans'
+import { FREE_TRIAL_MAX_SESSIONS } from '@/lib/plans'
 
 export default async function DashboardLayout({
   children,
@@ -107,7 +108,7 @@ export default async function DashboardLayout({
               letterSpacing: '0.04em',
               lineHeight: 1.6,
             }}>
-              You used all 5 sessions. Choose a plan to continue building your property empire.
+              You used all {FREE_TRIAL_MAX_SESSIONS} free sessions. Choose a plan to continue building your property empire.
             </p>
             <Link
               href="/upgrade"

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Check, X, Crown, Zap, Building2, Gift } from 'lucide-react'
+import { Check, X, Crown, Zap, Building2 } from 'lucide-react'
 import { PLAN_FEATURES, FREE_TRIAL_MAX_SESSIONS, getSessionsRemaining } from '@/lib/plans'
 import type { PlanId } from '@/lib/plans'
 import { useAppTheme } from '@/lib/theme-context'
@@ -35,15 +35,6 @@ function buildFeatureList(plan: PlanId) {
 }
 
 const PLANS: PlanDef[] = [
-  {
-    key: 'free',
-    label: 'Free Trial',
-    price: 'Free',
-    properties: 'Up to 20 properties',
-    icon: <Gift style={{ width: '20px', height: '20px' }} strokeWidth={1.2} />,
-    features: buildFeatureList('free'),
-    isFree: true,
-  },
   {
     key: 'starter',
     label: 'Starter',

@@ -18,7 +18,7 @@ export interface PlanFeatures {
 
 export const PLAN_FEATURES: Record<PlanId, PlanFeatures> = {
   free: {
-    maxProperties: 20,
+    maxProperties: 3,
     maxUnitsPerProperty: 50,
     transactions: true,
     recurringPayments: true,
@@ -91,7 +91,7 @@ export const PLAN_DETAILS: Record<PlanId, {
     price: 0,
     currency: 'CAD',
     interval: '',
-    description: 'Full access for 5 sessions — experience everything Dynasty offers',
+    description: 'Full access for 3 sessions — up to 3 properties',
   },
   starter: {
     name: 'Starter',
@@ -116,7 +116,7 @@ export const PLAN_DETAILS: Record<PlanId, {
   },
 }
 
-export const FREE_TRIAL_MAX_SESSIONS = 5
+export const FREE_TRIAL_MAX_SESSIONS = 3
 
 export function getSessionsRemaining(sessionsUsed: number): number {
   return Math.max(0, FREE_TRIAL_MAX_SESSIONS - sessionsUsed)

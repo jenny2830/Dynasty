@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { z } from 'zod'
+import { PLAN_FEATURES, type PlanId } from '@/lib/plans'
 
 const propertySchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -38,12 +39,12 @@ async function getLandlordId() {
 
   const { data: landlord } = await supabase
     .from('landlords')
-    .select('id')
+    .select('id, plan')
     .eq('auth_user_id', user.id)
     .single()
 
   if (!landlord) throw new Error('Landlord profile not found')
-  return { supabase, landlordId: landlord.id }
+  return { supabase, landlordId: landlord.id, plan: (landlord.plan ?? 'free') as PlanId }
 }
 
 function nullifyEmpty(val: unknown) {
@@ -56,11 +57,28 @@ export async function createProperty(
   formData: FormData
 ): Promise<PropertyFormState> {
   let landlordId: string
+  let plan: PlanId
   let supabase: Awaited<ReturnType<typeof createClient>>
   try {
-    ;({ supabase, landlordId } = await getLandlordId())
+    ;({ supabase, landlordId, plan } = await getLandlordId())
   } catch (e) {
     return { errors: { _form: [(e as Error).message] } }
+  }
+
+  // Enforce per-plan property limit
+  const maxProperties = PLAN_FEATURES[plan].maxProperties
+  const { count } = await supabase
+    .from('properties')
+    .select('*', { count: 'exact', head: true })
+    .eq('landlord_id', landlordId)
+  if ((count ?? 0) >= maxProperties) {
+    return {
+      errors: {
+        _form: [
+          `Your ${plan} plan allows up to ${maxProperties} ${maxProperties === 1 ? 'property' : 'properties'}. Upgrade to add more.`,
+        ],
+      },
+    }
   }
 
   const raw = {
