@@ -258,9 +258,9 @@ export function SettingsPanel({ currentPlan = 'free', hasSubscription = false }:
               {(['light', 'regular', 'bold'] as const).map((weight: TextThickness) => {
                 const isSelected = mounted && weight === textThickness
                 const previewWeights = {
-                  light:   { label: 300, sample: 300 },
-                  regular: { label: 400, sample: 400 },
-                  bold:    { label: 600, sample: 600 },
+                  light:   { label: 200, sample: 200 },
+                  regular: { label: 400, sample: 500 },
+                  bold:    { label: 600, sample: 800 },
                 } as const
 
                 return (
@@ -294,7 +294,7 @@ export function SettingsPanel({ currentPlan = 'free', hasSubscription = false }:
                       fontWeight: previewWeights[weight].sample,
                       fontSize: '28px',
                       color: theme.textPrimary,
-                      margin: '0 0 6px 0',
+                      margin: '0 0 4px 0',
                       lineHeight: 1,
                     }}>
                       Aa
@@ -303,6 +303,17 @@ export function SettingsPanel({ currentPlan = 'free', hasSubscription = false }:
                     <p style={{
                       fontFamily: "'Jost', sans-serif",
                       fontWeight: previewWeights[weight].label,
+                      fontSize: '11px',
+                      color: theme.textSecondary,
+                      margin: '0 0 8px 0',
+                      letterSpacing: '0.02em',
+                    }}>
+                      $12,450.00 monthly
+                    </p>
+
+                    <p style={{
+                      fontFamily: "'Jost', sans-serif",
+                      fontWeight: previewWeights[weight].label === 200 ? 300 : previewWeights[weight].label,
                       fontSize: '10px',
                       letterSpacing: '0.14em',
                       textTransform: 'uppercase',

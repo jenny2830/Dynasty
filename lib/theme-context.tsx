@@ -8,9 +8,9 @@ export type TextThickness = 'light' | 'regular' | 'bold'
 const FONT_WEIGHT_MAP: Record<TextThickness, {
   thin: number; body: number; medium: number; semibold: number; bold: number
 }> = {
-  light:   { thin: 200, body: 300, medium: 400, semibold: 500, bold: 600 },
+  light:   { thin: 200, body: 300, medium: 300, semibold: 400, bold: 500 },
   regular: { thin: 300, body: 400, medium: 500, semibold: 600, bold: 700 },
-  bold:    { thin: 400, body: 500, medium: 600, semibold: 700, bold: 800 },
+  bold:    { thin: 400, body: 600, medium: 700, semibold: 800, bold: 900 },
 }
 
 interface ThemeContextValue {
@@ -26,9 +26,9 @@ const ThemeContext = createContext<ThemeContextValue>({
   themeId: 'dark-gold',
   theme: THEMES['dark-gold'],
   setThemeId: () => {},
-  textThickness: 'regular',
+  textThickness: 'light',
   setTextThickness: () => {},
-  fontWeights: FONT_WEIGHT_MAP.regular,
+  fontWeights: FONT_WEIGHT_MAP.light,
 })
 
 export function useAppTheme() {
@@ -42,7 +42,7 @@ interface AppThemeProviderProps {
 
 export function AppThemeProvider({ children, initialThemeId }: AppThemeProviderProps) {
   const [themeId, setThemeIdState] = useState<ThemeId>(initialThemeId ?? 'dark-gold')
-  const [textThickness, setTextThicknessState] = useState<TextThickness>('regular')
+  const [textThickness, setTextThicknessState] = useState<TextThickness>('light')
   const supabase = createClient()
 
   useEffect(() => {

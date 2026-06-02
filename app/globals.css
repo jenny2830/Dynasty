@@ -1449,27 +1449,27 @@ input:-webkit-autofill:focus {
   --color-dynasty-black:        var(--text-on-accent);
 }
 
-/* ── Text thickness: Light (thinner) ── */
+/* ── Text thickness: Light (delicate) ── */
 .dashboard-landscape-shell[data-thickness="light"] {
   --font-weight-thin:       100;
   --font-weight-extralight: 200;
   --font-weight-light:      200;
   --font-weight-normal:     300;
-  --font-weight-medium:     400;
-  --font-weight-semibold:   500;
-  --font-weight-bold:       600;
-  --font-weight-extrabold:  700;
+  --font-weight-medium:     300;
+  --font-weight-semibold:   400;
+  --font-weight-bold:       500;
+  --font-weight-extrabold:  600;
 }
 
-/* ── Text thickness: Bold (heavier) ── */
+/* ── Text thickness: Bold (strong, dramatic) ── */
 .dashboard-landscape-shell[data-thickness="bold"] {
-  --font-weight-thin:       300;
-  --font-weight-extralight: 400;
-  --font-weight-light:      400;
-  --font-weight-normal:     500;
-  --font-weight-medium:     600;
-  --font-weight-semibold:   700;
-  --font-weight-bold:       800;
+  --font-weight-thin:       400;
+  --font-weight-extralight: 500;
+  --font-weight-light:      500;
+  --font-weight-normal:     600;
+  --font-weight-medium:     700;
+  --font-weight-semibold:   800;
+  --font-weight-bold:       900;
   --font-weight-extrabold:  900;
 }
 
