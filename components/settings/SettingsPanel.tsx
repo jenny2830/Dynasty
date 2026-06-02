@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { createClient } from '@/lib/supabase/client'
-import { useAppTheme } from '@/lib/theme-context'
+import { useAppTheme, type TextThickness } from '@/lib/theme-context'
 import { type ThemeId, THEMES, THEME_META } from '@/lib/themes'
 
 type TextSize = 'sm' | 'md' | 'lg'
@@ -32,7 +32,7 @@ interface SettingsPanelProps {
 }
 
 export function SettingsPanel({ currentPlan = 'free', hasSubscription = false }: SettingsPanelProps) {
-  const { themeId, theme, setThemeId } = useAppTheme()
+  const { themeId, theme, setThemeId, textThickness, setTextThickness } = useAppTheme()
   const [mounted, setMounted] = useState(false)
   const [textSize, setTextSize] = useState<TextSize>('md')
 
@@ -224,6 +224,121 @@ export function SettingsPanel({ currentPlan = 'free', hasSubscription = false }:
               color: theme.textMuted,
             }}>
               Changes the entire interface — sidebar, cards, accents, and all text.
+            </p>
+          </div>
+
+          {/* Text Thickness */}
+          <div>
+            <p style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              fontFamily: "'Jost', sans-serif",
+              fontSize: '10px',
+              letterSpacing: '0.18em',
+              textTransform: 'uppercase',
+              color: theme.textMuted,
+              margin: '0 0 8px 0',
+            }}>
+              <Type style={{ width: '13px', height: '13px' }} strokeWidth={1.4} />
+              Text Thickness
+            </p>
+            <p style={{
+              fontFamily: "'Jost', sans-serif",
+              fontWeight: 300,
+              fontSize: '11px',
+              letterSpacing: '0.04em',
+              color: theme.textMuted,
+              margin: '0 0 14px 0',
+            }}>
+              Adjust text weight across the entire platform for better visibility.
+            </p>
+
+            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+              {(['light', 'regular', 'bold'] as const).map((weight: TextThickness) => {
+                const isSelected = mounted && weight === textThickness
+                const previewWeights = {
+                  light:   { label: 300, sample: 300 },
+                  regular: { label: 400, sample: 400 },
+                  bold:    { label: 600, sample: 600 },
+                } as const
+
+                return (
+                  <button
+                    key={weight}
+                    onClick={() => setTextThickness(weight)}
+                    style={{
+                      flex: '1 1 120px',
+                      position: 'relative',
+                      background: theme.cardBg,
+                      border: isSelected
+                        ? `2px solid ${theme.accent}`
+                        : theme.cardBorder,
+                      borderRadius: '2px',
+                      padding: '20px 14px',
+                      cursor: 'pointer',
+                      textAlign: 'center',
+                      transition: 'all 0.3s',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    {isSelected && (
+                      <div style={{
+                        position: 'absolute', top: 0, left: '15%', right: '15%',
+                        height: '2px', background: theme.topLine,
+                      }} />
+                    )}
+
+                    <p style={{
+                      fontFamily: "'Cormorant Garamond', serif",
+                      fontWeight: previewWeights[weight].sample,
+                      fontSize: '28px',
+                      color: theme.textPrimary,
+                      margin: '0 0 6px 0',
+                      lineHeight: 1,
+                    }}>
+                      Aa
+                    </p>
+
+                    <p style={{
+                      fontFamily: "'Jost', sans-serif",
+                      fontWeight: previewWeights[weight].label,
+                      fontSize: '10px',
+                      letterSpacing: '0.14em',
+                      textTransform: 'uppercase',
+                      color: isSelected ? theme.accent : theme.textMuted,
+                      margin: 0,
+                    }}>
+                      {weight}
+                    </p>
+
+                    {isSelected && (
+                      <div style={{
+                        position: 'absolute', top: '6px', right: '6px',
+                        fontSize: '8px', letterSpacing: '0.12em',
+                        textTransform: 'uppercase',
+                        padding: '2px 6px', borderRadius: '1px',
+                        background: `${theme.accent}20`,
+                        color: theme.accent,
+                        fontFamily: "'Jost', sans-serif",
+                      }}>
+                        Active
+                      </div>
+                    )}
+                  </button>
+                )
+              })}
+            </div>
+
+            <p style={{
+              marginTop: '10px',
+              fontFamily: "'Jost', sans-serif",
+              fontWeight: 300,
+              fontSize: '11px',
+              letterSpacing: '0.04em',
+              color: theme.textMuted,
+            }}>
+              Saved to your account — synced across all devices.
             </p>
           </div>
 

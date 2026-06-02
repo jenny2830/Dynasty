@@ -45,6 +45,17 @@
   --font-display:  var(--font-bebas);
   --font-sans:     var(--font-jost);
   --font-mono:     var(--font-jetbrains);
+
+  /* ── Font weight scale (overridden by data-thickness on dashboard shell) ── */
+  --font-weight-thin:       100;
+  --font-weight-extralight: 200;
+  --font-weight-light:      300;
+  --font-weight-normal:     400;
+  --font-weight-medium:     500;
+  --font-weight-semibold:   600;
+  --font-weight-bold:       700;
+  --font-weight-extrabold:  800;
+  --font-weight-black:      900;
 }
 
 /* ─────────────────────────────────────────────
@@ -1436,5 +1447,29 @@ input:-webkit-autofill:focus {
 
   /* ── Text-on-accent (button labels on gradient backgrounds) ── */
   --color-dynasty-black:        var(--text-on-accent);
+}
+
+/* ── Text thickness: Light (thinner) ── */
+.dashboard-landscape-shell[data-thickness="light"] {
+  --font-weight-thin:       100;
+  --font-weight-extralight: 200;
+  --font-weight-light:      200;
+  --font-weight-normal:     300;
+  --font-weight-medium:     400;
+  --font-weight-semibold:   500;
+  --font-weight-bold:       600;
+  --font-weight-extrabold:  700;
+}
+
+/* ── Text thickness: Bold (heavier) ── */
+.dashboard-landscape-shell[data-thickness="bold"] {
+  --font-weight-thin:       300;
+  --font-weight-extralight: 400;
+  --font-weight-light:      400;
+  --font-weight-normal:     500;
+  --font-weight-medium:     600;
+  --font-weight-semibold:   700;
+  --font-weight-bold:       800;
+  --font-weight-extrabold:  900;
 }
 

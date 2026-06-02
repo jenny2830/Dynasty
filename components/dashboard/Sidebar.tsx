@@ -53,6 +53,7 @@ interface NavItemProps {
 }
 
 function NavItem({ href, label, Icon, isActive, gold, onNavigate, navText, navActive, navActiveBg, navActiveBorder, accentColor }: NavItemProps) {
+  const { fontWeights } = useAppTheme()
   const defaultColor = gold ? accentColor : navText
   return (
     <Link
@@ -62,6 +63,7 @@ function NavItem({ href, label, Icon, isActive, gold, onNavigate, navText, navAc
       style={isActive ? {
         color: navActive,
         fontFamily: "'Jost', sans-serif",
+        fontWeight: fontWeights.medium,
         fontSize: '11px',
         letterSpacing: '0.14em',
         textTransform: 'uppercase',
@@ -76,6 +78,7 @@ function NavItem({ href, label, Icon, isActive, gold, onNavigate, navText, navAc
       } : {
         color: defaultColor,
         fontFamily: "'Jost', sans-serif",
+        fontWeight: fontWeights.thin,
         fontSize: '11px',
         letterSpacing: '0.14em',
         textTransform: 'uppercase',
@@ -104,15 +107,20 @@ function NavItem({ href, label, Icon, isActive, gold, onNavigate, navText, navAc
 }
 
 function NavSectionLabel({ children, color }: { children: React.ReactNode; color: string }) {
+  const { fontWeights } = useAppTheme()
   return (
     <p style={{
       color,
       fontFamily: "'Jost', sans-serif",
+      fontWeight: fontWeights.thin,
       fontSize: '8px',
       letterSpacing: '0.22em',
       textTransform: 'uppercase',
       padding: '20px 20px 6px',
       margin: 0,
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      whiteSpace: 'nowrap',
     }}>
       {children}
     </p>
@@ -126,7 +134,7 @@ interface SidebarProps {
 export function Sidebar({ userId }: SidebarProps) {
   const pathname = usePathname()
   const router = useRouter()
-  const { theme } = useAppTheme()
+  const { theme, fontWeights } = useAppTheme()
   const [isMobile, setIsMobile] = useState(false)
   const [isPhoneLandscape, setIsPhoneLandscape] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
@@ -282,6 +290,7 @@ export function Sidebar({ userId }: SidebarProps) {
               cursor: 'pointer',
               color: theme.navText,
               fontFamily: "'Jost', sans-serif",
+              fontWeight: fontWeights.thin,
               fontSize: '11px',
               letterSpacing: '0.14em',
               textTransform: 'uppercase',
@@ -304,7 +313,7 @@ export function Sidebar({ userId }: SidebarProps) {
           textTransform: 'uppercase',
           textAlign: 'center',
           fontFamily: "'Jost', sans-serif",
-          fontWeight: 300,
+          fontWeight: fontWeights.thin,
           fontSize: '7px',
           letterSpacing: '0.35em',
           color: theme.tagline,

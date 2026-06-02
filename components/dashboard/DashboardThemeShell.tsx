@@ -15,7 +15,7 @@ function borderColor(b: string) {
 }
 
 function ThemedInner({ sidebar, children }: { sidebar: React.ReactNode; children: React.ReactNode }) {
-  const { theme } = useAppTheme()
+  const { theme, textThickness, fontWeights } = useAppTheme()
 
   const cssVars: React.CSSProperties = {
     /* ── Card / Section ── */
@@ -88,11 +88,19 @@ function ThemedInner({ sidebar, children }: { sidebar: React.ReactNode; children
     '--accent-shadow': `0 4px 16px ${theme.accent}2E`,
     '--accent-shadow-hover': `0 6px 24px ${theme.accent}47`,
     '--focus-ring': `${theme.accent}66`,
+
+    /* ── Font weight scale (changes with textThickness) ── */
+    '--fw-thin': fontWeights.thin,
+    '--fw-body': fontWeights.body,
+    '--fw-medium': fontWeights.medium,
+    '--fw-semibold': fontWeights.semibold,
+    '--fw-bold': fontWeights.bold,
   } as React.CSSProperties
 
   return (
     <div
       className="dashboard-landscape-shell"
+      data-thickness={textThickness}
       style={{
         display: 'flex',
         minHeight: '100vh',

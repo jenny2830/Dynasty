@@ -15,14 +15,7 @@ import {
 import { formatCurrency, formatPercent } from '@/lib/utils'
 import { NumberInput } from '@/components/ui/NumberInput'
 import { useAppTheme } from '@/lib/theme-context'
-import {
-  PieChart,
-  Pie,
-  Cell,
-  Tooltip,
-  ResponsiveContainer,
-  Legend,
-} from 'recharts'
+import { ProfitabilityChart } from '@/components/roi/ProfitabilityChart'
 
 interface Property {
   id: string
@@ -165,6 +158,7 @@ export function ROICalculator({ properties }: ROICalculatorProps) {
     : []
 
   return (
+    <>
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
       {/* Inputs panel */}
       <div className="space-y-6">
@@ -302,84 +296,45 @@ export function ROICalculator({ properties }: ROICalculatorProps) {
 
         {results && (
           <Section className="px-6 py-5">
-            <p className="mb-4 font-serif text-[18px] font-medium text-dynasty-warm-white">
-              <span className="mr-2 text-[8px] text-dynasty-gold leading-none">◆</span>
-              Monthly Breakdown
-            </p>
-            {(() => {
-              const pieData = [
-                { name: 'Net Cash Flow', value: Math.max(0, results.monthlyCashFlow), color: theme.accent },
-                { name: 'Mortgage', value: inputs.monthlyMortgage, color: theme.valueNegative },
-                { name: 'Expenses', value: inputs.monthlyExpenses, color: `${theme.valueNegative}88` },
-              ].filter((d) => d.value > 0)
-
-              if (pieData.length === 0) return null
-
-              return (
-                <ResponsiveContainer width="100%" height={260}>
-                  <PieChart>
-                    <Pie
-                      data={pieData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={55}
-                      outerRadius={90}
-                      paddingAngle={3}
-                      dataKey="value"
-                      stroke="none"
-                    >
-                      {pieData.map((entry, index) => (
-                        <Cell key={index} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      formatter={(value) => [formatCurrency(typeof value === 'number' ? value : 0), '']}
-                      contentStyle={{
-                        background: theme.cardBg,
-                        border: theme.cardBorder,
-                        borderRadius: '1px',
-                        fontFamily: "'Jost', sans-serif",
-                        fontSize: '12px',
-                        color: theme.textPrimary,
-                      }}
-                    />
-                    <Legend
-                      formatter={(value) => (
-                        <span style={{
-                          fontFamily: "'Jost', sans-serif",
-                          fontSize: '10px',
-                          letterSpacing: '0.12em',
-                          textTransform: 'uppercase',
-                          color: theme.textMuted,
-                        }}>
-                          {value}
-                        </span>
-                      )}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
-              )
-            })()}
-          </Section>
-        )}
-
-        {results && (
-          <Section className="px-6 py-5">
-            <p className="mb-3 font-sans text-[9px] font-light uppercase tracking-[0.2em] text-dynasty-gold/80">
-              <span className="mr-2 text-[6px] text-[rgba(201,168,76,0.5)] leading-none">◆</span>
+            <p className="mb-3 font-sans text-[9px] font-light uppercase tracking-[0.2em]" style={{ color: `${theme.accent}CC` }}>
+              <span className="mr-2 text-[6px] leading-none" style={{ color: `${theme.accent}80` }}>◆</span>
               Canadian Market Benchmarks
             </p>
-            <ul className="space-y-1.5 font-sans text-[12px] font-light tracking-[0.02em] text-dynasty-gray-300">
+            <ul className="space-y-1.5 font-sans text-[12px] font-light tracking-[0.02em]" style={{ color: theme.textSecondary }}>
               <li>Cap Rate &gt; 5% is generally considered good for residential</li>
               <li>Cash-on-Cash &gt; 8–10% indicates strong cash flow</li>
               <li>Monthly cash flow should be positive after all expenses</li>
             </ul>
-            <p className="mt-3 font-sans text-[10px] font-light italic tracking-[0.04em] text-dynasty-gray-500">
+            <p className="mt-3 font-sans text-[10px] font-light italic tracking-[0.04em]" style={{ color: theme.textMuted }}>
               * Estimates for planning purposes only. Consult a financial advisor for investment decisions.
             </p>
           </Section>
         )}
       </div>
     </div>
+
+    {/* ── Full-width Profitability Charts (only when results are available) ── */}
+    {results && (
+      <div style={{ marginTop: '32px' }}>
+        <ProfitabilityChart results={{
+          purchasePrice:    inputs.purchasePrice,
+          downPayment:      inputs.downPayment,
+          closingCosts:     inputs.closingCosts,
+          monthlyRent:      inputs.monthlyRent,
+          monthlyExpenses:  inputs.monthlyExpenses,
+          monthlyMortgage:  inputs.monthlyMortgage,
+          currentValue:     inputs.currentValue,
+          monthlyCashFlow:  results.monthlyCashFlow,
+          annualCashFlow:   results.annualCashFlow,
+          capRate:          results.capRate,
+          cashOnCash:       results.cashOnCash,
+          grossYield:       results.grossYield,
+          netYield:         results.netYield,
+          equity:           results.equity,
+          totalInvestment:  results.totalCashInvested,
+        }} />
+      </div>
+    )}
+    </>
   )
 }
