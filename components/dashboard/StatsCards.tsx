@@ -75,7 +75,7 @@ function StatCard({ label, value, subtext, trend, icon, highlight, negative }: S
           {subtext && (
             <p style={{
               ...styles.mutedText,
-              fontSize: '11px',
+              fontSize: '15px',
               margin: '8px 0 0 0',
             }}>
               {subtext}
@@ -87,7 +87,7 @@ function StatCard({ label, value, subtext, trend, icon, highlight, negative }: S
               marginTop: '8px',
               fontFamily: "'Jost', sans-serif",
               fontWeight: fontWeights.thin,
-              fontSize: '11px',
+              fontSize: '15px',
               letterSpacing: '0.04em',
               color: trend.value >= 0 ? theme.valuePositive : theme.valueNegative,
               margin: '8px 0 0 0',

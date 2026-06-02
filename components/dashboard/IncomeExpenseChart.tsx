@@ -60,8 +60,8 @@ function CustomTooltip({
       <p style={{
         marginBottom: '8px',
         fontFamily: "'Jost', sans-serif",
-        fontSize: '9px',
-        fontWeight: 300,
+        fontSize: '11px',
+        fontWeight: 400,
         textTransform: 'uppercase',
         letterSpacing: '0.2em',
         color: axisText,
@@ -69,7 +69,7 @@ function CustomTooltip({
         {label}
       </p>
       {payload.map((entry) => (
-        <div key={entry.name} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px' }}>
+        <div key={entry.name} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px' }}>
           <span style={{
             width: '8px',
             height: '8px',
@@ -77,7 +77,7 @@ function CustomTooltip({
             backgroundColor: entry.color,
             flexShrink: 0,
           }} />
-          <span style={{ fontFamily: "'Jost', sans-serif", fontWeight: 300, color: textSecondary, textTransform: 'capitalize' }}>
+          <span style={{ fontFamily: "'Jost', sans-serif", fontWeight: 400, color: textSecondary, textTransform: 'capitalize' }}>
             {entry.name}:
           </span>
           <span style={{ fontFamily: "'JetBrains Mono', monospace", fontWeight: 500, color: textPrimary }}>
@@ -97,8 +97,8 @@ export function IncomeExpenseChart({ data }: IncomeExpenseChartProps) {
       <div style={{ display: 'flex', height: '192px', alignItems: 'center', justifyContent: 'center' }}>
         <p style={{
           fontFamily: "'Jost', sans-serif",
-          fontSize: '12px',
-          fontWeight: 300,
+          fontSize: '14px',
+          fontWeight: 400,
           letterSpacing: '0.06em',
           color: theme.textMuted,
         }}>
@@ -118,19 +118,19 @@ export function IncomeExpenseChart({ data }: IncomeExpenseChartProps) {
         />
         <XAxis
           dataKey="month"
-          tick={{ fill: theme.chartAxisText, fontSize: 10, fontFamily: 'var(--font-jost)', letterSpacing: '0.1em' }}
+          tick={{ fill: theme.chartAxisText, fontSize: 12, fontFamily: 'var(--font-jost)', letterSpacing: '0.1em' }}
           axisLine={false}
           tickLine={false}
           tickMargin={8}
         />
         <YAxis
-          tick={{ fill: theme.chartAxisText, fontSize: 10, fontFamily: 'var(--font-jost)' }}
+          tick={{ fill: theme.chartAxisText, fontSize: 12, fontFamily: 'var(--font-jost)' }}
           axisLine={false}
           tickLine={false}
           tickFormatter={(v: number) =>
             v >= 1000 ? `$${(v / 1000).toFixed(0)}k` : `$${v}`
           }
-          width={48}
+          width={52}
         />
         <Tooltip
           content={
@@ -146,7 +146,7 @@ export function IncomeExpenseChart({ data }: IncomeExpenseChartProps) {
         />
         <Legend
           wrapperStyle={{
-            fontSize: 10,
+            fontSize: 12,
             color: theme.chartAxisText,
             paddingTop: 12,
             fontFamily: 'var(--font-jost)',
@@ -160,7 +160,7 @@ export function IncomeExpenseChart({ data }: IncomeExpenseChartProps) {
               color: value === 'expenses' ? theme.chartExpense : theme.chartIncome,
               textTransform: 'uppercase',
               letterSpacing: '0.18em',
-              fontSize: 10,
+              fontSize: 12,
             }}>
               {value}
             </span>

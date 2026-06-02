@@ -119,7 +119,7 @@ export function SettingsPanel({ currentPlan = 'free', hasSubscription = false }:
               alignItems: 'center',
               gap: '8px',
               fontFamily: "'Jost', sans-serif",
-              fontSize: '10px',
+              fontSize: '14px',
               letterSpacing: '0.18em',
               textTransform: 'uppercase',
               color: theme.textMuted,
@@ -172,7 +172,7 @@ export function SettingsPanel({ currentPlan = 'free', hasSubscription = false }:
 
                     <p style={{
                       fontFamily: "'Jost', sans-serif",
-                      fontSize: '11px',
+                      fontSize: '15px',
                       fontWeight: 500,
                       color: t.textPrimary,
                       letterSpacing: '0.08em',
@@ -183,7 +183,7 @@ export function SettingsPanel({ currentPlan = 'free', hasSubscription = false }:
                     </p>
                     <p style={{
                       fontFamily: "'Jost', sans-serif",
-                      fontSize: '10px',
+                      fontSize: '14px',
                       color: t.textMuted,
                       letterSpacing: '0.04em',
                       margin: 0,
@@ -218,8 +218,8 @@ export function SettingsPanel({ currentPlan = 'free', hasSubscription = false }:
             <p style={{
               marginTop: '12px',
               fontFamily: "'Jost', sans-serif",
-              fontWeight: 300,
-              fontSize: '11px',
+              fontWeight: 400,
+              fontSize: '15px',
               letterSpacing: '0.04em',
               color: theme.textMuted,
             }}>
@@ -234,7 +234,7 @@ export function SettingsPanel({ currentPlan = 'free', hasSubscription = false }:
               alignItems: 'center',
               gap: '8px',
               fontFamily: "'Jost', sans-serif",
-              fontSize: '10px',
+              fontSize: '14px',
               letterSpacing: '0.18em',
               textTransform: 'uppercase',
               color: theme.textMuted,
@@ -245,8 +245,8 @@ export function SettingsPanel({ currentPlan = 'free', hasSubscription = false }:
             </p>
             <p style={{
               fontFamily: "'Jost', sans-serif",
-              fontWeight: 300,
-              fontSize: '11px',
+              fontWeight: 400,
+              fontSize: '15px',
               letterSpacing: '0.04em',
               color: theme.textMuted,
               margin: '0 0 14px 0',
@@ -303,7 +303,7 @@ export function SettingsPanel({ currentPlan = 'free', hasSubscription = false }:
                     <p style={{
                       fontFamily: "'Jost', sans-serif",
                       fontWeight: previewWeights[weight].label,
-                      fontSize: '11px',
+                      fontSize: '15px',
                       color: theme.textSecondary,
                       margin: '0 0 8px 0',
                       letterSpacing: '0.02em',
@@ -314,7 +314,7 @@ export function SettingsPanel({ currentPlan = 'free', hasSubscription = false }:
                     <p style={{
                       fontFamily: "'Jost', sans-serif",
                       fontWeight: previewWeights[weight].label === 200 ? 300 : previewWeights[weight].label,
-                      fontSize: '10px',
+                      fontSize: '14px',
                       letterSpacing: '0.14em',
                       textTransform: 'uppercase',
                       color: isSelected ? theme.accent : theme.textMuted,
@@ -344,8 +344,8 @@ export function SettingsPanel({ currentPlan = 'free', hasSubscription = false }:
             <p style={{
               marginTop: '10px',
               fontFamily: "'Jost', sans-serif",
-              fontWeight: 300,
-              fontSize: '11px',
+              fontWeight: 400,
+              fontSize: '15px',
               letterSpacing: '0.04em',
               color: theme.textMuted,
             }}>
@@ -360,7 +360,7 @@ export function SettingsPanel({ currentPlan = 'free', hasSubscription = false }:
               alignItems: 'center',
               gap: '8px',
               fontFamily: "'Jost', sans-serif",
-              fontSize: '10px',
+              fontSize: '14px',
               letterSpacing: '0.18em',
               textTransform: 'uppercase',
               color: theme.textMuted,
@@ -390,7 +390,7 @@ export function SettingsPanel({ currentPlan = 'free', hasSubscription = false }:
                     borderRadius: '2px',
                     color: mounted && textSize === s.value ? theme.accent : theme.textMuted,
                     fontFamily: "'Jost', sans-serif",
-                    fontSize: '11px',
+                    fontSize: '15px',
                     letterSpacing: '0.12em',
                     textTransform: 'uppercase',
                     cursor: 'pointer',
@@ -404,8 +404,8 @@ export function SettingsPanel({ currentPlan = 'free', hasSubscription = false }:
             <p style={{
               marginTop: '10px',
               fontFamily: "'Jost', sans-serif",
-              fontWeight: 300,
-              fontSize: '11px',
+              fontWeight: 400,
+              fontSize: '15px',
               letterSpacing: '0.04em',
               color: theme.textMuted,
             }}>
@@ -465,8 +465,8 @@ export function SettingsPanel({ currentPlan = 'free', hasSubscription = false }:
                   : theme.badgeNegativeBg,
                 color: pwStatus === 'success' ? theme.badgePositiveText : theme.badgeNegativeText,
                 fontFamily: "'Jost', sans-serif",
-                fontSize: '12px',
-                fontWeight: 300,
+                fontSize: '14px',
+                fontWeight: 400,
               }}
             >
               {pwStatus === 'success' && <Check style={{ width: '14px', height: '14px' }} strokeWidth={1.6} />}
@@ -504,7 +504,7 @@ export function SettingsPanel({ currentPlan = 'free', hasSubscription = false }:
               <div>
                 <p style={{
                   fontFamily: "'Jost', sans-serif",
-                  fontSize: '10px',
+                  fontSize: '14px',
                   letterSpacing: '0.18em',
                   textTransform: 'uppercase',
                   color: theme.textMuted,
@@ -523,8 +523,8 @@ export function SettingsPanel({ currentPlan = 'free', hasSubscription = false }:
                   {planInfo.label}
                   <span style={{
                     fontFamily: "'Jost', sans-serif",
-                    fontSize: '12px',
-                    fontWeight: 300,
+                    fontSize: '14px',
+                    fontWeight: 400,
                     color: theme.textMuted,
                     marginLeft: '10px',
                   }}>
@@ -550,7 +550,7 @@ export function SettingsPanel({ currentPlan = 'free', hasSubscription = false }:
                     background: 'transparent',
                     color: theme.accent,
                     fontFamily: "'Jost', sans-serif",
-                    fontSize: '10px',
+                    fontSize: '14px',
                     letterSpacing: '0.15em',
                     textTransform: 'uppercase',
                     cursor: portalLoading ? 'not-allowed' : 'pointer',
@@ -574,7 +574,7 @@ export function SettingsPanel({ currentPlan = 'free', hasSubscription = false }:
                   background: theme.accentGradient,
                   color: theme.textOnAccent,
                   fontFamily: "'Jost', sans-serif",
-                  fontSize: '10px',
+                  fontSize: '14px',
                   letterSpacing: '0.15em',
                   textTransform: 'uppercase',
                   fontWeight: 600,
@@ -590,8 +590,8 @@ export function SettingsPanel({ currentPlan = 'free', hasSubscription = false }:
 
           <p style={{
             fontFamily: "'Jost', sans-serif",
-            fontWeight: 300,
-            fontSize: '11px',
+            fontWeight: 400,
+            fontSize: '15px',
             letterSpacing: '0.04em',
             color: theme.textMuted,
             margin: 0,

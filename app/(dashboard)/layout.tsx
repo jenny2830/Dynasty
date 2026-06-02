@@ -101,8 +101,8 @@ export default async function DashboardLayout({
             </h2>
             <p style={{
               fontFamily: "'Jost', sans-serif",
-              fontSize: '13px',
-              fontWeight: 300,
+              fontSize: '15px',
+              fontWeight: 400,
               color: 'var(--text-muted-c)',
               marginBottom: '32px',
               letterSpacing: '0.04em',
@@ -118,7 +118,7 @@ export default async function DashboardLayout({
                 color: 'var(--text-on-accent)',
                 fontFamily: "'Jost', sans-serif",
                 fontWeight: 600,
-                fontSize: '11px',
+                fontSize: '15px',
                 letterSpacing: '0.2em',
                 textTransform: 'uppercase',
                 padding: '14px 48px',

@@ -21,8 +21,8 @@ export function PageHeader({ title, subtitle, children, className }: PageHeaderP
         <div style={{ minWidth: 0, flex: 1 }}>
           <h1 style={{
             fontFamily: "'Cormorant Garamond', serif",
-            fontWeight: 600,
-            fontSize: 'clamp(18px, 4vw, 30px)',
+            fontWeight: 700,
+            fontSize: 'clamp(26px, 4vw, 36px)',
             letterSpacing: '0.04em',
             display: 'flex',
             alignItems: 'center',
@@ -48,8 +48,8 @@ export function PageHeader({ title, subtitle, children, className }: PageHeaderP
             <p style={{
               marginTop: '6px',
               fontFamily: "'Jost', sans-serif",
-              fontWeight: 300,
-              fontSize: '11px',
+              fontWeight: 400,
+              fontSize: '13px',
               textTransform: 'uppercase',
               letterSpacing: '0.16em',
               color: 'var(--text-muted, #6B6B65)',

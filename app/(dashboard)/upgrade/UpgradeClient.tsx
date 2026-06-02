@@ -128,7 +128,7 @@ export function UpgradeClient({ currentPlan, sessionsUsed, hasSubscription, succ
           border: toast.type === 'success' ? `1px solid ${theme.accent}66` : `1px solid ${theme.valueNegative}66`,
           background: toast.type === 'success' ? `${theme.accent}1A` : `${theme.valueNegative}1A`,
           color: toast.type === 'success' ? theme.accent : theme.valueNegative,
-          fontFamily: "'Jost', sans-serif", fontSize: '13px', fontWeight: 300,
+          fontFamily: "'Jost', sans-serif", fontSize: '15px', fontWeight: 400,
           letterSpacing: '0.04em', backdropFilter: 'blur(8px)', maxWidth: '360px',
         }}>
           {toast.msg}
@@ -144,10 +144,10 @@ export function UpgradeClient({ currentPlan, sessionsUsed, hasSubscription, succ
           flexWrap: 'wrap', gap: '12px',
         }}>
           <div>
-            <p style={{ fontFamily: "'Jost', sans-serif", fontSize: '12px', letterSpacing: '0.06em', color: theme.accent, margin: 0 }}>
+            <p style={{ fontFamily: "'Jost', sans-serif", fontSize: '14px', letterSpacing: '0.06em', color: theme.accent, margin: 0 }}>
               You have an active subscription
             </p>
-            <p style={{ fontFamily: "'Jost', sans-serif", fontSize: '11px', fontWeight: 300, color: theme.textMuted, margin: '4px 0 0 0' }}>
+            <p style={{ fontFamily: "'Jost', sans-serif", fontSize: '15px', fontWeight: 400, color: theme.textMuted, margin: '4px 0 0 0' }}>
               Manage payment method, invoices, or cancel via the billing portal.
             </p>
           </div>
@@ -156,7 +156,7 @@ export function UpgradeClient({ currentPlan, sessionsUsed, hasSubscription, succ
             style={{
               padding: '10px 20px', border: `1px solid ${theme.accent}4D`, borderRadius: '2px',
               background: 'transparent', color: theme.accent, fontFamily: "'Jost', sans-serif",
-              fontSize: '10px', letterSpacing: '0.18em', textTransform: 'uppercase',
+              fontSize: '14px', letterSpacing: '0.18em', textTransform: 'uppercase',
               cursor: portalLoading ? 'not-allowed' : 'pointer', opacity: portalLoading ? 0.6 : 1,
               transition: 'all 0.2s ease', whiteSpace: 'nowrap',
             }}
@@ -211,10 +211,10 @@ export function UpgradeClient({ currentPlan, sessionsUsed, hasSubscription, succ
                   {plan.icon}
                 </div>
                 <div>
-                  <p style={{ fontFamily: "'Jost', sans-serif", fontSize: '11px', letterSpacing: '0.20em', textTransform: 'uppercase', color: theme.accent, margin: 0 }}>
+                  <p style={{ fontFamily: "'Jost', sans-serif", fontSize: '15px', letterSpacing: '0.20em', textTransform: 'uppercase', color: theme.accent, margin: 0 }}>
                     {plan.label}
                   </p>
-                  <p style={{ fontFamily: "'Jost', sans-serif", fontSize: '10px', fontWeight: 300, letterSpacing: '0.06em', color: theme.textMuted, margin: '3px 0 0 0' }}>
+                  <p style={{ fontFamily: "'Jost', sans-serif", fontSize: '14px', fontWeight: 400, letterSpacing: '0.06em', color: theme.textMuted, margin: '3px 0 0 0' }}>
                     {plan.properties}
                   </p>
                 </div>
@@ -228,7 +228,7 @@ export function UpgradeClient({ currentPlan, sessionsUsed, hasSubscription, succ
                   ) : (
                     <>
                       {plan.price.split(' ')[0]}
-                      <span style={{ fontSize: '13px', color: theme.textMuted, fontFamily: "'Jost', sans-serif", fontWeight: 300, marginLeft: '6px' }}>
+                      <span style={{ fontSize: '15px', color: theme.textMuted, fontFamily: "'Jost', sans-serif", fontWeight: 400, marginLeft: '6px' }}>
                         CAD / mo
                       </span>
                     </>
@@ -237,7 +237,7 @@ export function UpgradeClient({ currentPlan, sessionsUsed, hasSubscription, succ
                 {plan.isFree && isCurrent && (
                   <div style={{ marginTop: '10px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
-                      <span style={{ fontFamily: "'Jost', sans-serif", fontSize: '10px', color: remaining > 1 ? theme.accent : theme.valueNegative, letterSpacing: '0.06em' }}>
+                      <span style={{ fontFamily: "'Jost', sans-serif", fontSize: '14px', color: remaining > 1 ? theme.accent : theme.valueNegative, letterSpacing: '0.06em' }}>
                         {remaining} of {FREE_TRIAL_MAX_SESSIONS} sessions remaining
                       </span>
                     </div>
@@ -262,7 +262,7 @@ export function UpgradeClient({ currentPlan, sessionsUsed, hasSubscription, succ
                     ) : (
                       <X style={{ width: '12px', height: '12px', color: theme.textMuted, flexShrink: 0, marginTop: '2px' }} strokeWidth={2} />
                     )}
-                    <span style={{ fontFamily: "'Jost', sans-serif", fontSize: '11px', fontWeight: 300, color: f.included ? theme.textSecondary : theme.textMuted, letterSpacing: '0.04em' }}>
+                    <span style={{ fontFamily: "'Jost', sans-serif", fontSize: '15px', fontWeight: 400, color: f.included ? theme.textSecondary : theme.textMuted, letterSpacing: '0.04em' }}>
                       {f.label}
                     </span>
                   </li>
@@ -275,7 +275,7 @@ export function UpgradeClient({ currentPlan, sessionsUsed, hasSubscription, succ
                   <div style={{
                     width: '100%', padding: '11px', textAlign: 'center',
                     border: `1px solid ${theme.accent}40`, borderRadius: '1px',
-                    fontFamily: "'Jost', sans-serif", fontSize: '10px', letterSpacing: '0.18em',
+                    fontFamily: "'Jost', sans-serif", fontSize: '14px', letterSpacing: '0.18em',
                     textTransform: 'uppercase', color: theme.accent, background: `${theme.accent}0F`,
                   }}>
                     ◆ Current Plan
@@ -288,7 +288,7 @@ export function UpgradeClient({ currentPlan, sessionsUsed, hasSubscription, succ
                       width: '100%', padding: '11px', borderRadius: '1px', border: 'none',
                       background: plan.popular ? theme.accentGradient : 'transparent',
                       color: plan.popular ? theme.textOnAccent : theme.accent,
-                      fontFamily: "'Jost', sans-serif", fontSize: '10px', letterSpacing: '0.18em',
+                      fontFamily: "'Jost', sans-serif", fontSize: '14px', letterSpacing: '0.18em',
                       textTransform: 'uppercase', fontWeight: plan.popular ? 600 : 400,
                       cursor: isLoading || !!loading ? 'not-allowed' : 'pointer',
                       opacity: !!loading && !isLoading ? 0.5 : 1,
@@ -307,7 +307,7 @@ export function UpgradeClient({ currentPlan, sessionsUsed, hasSubscription, succ
       </div>
 
       <p style={{
-        marginTop: '24px', fontFamily: "'Jost', sans-serif", fontSize: '11px', fontWeight: 300,
+        marginTop: '24px', fontFamily: "'Jost', sans-serif", fontSize: '15px', fontWeight: 400,
         letterSpacing: '0.04em', color: theme.textMuted, textAlign: 'center',
       }}>
         All prices in Canadian dollars. Billed monthly. Cancel anytime via the billing portal.

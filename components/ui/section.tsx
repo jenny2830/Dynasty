@@ -70,8 +70,8 @@ export function SectionHeader({
       <div style={{ minWidth: 0 }}>
         <h2 style={{
           fontFamily: "'Cormorant Garamond', serif",
-          fontSize: '18px',
-          fontWeight: 500,
+          fontSize: '22px',
+          fontWeight: 600,
           letterSpacing: '0.02em',
           margin: 0,
           background: theme.accentGradient,
@@ -86,8 +86,8 @@ export function SectionHeader({
           <p style={{
             marginTop: '2px',
             fontFamily: "'Jost', sans-serif",
-            fontWeight: 300,
-            fontSize: '11px',
+            fontWeight: 400,
+            fontSize: '13px',
             textTransform: 'uppercase',
             letterSpacing: '0.12em',
             color: theme.textMuted,

@@ -7,8 +7,8 @@ export function useThemeStyles() {
     // Page titles
     pageTitle: {
       fontFamily: "'Cormorant Garamond', serif",
-      fontWeight: fontWeights.semibold,
-      fontSize: 'clamp(22px, 4vw, 30px)',
+      fontWeight: fontWeights.bold,
+      fontSize: 'clamp(26px, 4vw, 36px)',
       color: theme.textPrimary,
       letterSpacing: '0.04em',
       overflow: 'hidden',
@@ -19,9 +19,9 @@ export function useThemeStyles() {
     // Card labels (PORTFOLIO VALUE, etc.)
     cardLabel: {
       fontFamily: "'Jost', sans-serif",
-      fontWeight: fontWeights.thin,
-      fontSize: '9px',
-      letterSpacing: '0.22em',
+      fontWeight: fontWeights.body,
+      fontSize: '11px',
+      letterSpacing: '0.18em',
       textTransform: 'uppercase' as const,
       color: theme.accent,
     } as React.CSSProperties,
@@ -29,8 +29,8 @@ export function useThemeStyles() {
     // Card values ($0, etc.)
     cardValue: {
       fontFamily: "'Bebas Neue', sans-serif",
-      fontWeight: fontWeights.medium,
-      fontSize: 'clamp(28px, 5vw, 38px)',
+      fontWeight: fontWeights.semibold,
+      fontSize: 'clamp(32px, 5vw, 44px)',
       color: theme.accent,
       lineHeight: 1,
     } as React.CSSProperties,
@@ -39,7 +39,7 @@ export function useThemeStyles() {
     bodyText: {
       fontFamily: "'Jost', sans-serif",
       fontWeight: fontWeights.body,
-      fontSize: '13px',
+      fontSize: '15px',
       color: theme.textSecondary,
       wordBreak: 'break-word' as const,
     } as React.CSSProperties,
@@ -47,19 +47,19 @@ export function useThemeStyles() {
     // Muted/subtitle text
     mutedText: {
       fontFamily: "'Jost', sans-serif",
-      fontWeight: fontWeights.thin,
-      fontSize: '12px',
+      fontWeight: fontWeights.body,
+      fontSize: '14px',
       color: theme.textMuted,
-      letterSpacing: '0.06em',
+      letterSpacing: '0.04em',
       wordBreak: 'break-word' as const,
     } as React.CSSProperties,
 
     // Section labels (PORTFOLIO, INTELLIGENCE, etc.)
     sectionLabel: {
       fontFamily: "'Jost', sans-serif",
-      fontWeight: fontWeights.thin,
-      fontSize: '8px',
-      letterSpacing: '0.22em',
+      fontWeight: fontWeights.body,
+      fontSize: '10px',
+      letterSpacing: '0.2em',
       textTransform: 'uppercase' as const,
       color: theme.sectionLabel,
       overflow: 'hidden',
@@ -70,9 +70,9 @@ export function useThemeStyles() {
     // Nav items (inactive)
     navItem: {
       fontFamily: "'Jost', sans-serif",
-      fontWeight: fontWeights.thin,
-      fontSize: '11px',
-      letterSpacing: '0.14em',
+      fontWeight: fontWeights.body,
+      fontSize: '12px',
+      letterSpacing: '0.12em',
       textTransform: 'uppercase' as const,
       overflow: 'hidden',
       textOverflow: 'ellipsis',
@@ -83,9 +83,9 @@ export function useThemeStyles() {
     // Nav items (active)
     navItemActive: {
       fontFamily: "'Jost', sans-serif",
-      fontWeight: fontWeights.medium,
-      fontSize: '11px',
-      letterSpacing: '0.14em',
+      fontWeight: fontWeights.semibold,
+      fontSize: '12px',
+      letterSpacing: '0.12em',
       textTransform: 'uppercase' as const,
       overflow: 'hidden',
       textOverflow: 'ellipsis',
@@ -96,18 +96,18 @@ export function useThemeStyles() {
     // Buttons
     buttonText: {
       fontFamily: "'Jost', sans-serif",
-      fontWeight: fontWeights.medium,
-      fontSize: '10px',
-      letterSpacing: '0.22em',
+      fontWeight: fontWeights.semibold,
+      fontSize: '11px',
+      letterSpacing: '0.2em',
       textTransform: 'uppercase' as const,
     } as React.CSSProperties,
 
     // Input labels
     inputLabel: {
       fontFamily: "'Jost', sans-serif",
-      fontWeight: fontWeights.thin,
-      fontSize: '10px',
-      letterSpacing: '0.15em',
+      fontWeight: fontWeights.body,
+      fontSize: '12px',
+      letterSpacing: '0.12em',
       textTransform: 'uppercase' as const,
       color: theme.textMuted,
       marginBottom: '7px',
@@ -121,12 +121,12 @@ export function useThemeStyles() {
     inputField: {
       fontFamily: "'Jost', sans-serif",
       fontWeight: fontWeights.body,
-      fontSize: '13px',
+      fontSize: '15px',
       color: theme.inputText,
       background: theme.inputBg,
       border: `1px solid ${theme.inputBorder}`,
       borderRadius: '1px',
-      padding: '11px 15px',
+      padding: '12px 16px',
       width: '100%',
       outline: 'none',
     } as React.CSSProperties,
@@ -134,16 +134,16 @@ export function useThemeStyles() {
     // Financial numbers
     financial: {
       fontFamily: "'JetBrains Mono', monospace",
-      fontWeight: fontWeights.medium,
-      fontSize: '13px',
+      fontWeight: fontWeights.semibold,
+      fontSize: '15px',
     } as React.CSSProperties,
 
     // Table header
     tableHeader: {
       fontFamily: "'Jost', sans-serif",
-      fontWeight: fontWeights.thin,
-      fontSize: '9px',
-      letterSpacing: '0.2em',
+      fontWeight: fontWeights.body,
+      fontSize: '11px',
+      letterSpacing: '0.18em',
       textTransform: 'uppercase' as const,
       color: theme.tableHeaderText,
       overflow: 'hidden',
@@ -155,7 +155,7 @@ export function useThemeStyles() {
     tableCell: {
       fontFamily: "'Jost', sans-serif",
       fontWeight: fontWeights.body,
-      fontSize: '13px',
+      fontSize: '14px',
       color: theme.tableCellText,
       wordBreak: 'break-word' as const,
     } as React.CSSProperties,
@@ -163,19 +163,19 @@ export function useThemeStyles() {
     // Badge
     badge: {
       fontFamily: "'Jost', sans-serif",
-      fontWeight: fontWeights.thin,
-      fontSize: '9px',
-      letterSpacing: '0.15em',
+      fontWeight: fontWeights.body,
+      fontSize: '10px',
+      letterSpacing: '0.14em',
       textTransform: 'uppercase' as const,
-      padding: '3px 10px',
+      padding: '4px 12px',
       borderRadius: '1px',
     } as React.CSSProperties,
 
     // Heading h3 (card titles like "Income vs Expenses")
     cardTitle: {
       fontFamily: "'Cormorant Garamond', serif",
-      fontWeight: fontWeights.medium,
-      fontSize: '18px',
+      fontWeight: fontWeights.semibold,
+      fontSize: '22px',
       color: theme.textPrimary,
       overflow: 'hidden',
       wordBreak: 'break-word' as const,

@@ -60,7 +60,7 @@ export default async function PropertiesPage() {
             {!trialExpired && plan !== 'free' && (
               <span style={{
                 fontFamily: "'Jost', sans-serif",
-                fontSize: '10px',
+                fontSize: '14px',
                 letterSpacing: '0.12em',
                 color: 'var(--text-muted-c)',
               }}>

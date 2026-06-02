@@ -32,10 +32,10 @@ export function TrialBanner({ plan, sessionsUsed, trialExpired }: TrialBannerPro
         gap: '12px',
       }}>
         <div>
-          <span style={{ fontFamily: "'Jost', sans-serif", fontSize: '13px', color: theme.valueNegative, fontWeight: 500 }}>
+          <span style={{ fontFamily: "'Jost', sans-serif", fontSize: '15px', color: theme.valueNegative, fontWeight: 500 }}>
             Your free trial has ended.
           </span>
-          <span style={{ fontFamily: "'Jost', sans-serif", fontSize: '13px', color: theme.textMuted, marginLeft: '8px' }}>
+          <span style={{ fontFamily: "'Jost', sans-serif", fontSize: '15px', color: theme.textMuted, marginLeft: '8px' }}>
             Upgrade to continue using Dynasty.
           </span>
         </div>
@@ -46,7 +46,7 @@ export function TrialBanner({ plan, sessionsUsed, trialExpired }: TrialBannerPro
             color: theme.textOnAccent,
             fontFamily: "'Jost', sans-serif",
             fontWeight: 600,
-            fontSize: '10px',
+            fontSize: '12px',
             letterSpacing: '0.2em',
             textTransform: 'uppercase',
             padding: '8px 24px',
@@ -77,7 +77,7 @@ export function TrialBanner({ plan, sessionsUsed, trialExpired }: TrialBannerPro
     }}>
       <span style={{
         fontFamily: "'Jost', sans-serif",
-        fontSize: '12px',
+        fontSize: '14px',
         color: theme.accent,
         letterSpacing: '0.06em',
       }}>
@@ -90,7 +90,7 @@ export function TrialBanner({ plan, sessionsUsed, trialExpired }: TrialBannerPro
           border: `1px solid ${theme.accent}4D`,
           color: theme.accent,
           fontFamily: "'Jost', sans-serif",
-          fontSize: '10px',
+          fontSize: '12px',
           letterSpacing: '0.18em',
           textTransform: 'uppercase',
           padding: '6px 18px',

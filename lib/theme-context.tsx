@@ -8,9 +8,9 @@ export type TextThickness = 'light' | 'regular' | 'bold'
 const FONT_WEIGHT_MAP: Record<TextThickness, {
   thin: number; body: number; medium: number; semibold: number; bold: number
 }> = {
-  light:   { thin: 200, body: 300, medium: 300, semibold: 400, bold: 500 },
-  regular: { thin: 300, body: 400, medium: 500, semibold: 600, bold: 700 },
-  bold:    { thin: 400, body: 600, medium: 700, semibold: 800, bold: 900 },
+  light:   { thin: 300, body: 400, medium: 400, semibold: 500, bold: 600 },
+  regular: { thin: 400, body: 500, medium: 600, semibold: 700, bold: 800 },
+  bold:    { thin: 500, body: 700, medium: 800, semibold: 900, bold: 900 },
 }
 
 interface ThemeContextValue {
@@ -28,7 +28,7 @@ const ThemeContext = createContext<ThemeContextValue>({
   setThemeId: () => {},
   textThickness: 'light',
   setTextThickness: () => {},
-  fontWeights: FONT_WEIGHT_MAP.light,
+  fontWeights: FONT_WEIGHT_MAP.light,  // updated with new scale
 })
 
 export function useAppTheme() {

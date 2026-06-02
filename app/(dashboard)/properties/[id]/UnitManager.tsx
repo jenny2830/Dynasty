@@ -83,7 +83,7 @@ function UnitForm({ form, setForm, onSave, onCancel, saving, error, title }: Uni
     }}>
       <p style={{
         fontFamily: "'Jost', sans-serif",
-        fontSize: '10px',
+        fontSize: '14px',
         letterSpacing: '0.18em',
         textTransform: 'uppercase',
         color: '#C9A84C',
@@ -171,7 +171,7 @@ function UnitForm({ form, setForm, onSave, onCancel, saving, error, title }: Uni
       </div>
 
       {error && (
-        <p style={{ color: '#D4959E', fontFamily: "'Jost', sans-serif", fontSize: '12px', marginTop: '10px' }}>
+        <p style={{ color: '#D4959E', fontFamily: "'Jost', sans-serif", fontSize: '14px', marginTop: '10px' }}>
           {error}
         </p>
       )}
@@ -288,7 +288,7 @@ export function UnitManager({ propertyId, initialUnits }: UnitManagerProps) {
         }}>
           <span style={{ fontSize: '8px', color: '#C9A84C' }}>◆</span>
           Units
-          <span style={{ fontFamily: "'Jost', sans-serif", fontSize: '11px', color: '#8A8A82', fontWeight: 400 }}>
+          <span style={{ fontFamily: "'Jost', sans-serif", fontSize: '15px', color: '#8A8A82', fontWeight: 400 }}>
             ({units.length} added)
           </span>
         </h2>
@@ -300,7 +300,7 @@ export function UnitManager({ propertyId, initialUnits }: UnitManagerProps) {
               color: theme.textOnAccent,
               fontFamily: "'Jost', sans-serif",
               fontWeight: 600,
-              fontSize: '10px',
+              fontSize: '14px',
               letterSpacing: '0.18em',
               textTransform: 'uppercase',
               padding: '8px 18px',
@@ -332,7 +332,7 @@ export function UnitManager({ propertyId, initialUnits }: UnitManagerProps) {
 
       {/* Units list */}
       {units.length === 0 && !showAdd ? (
-        <p style={{ color: '#6B6B65', fontFamily: "'Jost', sans-serif", fontSize: '13px', textAlign: 'center', padding: '24px 0' }}>
+        <p style={{ color: '#6B6B65', fontFamily: "'Jost', sans-serif", fontSize: '15px', textAlign: 'center', padding: '24px 0' }}>
           No units added yet. Click &ldquo;Add Unit&rdquo; to start.
         </p>
       ) : (
@@ -361,10 +361,10 @@ export function UnitManager({ propertyId, initialUnits }: UnitManagerProps) {
                   gap: '12px',
                 }}>
                   <div style={{ minWidth: 0, flex: 1 }}>
-                    <span style={{ fontFamily: "'Jost', sans-serif", fontSize: '13px', color: 'var(--text-primary, #FAF7F2)', fontWeight: 500 }}>
+                    <span style={{ fontFamily: "'Jost', sans-serif", fontSize: '15px', color: 'var(--text-primary, #FAF7F2)', fontWeight: 500 }}>
                       Unit {unit.unit_number}
                     </span>
-                    <span style={{ fontFamily: "'Jost', sans-serif", fontSize: '11px', color: '#8A8A82', marginLeft: '12px' }}>
+                    <span style={{ fontFamily: "'Jost', sans-serif", fontSize: '15px', color: '#8A8A82', marginLeft: '12px' }}>
                       {[
                         unit.bedrooms != null && `${unit.bedrooms}BR`,
                         unit.bathrooms != null && `${unit.bathrooms}BA`,
@@ -377,7 +377,7 @@ export function UnitManager({ propertyId, initialUnits }: UnitManagerProps) {
                     {unit.rent_amount != null && (
                       <span style={{
                         fontFamily: "'JetBrains Mono', monospace",
-                        fontSize: '13px',
+                        fontSize: '15px',
                         color: unit.status === 'occupied' ? '#C9A84C' : '#B76E79',
                       }}>
                         {formatCurrency(unit.rent_amount)}/mo
@@ -396,7 +396,7 @@ export function UnitManager({ propertyId, initialUnits }: UnitManagerProps) {
                     {/* Edit / Delete */}
                     {deleteId === unit.id ? (
                       <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-                        <span style={{ fontSize: '11px', color: '#D4959E', fontFamily: "'Jost', sans-serif" }}>Delete?</span>
+                        <span style={{ fontSize: '15px', color: '#D4959E', fontFamily: "'Jost', sans-serif" }}>Delete?</span>
                         <button
                           onClick={() => handleDelete(unit.id)}
                           disabled={isPending}

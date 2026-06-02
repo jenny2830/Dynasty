@@ -46,7 +46,7 @@ export function ProfitabilityChart({ results }: { results: ProfitabilityResults 
     border: `1px solid ${theme.chartTooltipBorder}`,
     borderRadius: '2px',
     fontFamily: "'Jost', sans-serif",
-    fontSize: '12px',
+    fontSize: '14px',
     color: theme.textPrimary,
     padding: '10px 14px',
   }
@@ -180,7 +180,7 @@ export function ProfitabilityChart({ results }: { results: ProfitabilityResults 
               <div key={entry.name} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <div style={{ width: '10px', height: '10px', borderRadius: '1px', background: pieColors[i % pieColors.length], flexShrink: 0 }} />
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ ...styles.bodyText, marginBottom: '2px', fontSize: '12px' }}>{entry.name}</p>
+                  <p style={{ ...styles.bodyText, marginBottom: '2px', fontSize: '14px' }}>{entry.name}</p>
                   <p style={{ ...styles.financial, color: i === 0 ? theme.accent : theme.valueNegative }}>
                     {formatCurrency(entry.value)}/mo
                   </p>

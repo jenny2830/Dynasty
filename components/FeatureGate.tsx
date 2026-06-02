@@ -56,7 +56,7 @@ function UpgradePrompt({ feature }: { feature: string }) {
       <div style={{ fontSize: '32px', marginBottom: '12px', color: theme.accent }}>◆</div>
       <h3 style={{
         fontFamily: "'Cormorant Garamond', serif",
-        fontSize: '22px',
+        fontSize: '26px',
         fontWeight: 600,
         color: theme.textPrimary,
         marginBottom: '8px',
@@ -66,8 +66,8 @@ function UpgradePrompt({ feature }: { feature: string }) {
       </h3>
       <p style={{
         fontFamily: "'Jost', sans-serif",
-        fontSize: '13px',
-        fontWeight: 300,
+        fontSize: '15px',
+        fontWeight: 400,
         color: theme.textMuted,
         marginBottom: '24px',
         letterSpacing: '0.04em',
@@ -81,7 +81,7 @@ function UpgradePrompt({ feature }: { feature: string }) {
           color: theme.textOnAccent,
           fontFamily: "'Jost', sans-serif",
           fontWeight: 600,
-          fontSize: '10px',
+          fontSize: '12px',
           letterSpacing: '0.22em',
           textTransform: 'uppercase',
           padding: '12px 36px',
