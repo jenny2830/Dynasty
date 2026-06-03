@@ -144,7 +144,6 @@ export function StatsCards({
         label="Monthly Net Income"
         value={formatCurrency(monthlyNetIncome)}
         subtext="Income minus expenses"
-        trend={{ value: 4.2, label: 'vs last month' }}
         icon={<TrendingUp style={{ width: '16px', height: '16px' }} strokeWidth={1.2} />}
         highlight
         negative={monthlyNetIncome < 0}

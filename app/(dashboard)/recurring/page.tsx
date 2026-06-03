@@ -20,7 +20,7 @@ export default async function RecurringPage() {
     .from('landlords')
     .select('id')
     .eq('auth_user_id', user.id)
-    .single()
+    .maybeSingle()
   if (!landlord) return null
 
   const { data: payments } = await supabase

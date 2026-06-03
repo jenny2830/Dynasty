@@ -16,7 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { EXPENSE_CATEGORIES, INCOME_CATEGORIES } from '@/lib/constants'
+import { EXPENSE_ONLY_CATEGORIES, INCOME_CATEGORIES } from '@/lib/constants'
 import type { Transaction } from '@/types/database.types'
 import { createClient } from '@/lib/supabase/client'
 
@@ -100,10 +100,7 @@ export function TransactionForm({
     }
   }, [selectedProperty])
 
-  const categories =
-    txType === 'income'
-      ? INCOME_CATEGORIES
-      : EXPENSE_CATEGORIES.filter((c) => !(['Rental income', 'Other income'] as string[]).includes(c))
+  const categories = txType === 'income' ? INCOME_CATEGORIES : EXPENSE_ONLY_CATEGORIES
 
   const today = new Date().toISOString().split('T')[0]
 

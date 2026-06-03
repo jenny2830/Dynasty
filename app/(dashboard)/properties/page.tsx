@@ -90,7 +90,7 @@ export default async function PropertiesPage() {
       {propertiesError && (
         <div
           className="rounded-[2px] border px-5 py-3 font-sans text-[12px] tracking-[0.06em]"
-          style={{ borderColor: 'var(--value-negative-c)', color: 'var(--value-negative-c)', background: 'rgba(183,110,121,0.06)' }}
+          style={{ borderColor: 'var(--value-neg-c)', color: 'var(--value-neg-c)', background: 'rgba(183,110,121,0.06)' }}
         >
           Error loading properties. Please refresh the page.
         </div>

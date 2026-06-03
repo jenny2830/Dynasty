@@ -24,7 +24,7 @@ export default async function EditTransactionPage({
     .from('landlords')
     .select('id')
     .eq('auth_user_id', user.id)
-    .single()
+    .maybeSingle()
   if (!landlord) return null
 
   const [txResult, propertiesResult] = await Promise.all([

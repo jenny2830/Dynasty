@@ -41,7 +41,7 @@ async function getLandlordId() {
     .from('landlords')
     .select('id, plan')
     .eq('auth_user_id', user.id)
-    .single()
+    .maybeSingle()
 
   if (!landlord) throw new Error('Landlord profile not found')
   return { supabase, landlordId: landlord.id, plan: (landlord.plan ?? 'free') as PlanId }

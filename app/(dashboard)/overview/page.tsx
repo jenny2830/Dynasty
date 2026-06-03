@@ -44,7 +44,7 @@ export default async function OverviewPage() {
     .from('landlords')
     .select('id, full_name, plan')
     .eq('auth_user_id', user.id)
-    .single()
+    .maybeSingle()
 
   if (!landlord) {
     return (

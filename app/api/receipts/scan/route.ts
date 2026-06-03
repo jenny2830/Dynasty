@@ -104,7 +104,7 @@ export async function POST(request: NextRequest) {
     .from('landlords')
     .select('id')
     .eq('auth_user_id', user.id)
-    .single()
+    .maybeSingle()
 
   if (!landlord) {
     return NextResponse.json({ error: 'Landlord profile not found' }, { status: 404 })

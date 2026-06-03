@@ -22,7 +22,7 @@ export default async function NewTransactionPage({
     .from('landlords')
     .select('id')
     .eq('auth_user_id', user.id)
-    .single()
+    .maybeSingle()
 
   const { data: properties } = landlord
     ? await supabase

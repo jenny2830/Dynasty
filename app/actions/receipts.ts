@@ -26,7 +26,7 @@ export async function confirmReceipt(
     .from('landlords')
     .select('id')
     .eq('auth_user_id', user.id)
-    .single()
+    .maybeSingle()
 
   if (!landlord) return { error: 'Landlord profile not found' }
 
@@ -87,7 +87,7 @@ export async function rejectReceipt(receiptId: string): Promise<{ error?: string
     .from('landlords')
     .select('id')
     .eq('auth_user_id', user.id)
-    .single()
+    .maybeSingle()
   if (!landlord) return { error: 'Profile not found' }
 
   const { error } = await supabase

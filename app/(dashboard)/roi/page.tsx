@@ -15,7 +15,7 @@ export default async function ROIPage() {
     .from('landlords')
     .select('id, plan, free_trial_expired')
     .eq('auth_user_id', user.id)
-    .single()
+    .maybeSingle()
 
   const plan = (landlord?.plan ?? 'free') as PlanId
   const trialExpired = landlord?.free_trial_expired ?? false
