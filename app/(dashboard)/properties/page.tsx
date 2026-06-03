@@ -8,6 +8,7 @@ import { formatCurrency } from '@/lib/utils'
 import { PLAN_FEATURES, hasFeatureAccess } from '@/lib/plans'
 import type { PlanId } from '@/lib/plans'
 
+export const dynamic = 'force-dynamic'
 export const metadata = { title: 'Properties' }
 
 const statusColors = {
@@ -21,24 +22,33 @@ export default async function PropertiesPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
 
-  const { data: landlord } = await supabase
+  const { data: landlord, error: landlordError } = await supabase
     .from('landlords')
     .select('id, plan, free_trial_expired')
     .eq('auth_user_id', user.id)
-    .single()
+    .maybeSingle()
+
+  if (landlordError) {
+    console.error('[PropertiesPage] landlord fetch error:', landlordError)
+  }
 
   const plan = (landlord?.plan ?? 'free') as PlanId
   const trialExpired = landlord?.free_trial_expired ?? false
 
-  const { data: properties } = landlord
+  const { data: properties, error: propertiesError } = landlord
     ? await supabase
         .from('properties')
         .select('*')
         .eq('landlord_id', landlord.id)
         .order('created_at', { ascending: false })
-    : { data: [] }
+    : { data: [], error: null }
 
-  const count = properties?.length ?? 0
+  if (propertiesError) {
+    console.error('[PropertiesPage] properties fetch error:', propertiesError)
+  }
+
+  const propertiesList = properties ?? []
+  const count = propertiesList.length
   const maxProperties = PLAN_FEATURES[plan].maxProperties
   const canAdd = hasFeatureAccess(plan, 'transactions', trialExpired) &&
     (plan === 'free' ? !trialExpired && count < maxProperties : count < maxProperties)
@@ -77,7 +87,16 @@ export default async function PropertiesPage() {
         )}
       </PageHeader>
 
-      {!properties?.length ? (
+      {propertiesError && (
+        <div
+          className="rounded-[2px] border px-5 py-3 font-sans text-[12px] tracking-[0.06em]"
+          style={{ borderColor: 'var(--value-negative-c)', color: 'var(--value-negative-c)', background: 'rgba(183,110,121,0.06)' }}
+        >
+          Error loading properties. Please refresh the page.
+        </div>
+      )}
+
+      {!propertiesList.length ? (
         <div
           className="flex min-h-[50vh] flex-col items-center justify-center rounded-[2px] border border-dashed px-6 py-16 text-center"
           style={{
@@ -108,7 +127,7 @@ export default async function PropertiesPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
-          {properties.map((p) => (
+          {propertiesList.map((p) => (
             <Link
               key={p.id}
               href={`/properties/${p.id}`}

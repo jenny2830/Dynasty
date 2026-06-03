@@ -103,7 +103,7 @@ export const THEMES: Record<ThemeId, ThemeColors> = {
     navActive: gold,
     navActiveBg: 'rgba(201,168,76,0.07)',
     navActiveBorder: gold,
-    sectionLabel: '#6B6B65',
+    sectionLabel: '#8A8880',
     tagline: 'rgba(201,168,76,0.45)',
 
     cardBg: 'linear-gradient(160deg, #141414 0%, #1A1815 100%)',
@@ -245,7 +245,7 @@ export const THEMES: Record<ThemeId, ThemeColors> = {
     navActive: rose,
     navActiveBg: 'rgba(183,110,121,0.07)',
     navActiveBorder: rose,
-    sectionLabel: '#5C5055',
+    sectionLabel: '#82747A',
     tagline: 'rgba(183,110,121,0.45)',
 
     cardBg: 'linear-gradient(160deg, #141212 0%, #1A1618 100%)',
