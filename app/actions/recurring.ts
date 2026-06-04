@@ -160,11 +160,16 @@ export async function markAsPaid(id: string): Promise<{ error?: string }> {
 
   if (fetchError || !payment) return { error: 'Payment not found' }
 
+  const today = format(new Date(), 'yyyy-MM-dd')
   const nextDue = advanceDate(payment.next_due_date, payment.frequency)
 
   const { error: updateError } = await supabase
     .from('recurring_payments')
-    .update({ next_due_date: nextDue })
+    .update({
+      next_due_date: nextDue,
+      last_paid_date: today,
+      last_paid_amount: payment.amount,
+    })
     .eq('id', id)
 
   if (updateError) return { error: updateError.message }

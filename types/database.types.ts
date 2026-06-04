@@ -472,6 +472,8 @@ export type Database = {
           is_active: boolean
           notes: string | null
           created_at: string
+          last_paid_date: string | null
+          last_paid_amount: number | null
         }
         Insert: {
           id?: string
@@ -487,6 +489,8 @@ export type Database = {
           is_active?: boolean
           notes?: string | null
           created_at?: string
+          last_paid_date?: string | null
+          last_paid_amount?: number | null
         }
         Update: {
           id?: string
@@ -502,6 +506,8 @@ export type Database = {
           is_active?: boolean
           notes?: string | null
           created_at?: string
+          last_paid_date?: string | null
+          last_paid_amount?: number | null
         }
         Relationships: [
           {

@@ -41,8 +41,21 @@ interface AppThemeProviderProps {
 }
 
 export function AppThemeProvider({ children, initialThemeId }: AppThemeProviderProps) {
-  const [themeId, setThemeIdState] = useState<ThemeId>(initialThemeId ?? 'dark-gold')
-  const [textThickness, setTextThicknessState] = useState<TextThickness>('light')
+  // Read from localStorage first (instant on refresh), fall back to server-provided value
+  const [themeId, setThemeIdState] = useState<ThemeId>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('dynasty-theme') as ThemeId
+      if (saved && THEMES[saved]) return saved
+    }
+    return initialThemeId ?? 'dark-gold'
+  })
+  const [textThickness, setTextThicknessState] = useState<TextThickness>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('dynasty-text-thickness') as TextThickness
+      if (saved === 'light' || saved === 'regular' || saved === 'bold') return saved
+    }
+    return 'light'
+  })
   const supabase = createClient()
 
   useEffect(() => {
@@ -57,9 +70,11 @@ export function AppThemeProvider({ children, initialThemeId }: AppThemeProviderP
           .maybeSingle() as any) as { data: { theme_preference?: string; text_thickness?: string } | null }
         if (data?.theme_preference && THEMES[data.theme_preference as ThemeId]) {
           setThemeIdState(data.theme_preference as ThemeId)
+          localStorage.setItem('dynasty-theme', data.theme_preference)
         }
         if (data?.text_thickness === 'light' || data?.text_thickness === 'regular' || data?.text_thickness === 'bold') {
           setTextThicknessState(data.text_thickness)
+          localStorage.setItem('dynasty-text-thickness', data.text_thickness)
         }
       }
     }
@@ -69,6 +84,10 @@ export function AppThemeProvider({ children, initialThemeId }: AppThemeProviderP
 
   const setThemeId = async (id: ThemeId) => {
     setThemeIdState(id)
+    // Persist locally for instant load on next visit
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('dynasty-theme', id)
+    }
     const { data: { user } } = await supabase.auth.getUser()
     if (user) {
       await supabase
@@ -80,6 +99,9 @@ export function AppThemeProvider({ children, initialThemeId }: AppThemeProviderP
 
   const setTextThickness = async (t: TextThickness) => {
     setTextThicknessState(t)
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('dynasty-text-thickness', t)
+    }
     const { data: { user } } = await supabase.auth.getUser()
     if (user) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
