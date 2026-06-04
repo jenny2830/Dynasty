@@ -10,6 +10,7 @@ import { PageHeader } from '@/components/ui/page-header'
 import { Section, SectionHeader } from '@/components/ui/section'
 import { subMonths, format, startOfMonth, endOfMonth } from 'date-fns'
 
+export const dynamic = 'force-dynamic'
 export const metadata = { title: 'Overview' }
 
 function buildChartData(

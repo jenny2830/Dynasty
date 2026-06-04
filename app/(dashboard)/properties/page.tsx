@@ -30,6 +30,23 @@ export default async function PropertiesPage() {
 
   if (landlordError) {
     console.error('[PropertiesPage] landlord fetch error:', landlordError)
+    return (
+      <div className="flex min-h-[60vh] flex-col items-center justify-center text-center">
+        <p className="font-sans text-[12px] uppercase tracking-[0.3em]" style={{ color: 'var(--value-neg-c)' }}>
+          Failed to load your account. Please refresh the page.
+        </p>
+      </div>
+    )
+  }
+
+  if (!landlord) {
+    return (
+      <div className="flex min-h-[60vh] flex-col items-center justify-center text-center">
+        <p className="font-sans text-[12px] uppercase tracking-[0.3em]" style={{ color: 'var(--text-muted-c)' }}>
+          Landlord profile not found. Please complete your profile setup.
+        </p>
+      </div>
+    )
   }
 
   const plan = (landlord?.plan ?? 'free') as PlanId
