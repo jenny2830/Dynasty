@@ -17,6 +17,7 @@ function borderColor(b: string) {
 
 function ThemedInner({ sidebar, children }: { sidebar: React.ReactNode; children: React.ReactNode }) {
   const { theme, textThickness, fontWeights, themeId } = useAppTheme()
+  const mode: 'light' | 'dark' = themeId.startsWith('light') ? 'light' : 'dark'
 
   const cssVars: React.CSSProperties = {
     /* ── Card / Section ── */
@@ -59,6 +60,14 @@ function ThemedInner({ sidebar, children }: { sidebar: React.ReactNode; children
     '--input-bg': theme.inputBg,
     '--input-border-color': theme.inputBorder,
 
+    /* ── Menus / dropdowns / popovers (Radix portals) ── */
+    '--menu-bg': theme.chartTooltipBg,
+    '--menu-border': theme.chartTooltipBorder,
+    '--menu-item-text': theme.textPrimary,
+    '--menu-item-hover-bg': theme.tableRowHover,
+    '--menu-item-active': theme.accent,
+    '--menu-shadow': theme.cardShadow,
+
     /* ── Text colors ── */
     '--text-primary-c': theme.textPrimary,
     '--text-secondary-c': theme.textSecondary,
@@ -100,6 +109,9 @@ function ThemedInner({ sidebar, children }: { sidebar: React.ReactNode; children
 
   // Sync all CSS variables to <html> so Radix portals (dropdowns, dialogs)
   // rendered at document.body always inherit the active theme.
+  // Also drive the document background + color-scheme so there is no dark
+  // flash on refresh for light themes and native controls (date pickers,
+  // scrollbars) match the active palette.
   useEffect(() => {
     const root = document.documentElement
     const entries = Object.entries(cssVars) as [string, string | number][]
@@ -108,6 +120,9 @@ function ThemedInner({ sidebar, children }: { sidebar: React.ReactNode; children
         root.style.setProperty(key, String(value))
       }
     })
+    root.style.colorScheme = mode
+    root.style.backgroundColor = theme.pageBg
+    document.body.style.backgroundColor = theme.pageBg
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [themeId, textThickness])
 
@@ -115,11 +130,13 @@ function ThemedInner({ sidebar, children }: { sidebar: React.ReactNode; children
     <div
       className="dashboard-landscape-shell"
       data-thickness={textThickness}
+      data-mode={mode}
       style={{
         display: 'flex',
         minHeight: '100vh',
         width: '100%',
         backgroundColor: theme.sidebarBg,
+        colorScheme: mode,
         transition: 'background-color 0.3s ease',
         ...cssVars,
       }}

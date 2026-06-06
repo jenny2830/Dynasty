@@ -44,10 +44,11 @@ export default async function RecurringPage() {
     const due = new Date(p.next_due_date)
     due.setHours(0, 0, 0, 0)
     const diffDays = Math.floor((due.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
-    // Check not already paid this period
+    // Skip if already paid for this due date (paid record covers the cycle)
     if (p.last_paid_date) {
       const lp = new Date(p.last_paid_date)
-      if (lp.getMonth() === due.getMonth() && lp.getFullYear() === due.getFullYear()) {
+      lp.setHours(0, 0, 0, 0)
+      if (lp >= due) {
         return false
       }
     }

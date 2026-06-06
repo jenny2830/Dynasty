@@ -5,7 +5,7 @@ import { Sidebar } from '@/components/dashboard/Sidebar'
 import { PreferencesInit } from '@/components/dashboard/PreferencesInit'
 import { DashboardClientWrapper } from '@/components/dashboard/DashboardClientWrapper'
 import { DashboardThemeShell } from '@/components/dashboard/DashboardThemeShell'
-import { toThemeId } from '@/lib/themes'
+import { toThemeId, THEMES } from '@/lib/themes'
 import type { PlanId } from '@/lib/plans'
 import { FREE_TRIAL_MAX_SESSIONS } from '@/lib/plans'
 
@@ -36,9 +36,30 @@ export default async function DashboardLayout({
   const sessionsUsed = landlord?.sessions_used ?? 0
   const trialExpired = landlord?.free_trial_expired ?? false
 
+  const initialThemeId = toThemeId(landlord?.theme_preference)
+
+  // Build a { themeId: pageBg } map so the pre-paint script can resolve the
+  // correct background instantly (prefers the locally-saved theme, falls back
+  // to the server value). This prevents a dark/black flash on refresh when a
+  // light theme is active.
+  const pageBgMap = Object.fromEntries(
+    (Object.keys(THEMES) as (keyof typeof THEMES)[]).map((id) => [id, THEMES[id].pageBg])
+  )
+  const themeBootstrap = `(() => {try {
+    var map = ${JSON.stringify(pageBgMap)};
+    var saved = localStorage.getItem('dynasty-theme');
+    var id = (saved && map[saved]) ? saved : ${JSON.stringify(initialThemeId)};
+    var bg = map[id];
+    if (bg) {
+      document.documentElement.style.backgroundColor = bg;
+      document.documentElement.style.colorScheme = id.indexOf('light') === 0 ? 'light' : 'dark';
+      if (document.body) document.body.style.backgroundColor = bg;
+    }
+  } catch (e) {} })();`
+
   return (
     <DashboardThemeShell
-      initialThemeId={toThemeId(landlord?.theme_preference)}
+      initialThemeId={initialThemeId}
       sidebar={
         <>
           <PreferencesInit />
@@ -46,6 +67,7 @@ export default async function DashboardLayout({
         </>
       }
     >
+      <script dangerouslySetInnerHTML={{ __html: themeBootstrap }} />
       <div style={{ position: 'relative', zIndex: 1 }}>
         <DashboardClientWrapper
           landlordId={landlord?.id ?? ''}

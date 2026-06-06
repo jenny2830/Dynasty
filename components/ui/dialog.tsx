@@ -53,10 +53,11 @@ const DialogContent = React.forwardRef<
         left: '50%',
         top: '50%',
         transform: 'translate(-50%, -50%)',
-        background: 'radial-gradient(ellipse 100% 70% at 50% 0%, rgba(201,168,76,0.04) 0%, transparent 60%), linear-gradient(160deg, #141414 0%, #1A1815 100%)',
-        border: '1px solid rgba(201,168,76,0.15)',
+        background: 'var(--menu-bg, linear-gradient(160deg, #141414 0%, #1A1815 100%))',
+        border: '1px solid var(--menu-border, rgba(201,168,76,0.15))',
         borderRadius: '2px',
-        boxShadow: '0 32px 80px rgba(0,0,0,0.85), 0 0 0 1px rgba(201,168,76,0.08)',
+        boxShadow: 'var(--menu-shadow, 0 32px 80px rgba(0,0,0,0.85))',
+        color: 'var(--menu-item-text, var(--text-primary-c, #FAF7F2))',
         ...style,
       }}
       {...props}

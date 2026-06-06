@@ -162,15 +162,16 @@ export async function markAsPaid(id: string): Promise<{ error?: string }> {
 
   const today = format(new Date(), 'yyyy-MM-dd')
 
-  // Only record that this period has been paid — do NOT advance next_due_date.
-  // The due date should stay as-is so the payment keeps its list position and
-  // the paid-this-period check in getReminderStatus can compare against it.
-  // next_due_date will naturally become "overdue" in the next cycle, prompting
-  // the user to mark it paid again.
+  // Record the paid state against the CURRENT due date — not "today". This ties
+  // the paid flag to a specific billing cycle so that simply editing the due
+  // date can never make a payment look paid. A payment counts as paid only when
+  // last_paid_date covers its current next_due_date; changing the date to a new
+  // (unpaid) cycle automatically clears the paid status. Paid is set explicitly
+  // here via the "Mark Paid" action — never as a side effect of date changes.
   const { error: updateError } = await supabase
     .from('recurring_payments')
     .update({
-      last_paid_date: today,
+      last_paid_date: payment.next_due_date,
       last_paid_amount: payment.amount,
     })
     .eq('id', id)
@@ -197,6 +198,33 @@ export async function markAsPaid(id: string): Promise<{ error?: string }> {
     .update({ status: 'paid' })
     .eq('recurring_payment_id', id)
     .eq('status', 'pending')
+
+  revalidatePath('/recurring')
+  revalidatePath('/overview')
+  return {}
+}
+
+export async function markAsUnpaid(id: string): Promise<{ error?: string }> {
+  let supabase: Awaited<ReturnType<typeof createClient>>
+  let landlordId: string
+  try {
+    ;({ supabase, landlordId } = await getLandlordId())
+  } catch (e) {
+    return { error: (e as Error).message }
+  }
+
+  // Clear the paid record for this payment so it returns to its due/scheduled
+  // state. Lets users undo an accidental "Mark Paid".
+  const { error: updateError } = await supabase
+    .from('recurring_payments')
+    .update({
+      last_paid_date: null,
+      last_paid_amount: null,
+    })
+    .eq('id', id)
+    .eq('landlord_id', landlordId)
+
+  if (updateError) return { error: updateError.message }
 
   revalidatePath('/recurring')
   revalidatePath('/overview')

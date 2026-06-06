@@ -45,7 +45,7 @@ const SelectScrollUpButton = React.forwardRef<
   <SelectPrimitive.ScrollUpButton
     ref={ref}
     className={cn('flex cursor-default items-center justify-center py-1.5', className)}
-    style={{ color: 'var(--accent-c, #C9A84C)', opacity: 0.7 }}
+    style={{ color: 'var(--menu-item-active, var(--accent-c, #C9A84C))', opacity: 0.7 }}
     {...props}
   >
     <ChevronUp className="h-3.5 w-3.5" strokeWidth={1.5} />
@@ -60,7 +60,7 @@ const SelectScrollDownButton = React.forwardRef<
   <SelectPrimitive.ScrollDownButton
     ref={ref}
     className={cn('flex cursor-default items-center justify-center py-1.5', className)}
-    style={{ color: 'var(--accent-c, #C9A84C)', opacity: 0.7 }}
+    style={{ color: 'var(--menu-item-active, var(--accent-c, #C9A84C))', opacity: 0.7 }}
     {...props}
   >
     <ChevronDown className="h-3.5 w-3.5" strokeWidth={1.5} />
@@ -88,10 +88,10 @@ const SelectContent = React.forwardRef<
         className
       )}
       style={{
-        background: 'linear-gradient(160deg, #161616 0%, #1a1815 100%)',
-        border: '1px solid rgba(201,168,76,0.18)',
-        boxShadow: '0 12px 40px rgba(0,0,0,0.7), 0 0 0 1px rgba(201,168,76,0.06)',
-        color: 'var(--text-primary-c, #FAF7F2)',
+        background: 'var(--menu-bg, #161616)',
+        border: '1px solid var(--menu-border, rgba(201,168,76,0.18))',
+        boxShadow: 'var(--menu-shadow, 0 12px 40px rgba(0,0,0,0.7))',
+        color: 'var(--menu-item-text, var(--text-primary-c, #FAF7F2))',
         ...style,
       }}
       position={position}
@@ -139,10 +139,10 @@ const SelectItem = React.forwardRef<
       'relative flex cursor-default select-none items-center',
       'mx-1.5 w-[calc(100%-12px)] rounded-[1px] py-2.5 pl-8 pr-4',
       'font-sans font-light text-[13px] tracking-[0.01em] outline-none',
-      'text-[#FAF7F2]',
+      'text-[var(--menu-item-text,#FAF7F2)]',
       'transition-colors duration-150',
-      'data-[highlighted]:bg-[rgba(201,168,76,0.08)] data-[highlighted]:text-[#C9A84C]',
-      'data-[state=checked]:text-[#C9A84C]',
+      'data-[highlighted]:bg-[var(--menu-item-hover-bg,rgba(201,168,76,0.08))] data-[highlighted]:text-[var(--menu-item-active,#C9A84C)]',
+      'data-[state=checked]:text-[var(--menu-item-active,#C9A84C)]',
       'data-[disabled]:pointer-events-none data-[disabled]:opacity-40',
       className
     )}
@@ -150,7 +150,7 @@ const SelectItem = React.forwardRef<
   >
     <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
       <SelectPrimitive.ItemIndicator>
-        <Check className="h-3.5 w-3.5 text-[#C9A84C]" strokeWidth={1.5} />
+        <Check className="h-3.5 w-3.5 text-[var(--menu-item-active,#C9A84C)]" strokeWidth={1.5} />
       </SelectPrimitive.ItemIndicator>
     </span>
     <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
@@ -165,7 +165,7 @@ const SelectSeparator = React.forwardRef<
   <SelectPrimitive.Separator
     ref={ref}
     className={cn('mx-3 my-1.5 h-px', className)}
-    style={{ backgroundColor: 'rgba(201,168,76,0.12)' }}
+    style={{ backgroundColor: 'var(--menu-border, rgba(201,168,76,0.12))' }}
     {...props}
   />
 ))

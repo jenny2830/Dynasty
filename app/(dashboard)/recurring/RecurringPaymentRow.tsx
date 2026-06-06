@@ -1,10 +1,10 @@
 'use client'
 
 import { useState, useTransition, useEffect, useRef } from 'react'
-import { Bell, CheckCircle2, MoreHorizontal, Power, Trash2, Edit, Clock, AlertTriangle } from 'lucide-react'
+import { Bell, CheckCircle2, MoreHorizontal, Power, Trash2, Edit, Clock, AlertTriangle, RotateCcw } from 'lucide-react'
 import Link from 'next/link'
 import { formatCurrency, formatDate } from '@/lib/utils'
-import { markAsPaid, toggleRecurringActive, deleteRecurringPayment } from '@/app/actions/recurring'
+import { markAsPaid, markAsUnpaid, toggleRecurringActive, deleteRecurringPayment } from '@/app/actions/recurring'
 
 interface RecurringPayment {
   id: string
@@ -37,16 +37,14 @@ function getReminderStatus(payment: RecurringPayment): ReminderStatus {
   const due = new Date(payment.next_due_date)
   due.setHours(0, 0, 0, 0)
 
-  // Paid this period: last_paid_date is on/after the due date, OR in the same
-  // month/year as the due date (handles early payment before the due day).
+  // Paid only when the recorded payment covers the CURRENT due date. The
+  // "Mark Paid" action stores last_paid_date as the due date it settled, so
+  // editing the due date to a new (unpaid) cycle clears the paid status and
+  // changing the date can never make a payment look paid on its own.
   if (payment.last_paid_date) {
     const lastPaid = new Date(payment.last_paid_date)
     lastPaid.setHours(0, 0, 0, 0)
-    const paidThisPeriod =
-      lastPaid >= due ||
-      (lastPaid.getMonth() === due.getMonth() &&
-        lastPaid.getFullYear() === due.getFullYear())
-    if (paidThisPeriod) return 'paid'
+    if (lastPaid >= due) return 'paid'
   }
 
   const diffDays = Math.floor((due.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
@@ -168,6 +166,13 @@ export function RecurringPaymentRow({ payment }: { payment: RecurringPayment }) 
   function handleMarkPaid() {
     startTransition(async () => {
       await markAsPaid(payment.id)
+      setShowMenu(false)
+    })
+  }
+
+  function handleMarkUnpaid() {
+    startTransition(async () => {
+      await markAsUnpaid(payment.id)
       setShowMenu(false)
     })
   }
@@ -331,9 +336,13 @@ export function RecurringPaymentRow({ payment }: { payment: RecurringPayment }) 
                   overflow: 'hidden',
                 }}
               >
-                {!isPaid && (
+                {!isPaid ? (
                   <button onClick={handleMarkPaid} disabled={isPending} style={MENU_ITEM_STYLE}>
                     <CheckCircle2 size={13} strokeWidth={1.2} /> Mark as Paid
+                  </button>
+                ) : (
+                  <button onClick={handleMarkUnpaid} disabled={isPending} style={MENU_ITEM_STYLE}>
+                    <RotateCcw size={13} strokeWidth={1.2} /> Mark as Unpaid
                   </button>
                 )}
                 <Link
