@@ -161,12 +161,15 @@ export async function markAsPaid(id: string): Promise<{ error?: string }> {
   if (fetchError || !payment) return { error: 'Payment not found' }
 
   const today = format(new Date(), 'yyyy-MM-dd')
-  const nextDue = advanceDate(payment.next_due_date, payment.frequency)
 
+  // Only record that this period has been paid — do NOT advance next_due_date.
+  // The due date should stay as-is so the payment keeps its list position and
+  // the paid-this-period check in getReminderStatus can compare against it.
+  // next_due_date will naturally become "overdue" in the next cycle, prompting
+  // the user to mark it paid again.
   const { error: updateError } = await supabase
     .from('recurring_payments')
     .update({
-      next_due_date: nextDue,
       last_paid_date: today,
       last_paid_amount: payment.amount,
     })
@@ -182,7 +185,7 @@ export async function markAsPaid(id: string): Promise<{ error?: string }> {
       type: 'expense',
       category: payment.category,
       amount: payment.amount,
-      transaction_date: payment.next_due_date,
+      transaction_date: today,
       description: payment.name,
       source: 'recurring',
     })

@@ -17,7 +17,7 @@ const DialogOverlay = React.forwardRef<
   <DialogPrimitive.Overlay
     ref={ref}
     className={cn(
-      'fixed inset-0 z-50 bg-black/85 backdrop-blur-[4px]',
+      'fixed inset-0 z-[199] bg-black/85 backdrop-blur-[4px]',
       'data-[state=open]:animate-in data-[state=closed]:animate-out',
       'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
       className
@@ -30,16 +30,17 @@ DialogOverlay.displayName = DialogPrimitive.Overlay.displayName
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
->(({ className, children, ...props }, ref) => (
+>(({ className, children, style, ...props }, ref) => (
   <DialogPortal>
     <DialogOverlay />
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        'fixed left-[50%] top-[50%] z-50 grid w-full max-w-[560px]',
-        'translate-x-[-50%] translate-y-[-50%] gap-4',
-        'lux-card deco-corners-4',
-        'p-9 shadow-[var(--shadow-modal)]',
+        'z-[200] grid w-full max-w-[560px]',
+        'gap-4',
+        'deco-corners-4',
+        'max-h-[90vh] overflow-y-auto',
+        'p-9',
         'data-[state=open]:animate-in data-[state=closed]:animate-out',
         'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
         'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
@@ -47,6 +48,17 @@ const DialogContent = React.forwardRef<
         'data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]',
         className
       )}
+      style={{
+        position: 'fixed',
+        left: '50%',
+        top: '50%',
+        transform: 'translate(-50%, -50%)',
+        background: 'radial-gradient(ellipse 100% 70% at 50% 0%, rgba(201,168,76,0.04) 0%, transparent 60%), linear-gradient(160deg, #141414 0%, #1A1815 100%)',
+        border: '1px solid rgba(201,168,76,0.15)',
+        borderRadius: '2px',
+        boxShadow: '0 32px 80px rgba(0,0,0,0.85), 0 0 0 1px rgba(201,168,76,0.08)',
+        ...style,
+      }}
       {...props}
     >
       {children}

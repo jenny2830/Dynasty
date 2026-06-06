@@ -41,11 +41,17 @@ interface AppThemeProviderProps {
 }
 
 export function AppThemeProvider({ children, initialThemeId }: AppThemeProviderProps) {
-  // Read from localStorage first (instant on refresh), fall back to server-provided value
+  // Read from localStorage first (instant on refresh), fall back to server-provided value.
+  // Always write the server-provided initialThemeId to localStorage so that even after a
+  // hard refresh (before the Supabase effect fires) the correct theme is applied.
   const [themeId, setThemeIdState] = useState<ThemeId>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('dynasty-theme') as ThemeId
       if (saved && THEMES[saved]) return saved
+      // No local value yet — seed from server and persist immediately
+      if (initialThemeId) {
+        localStorage.setItem('dynasty-theme', initialThemeId)
+      }
     }
     return initialThemeId ?? 'dark-gold'
   })

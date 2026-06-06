@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition, useEffect, useRef } from 'react'
-import { CheckCircle2, MoreHorizontal, Power, Trash2, Edit } from 'lucide-react'
+import { Bell, CheckCircle2, MoreHorizontal, Power, Trash2, Edit, Clock, AlertTriangle } from 'lucide-react'
 import Link from 'next/link'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import { markAsPaid, toggleRecurringActive, deleteRecurringPayment } from '@/app/actions/recurring'
@@ -18,6 +18,7 @@ interface RecurringPayment {
   is_active: boolean
   auto_log_transaction: boolean
   last_paid_date?: string | null
+  reminder_days_before?: number | null
   properties: { name: string } | null
 }
 
@@ -28,48 +29,76 @@ const frequencyLabels: Record<string, string> = {
   annually: 'Annual',
 }
 
-type PaymentStatus = 'scheduled' | 'pending' | 'paid'
+type ReminderStatus = 'paid' | 'overdue' | 'due-today' | 'upcoming' | 'scheduled'
 
-function getPaymentStatus(payment: RecurringPayment): PaymentStatus {
+function getReminderStatus(payment: RecurringPayment): ReminderStatus {
   const today = new Date()
   today.setHours(0, 0, 0, 0)
   const due = new Date(payment.next_due_date)
   due.setHours(0, 0, 0, 0)
 
-  // Check if paid this period — last_paid_date must be in the same month/year as the due date
+  // Paid this period: last_paid_date is on/after the due date, OR in the same
+  // month/year as the due date (handles early payment before the due day).
   if (payment.last_paid_date) {
     const lastPaid = new Date(payment.last_paid_date)
-    if (
-      lastPaid.getMonth() === due.getMonth() &&
-      lastPaid.getFullYear() === due.getFullYear()
-    ) {
-      return 'paid'
-    }
+    lastPaid.setHours(0, 0, 0, 0)
+    const paidThisPeriod =
+      lastPaid >= due ||
+      (lastPaid.getMonth() === due.getMonth() &&
+        lastPaid.getFullYear() === due.getFullYear())
+    if (paidThisPeriod) return 'paid'
   }
 
   const diffDays = Math.floor((due.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
-  if (diffDays > 0) return 'scheduled'
-  return 'pending' // due today or overdue
+  const reminderDays = payment.reminder_days_before ?? 5
+
+  if (diffDays < 0) return 'overdue'
+  if (diffDays === 0) return 'due-today'
+  if (diffDays <= reminderDays) return 'upcoming'
+  return 'scheduled'
 }
 
-const STATUS_CONFIG: Record<PaymentStatus, { label: string; bg: string; color: string; border: string }> = {
-  scheduled: {
-    label: 'Scheduled',
-    bg: 'rgba(201,168,76,0.08)',
-    color: '#C9A84C',
-    border: '1px solid rgba(201,168,76,0.25)',
-  },
-  pending: {
-    label: 'Pending',
-    bg: 'rgba(183,110,121,0.10)',
-    color: '#B76E79',
-    border: '1px solid rgba(183,110,121,0.30)',
-  },
+const STATUS_CONFIG: Record<ReminderStatus, {
+  label: string
+  bg: string
+  color: string
+  border: string
+  icon: React.ElementType
+}> = {
   paid: {
     label: 'Paid',
     bg: 'rgba(34,197,94,0.08)',
     color: '#16a34a',
     border: '1px solid rgba(34,197,94,0.25)',
+    icon: CheckCircle2,
+  },
+  overdue: {
+    label: 'Overdue',
+    bg: 'rgba(183,110,121,0.12)',
+    color: '#B76E79',
+    border: '1px solid rgba(183,110,121,0.35)',
+    icon: AlertTriangle,
+  },
+  'due-today': {
+    label: 'Due Today',
+    bg: 'rgba(251,146,60,0.10)',
+    color: '#ea580c',
+    border: '1px solid rgba(251,146,60,0.35)',
+    icon: Bell,
+  },
+  upcoming: {
+    label: 'Reminder',
+    bg: 'rgba(201,168,76,0.10)',
+    color: '#C9A84C',
+    border: '1px solid rgba(201,168,76,0.30)',
+    icon: Bell,
+  },
+  scheduled: {
+    label: 'Scheduled',
+    bg: 'rgba(201,168,76,0.06)',
+    color: 'var(--text-muted-c, #8A8A82)',
+    border: '1px solid rgba(201,168,76,0.15)',
+    icon: Clock,
   },
 }
 
@@ -81,7 +110,9 @@ const BADGE_STYLE: React.CSSProperties = {
   textTransform: 'uppercase',
   padding: '3px 10px',
   borderRadius: '1px',
-  display: 'inline-block',
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: '4px',
 }
 
 const MENU_ITEM_STYLE: React.CSSProperties = {
@@ -98,7 +129,7 @@ const MENU_ITEM_STYLE: React.CSSProperties = {
   background: 'transparent',
   border: 'none',
   cursor: 'pointer',
-  color: 'var(--text-secondary-c, #C8C4BC)',
+  color: 'var(--text-secondary-c)',
   textDecoration: 'none',
 }
 
@@ -108,15 +139,19 @@ export function RecurringPaymentRow({ payment }: { payment: RecurringPayment }) 
   const [menuPos, setMenuPos] = useState({ top: 0, right: 0 })
   const triggerRef = useRef<HTMLButtonElement>(null)
 
-  const status = getPaymentStatus(payment)
+  const status = getReminderStatus(payment)
   const statusConfig = STATUS_CONFIG[status]
+  const StatusIcon = statusConfig.icon
+  const isPaid = status === 'paid'
+  const needsAttention = status === 'overdue' || status === 'due-today' || status === 'upcoming'
 
   function handleMenuToggle(e: React.MouseEvent) {
     e.stopPropagation()
     if (!showMenu && triggerRef.current) {
       const rect = triggerRef.current.getBoundingClientRect()
+      // position: fixed coordinates are viewport-relative — do NOT add scrollY
       setMenuPos({
-        top: rect.bottom + window.scrollY + 4,
+        top: rect.bottom + 4,
         right: window.innerWidth - rect.right,
       })
     }
@@ -145,57 +180,101 @@ export function RecurringPaymentRow({ payment }: { payment: RecurringPayment }) 
   }
 
   function handleDelete() {
-    if (!confirm('Delete this recurring payment?')) return
+    if (!confirm('Delete this recurring payment? This cannot be undone.')) return
     startTransition(async () => {
       await deleteRecurringPayment(payment.id)
     })
   }
 
   return (
-    <div className="flex items-center gap-4 px-7 py-4 transition-colors hover:bg-[rgba(201,168,76,0.025)]">
+    <div
+      className="flex items-center gap-4 px-7 py-4 transition-colors"
+      style={{
+        background: needsAttention ? 'rgba(201,168,76,0.02)' : 'transparent',
+        borderLeft: needsAttention ? '2px solid rgba(201,168,76,0.3)' : '2px solid transparent',
+      }}
+    >
+      {/* Bell icon for reminder emphasis */}
+      <div style={{
+        flexShrink: 0,
+        width: '32px',
+        height: '32px',
+        borderRadius: '1px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: statusConfig.bg,
+        border: statusConfig.border,
+        color: statusConfig.color,
+        opacity: isPaid ? 0.6 : 1,
+      }}>
+        <StatusIcon size={14} strokeWidth={1.4} />
+      </div>
+
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="font-sans text-[13px] text-dynasty-warm-white">{payment.name}</span>
-          <span style={{ ...BADGE_STYLE, background: 'rgba(201,168,76,0.08)', color: 'var(--text-muted-c, #9A9690)', border: '1px solid rgba(201,168,76,0.15)' }}>
+          <span
+            className="font-sans text-[13px]"
+            style={{ color: 'var(--text-primary-c)', opacity: isPaid ? 0.7 : 1 }}
+          >
+            {payment.name}
+          </span>
+          <span style={{
+            ...BADGE_STYLE,
+            background: 'rgba(201,168,76,0.06)',
+            color: 'var(--text-muted-c)',
+            border: '1px solid rgba(201,168,76,0.12)',
+          }}>
             {payment.category}
           </span>
           {payment.auto_log_transaction && (
-            <span style={{ ...BADGE_STYLE, background: 'rgba(201,168,76,0.12)', color: '#C9A84C', border: '1px solid rgba(201,168,76,0.25)' }}>
+            <span style={{
+              ...BADGE_STYLE,
+              background: 'rgba(201,168,76,0.10)',
+              color: '#C9A84C',
+              border: '1px solid rgba(201,168,76,0.22)',
+            }}>
               Auto-log
             </span>
           )}
         </div>
-        <div className="mt-1 flex items-center gap-3 font-sans text-[11px] font-light text-dynasty-gray-500">
+        <div className="mt-1 flex items-center gap-3 font-sans text-[11px] font-light" style={{ color: 'var(--text-muted-c)' }}>
           <span>{(payment.properties as { name: string } | null)?.name ?? '—'}</span>
-          <span className="text-[rgba(201,168,76,0.4)]">·</span>
+          <span style={{ color: 'rgba(201,168,76,0.4)' }}>·</span>
           <span>{frequencyLabels[payment.frequency] ?? payment.frequency}</span>
-          <span className="text-[rgba(201,168,76,0.4)]">·</span>
-          <span>Due {formatDate(payment.next_due_date)}</span>
+          <span style={{ color: 'rgba(201,168,76,0.4)' }}>·</span>
+          <span style={{ color: needsAttention ? statusConfig.color : 'var(--text-muted-c)' }}>
+            {isPaid ? `Paid — next due ${formatDate(payment.next_due_date)}` : `Due ${formatDate(payment.next_due_date)}`}
+          </span>
         </div>
       </div>
 
       <div className="flex shrink-0 items-center gap-4">
         <div className="text-right">
-          <p className="font-mono text-[14px] font-medium tracking-tight text-dynasty-gold">
+          <p className="font-mono text-[14px] font-medium tracking-tight" style={{ color: 'var(--accent-c)' }}>
             {formatCurrency(payment.amount)}
           </p>
           <div className="mt-1">
             <span style={{ ...BADGE_STYLE, background: statusConfig.bg, color: statusConfig.color, border: statusConfig.border }}>
+              <StatusIcon size={9} strokeWidth={1.8} />
               {statusConfig.label}
             </span>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Mark as Paid button — only show when pending/overdue */}
-          {status !== 'paid' && (
+          {/* Mark as Paid — shown when not yet paid */}
+          {!isPaid && (
             <button
               onClick={handleMarkPaid}
               disabled={isPending || !payment.is_active}
+              title="Mark as paid"
               style={{
-                display: 'flex', alignItems: 'center', gap: '6px',
-                background: 'rgba(201,168,76,0.10)',
-                border: '1px solid rgba(201,168,76,0.30)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                background: needsAttention ? 'rgba(201,168,76,0.14)' : 'rgba(201,168,76,0.08)',
+                border: `1px solid ${needsAttention ? 'rgba(201,168,76,0.40)' : 'rgba(201,168,76,0.22)'}`,
                 color: '#C9A84C',
                 fontFamily: "'Jost', sans-serif",
                 fontSize: '10px',
@@ -206,9 +285,11 @@ export function RecurringPaymentRow({ payment }: { payment: RecurringPayment }) 
                 borderRadius: '1px',
                 cursor: isPending || !payment.is_active ? 'not-allowed' : 'pointer',
                 opacity: isPending || !payment.is_active ? 0.5 : 1,
+                whiteSpace: 'nowrap',
               }}
             >
-              <CheckCircle2 size={12} strokeWidth={1.5} /> Paid
+              <CheckCircle2 size={12} strokeWidth={1.5} />
+              {isPending ? '…' : 'Mark Paid'}
             </button>
           )}
 
@@ -218,13 +299,16 @@ export function RecurringPaymentRow({ payment }: { payment: RecurringPayment }) 
               ref={triggerRef}
               onClick={handleMenuToggle}
               style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                width: '32px', height: '32px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '32px',
+                height: '32px',
                 background: 'transparent',
                 border: '1px solid transparent',
                 borderRadius: '1px',
                 cursor: 'pointer',
-                color: 'var(--text-muted-c, #9A9690)',
+                color: 'var(--text-muted-c)',
                 transition: 'border-color 0.2s, color 0.2s',
               }}
             >
@@ -239,17 +323,19 @@ export function RecurringPaymentRow({ payment }: { payment: RecurringPayment }) 
                   top: menuPos.top,
                   right: menuPos.right,
                   zIndex: 9999,
-                  background: 'var(--card-bg, #1A1812)',
-                  border: '1px solid var(--card-border-color, rgba(201,168,76,0.15))',
+                  background: 'var(--card-bg)',
+                  border: '1px solid var(--card-border-color)',
                   borderRadius: '2px',
-                  boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.25)',
                   minWidth: '160px',
                   overflow: 'hidden',
                 }}
               >
-                <button onClick={handleMarkPaid} disabled={isPending} style={MENU_ITEM_STYLE}>
-                  <CheckCircle2 size={13} strokeWidth={1.2} /> Mark as Paid
-                </button>
+                {!isPaid && (
+                  <button onClick={handleMarkPaid} disabled={isPending} style={MENU_ITEM_STYLE}>
+                    <CheckCircle2 size={13} strokeWidth={1.2} /> Mark as Paid
+                  </button>
+                )}
                 <Link
                   href={`/recurring/${payment.id}/edit`}
                   style={MENU_ITEM_STYLE}
@@ -261,7 +347,7 @@ export function RecurringPaymentRow({ payment }: { payment: RecurringPayment }) 
                   <Power size={13} strokeWidth={1.2} />
                   {payment.is_active ? 'Deactivate' : 'Activate'}
                 </button>
-                <div style={{ height: '1px', background: 'var(--divider-c, rgba(255,255,255,0.06))', margin: '2px 0' }} />
+                <div style={{ height: '1px', background: 'var(--divider-c)', margin: '2px 0' }} />
                 <button
                   onClick={handleDelete}
                   disabled={isPending}

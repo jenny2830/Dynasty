@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Plus, RefreshCw } from 'lucide-react'
+import { Plus, RefreshCw, Bell } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { Button } from '@/components/ui/button'
 import { PageHeader } from '@/components/ui/page-header'
@@ -36,6 +36,25 @@ export default async function RecurringPage() {
     .filter((p) => p.frequency === 'monthly')
     .reduce((s, p) => s + p.amount, 0)
 
+  // Compute attention items: overdue or due today (not already paid this period)
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+
+  const attentionPayments = active.filter((p) => {
+    const due = new Date(p.next_due_date)
+    due.setHours(0, 0, 0, 0)
+    const diffDays = Math.floor((due.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+    // Check not already paid this period
+    if (p.last_paid_date) {
+      const lp = new Date(p.last_paid_date)
+      if (lp.getMonth() === due.getMonth() && lp.getFullYear() === due.getFullYear()) {
+        return false
+      }
+    }
+    const reminderDays = (p as { reminder_days_before?: number | null }).reminder_days_before ?? 5
+    return diffDays <= reminderDays // includes overdue (negative) + today (0) + upcoming window
+  })
+
   return (
     <div className="space-y-7">
       <PageHeader
@@ -48,6 +67,46 @@ export default async function RecurringPage() {
           </Link>
         </Button>
       </PageHeader>
+
+      {/* Reminder banner — shown when payments need attention */}
+      {attentionPayments.length > 0 && (
+        <div style={{
+          display: 'flex',
+          alignItems: 'flex-start',
+          gap: '12px',
+          padding: '16px 20px',
+          borderRadius: '2px',
+          background: 'rgba(201,168,76,0.06)',
+          border: '1px solid rgba(201,168,76,0.22)',
+          borderLeft: '3px solid #C9A84C',
+        }}>
+          <Bell size={16} strokeWidth={1.4} style={{ color: '#C9A84C', flexShrink: 0, marginTop: '1px' }} />
+          <div>
+            <p style={{
+              fontFamily: "'Jost', sans-serif",
+              fontSize: '12px',
+              fontWeight: 600,
+              letterSpacing: '0.14em',
+              textTransform: 'uppercase',
+              color: '#C9A84C',
+              margin: '0 0 4px',
+            }}>
+              {attentionPayments.length === 1
+                ? '1 Payment Reminder'
+                : `${attentionPayments.length} Payment Reminders`}
+            </p>
+            <p style={{
+              fontFamily: "'Jost', sans-serif",
+              fontSize: '12px',
+              fontWeight: 400,
+              color: 'var(--text-secondary-c)',
+              margin: 0,
+            }}>
+              {attentionPayments.map((p) => p.name).join(', ')} — mark as paid once completed.
+            </p>
+          </div>
+        </div>
+      )}
 
       {!payments?.length ? (
         <div
@@ -78,7 +137,7 @@ export default async function RecurringPage() {
           {active.length > 0 && (
             <Section>
               <SectionHeader title={`Active (${active.length})`} />
-              <div className="divide-y divide-[rgba(255,255,255,0.025)]">
+              <div className="divide-y" style={{ borderColor: 'var(--divider-c)' }}>
                 {active.map((p) => (
                   <RecurringPaymentRow key={p.id} payment={p} />
                 ))}
@@ -89,7 +148,7 @@ export default async function RecurringPage() {
           {inactive.length > 0 && (
             <Section className="opacity-60">
               <SectionHeader title={`Inactive (${inactive.length})`} />
-              <div className="divide-y divide-[rgba(255,255,255,0.025)]">
+              <div className="divide-y" style={{ borderColor: 'var(--divider-c)' }}>
                 {inactive.map((p) => (
                   <RecurringPaymentRow key={p.id} payment={p} />
                 ))}

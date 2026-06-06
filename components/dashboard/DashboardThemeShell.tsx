@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect } from 'react'
 import { AppThemeProvider, useAppTheme } from '@/lib/theme-context'
 import type { ThemeId } from '@/lib/themes'
 
@@ -15,7 +16,7 @@ function borderColor(b: string) {
 }
 
 function ThemedInner({ sidebar, children }: { sidebar: React.ReactNode; children: React.ReactNode }) {
-  const { theme, textThickness, fontWeights } = useAppTheme()
+  const { theme, textThickness, fontWeights, themeId } = useAppTheme()
 
   const cssVars: React.CSSProperties = {
     /* ── Card / Section ── */
@@ -96,6 +97,19 @@ function ThemedInner({ sidebar, children }: { sidebar: React.ReactNode; children
     '--fw-semibold': fontWeights.semibold,
     '--fw-bold': fontWeights.bold,
   } as React.CSSProperties
+
+  // Sync all CSS variables to <html> so Radix portals (dropdowns, dialogs)
+  // rendered at document.body always inherit the active theme.
+  useEffect(() => {
+    const root = document.documentElement
+    const entries = Object.entries(cssVars) as [string, string | number][]
+    entries.forEach(([key, value]) => {
+      if (key.startsWith('--') && value !== undefined) {
+        root.style.setProperty(key, String(value))
+      }
+    })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [themeId, textThickness])
 
   return (
     <div

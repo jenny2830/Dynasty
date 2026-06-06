@@ -75,8 +75,8 @@ function UnitForm({ form, setForm, onSave, onCancel, saving, error, title }: Uni
 
   return (
     <div style={{
-      background: 'rgba(201,168,76,0.03)',
-      border: '1px solid rgba(201,168,76,0.18)',
+      background: 'var(--card-bg)',
+      border: '1px solid var(--card-border-color)',
       borderRadius: '2px',
       padding: '20px',
       marginTop: '12px',
@@ -86,7 +86,7 @@ function UnitForm({ form, setForm, onSave, onCancel, saving, error, title }: Uni
         fontSize: '14px',
         letterSpacing: '0.18em',
         textTransform: 'uppercase',
-        color: '#C9A84C',
+        color: 'var(--accent-c)',
         margin: '0 0 16px 0',
       }}>
         {title}
@@ -171,7 +171,7 @@ function UnitForm({ form, setForm, onSave, onCancel, saving, error, title }: Uni
       </div>
 
       {error && (
-        <p style={{ color: '#D4959E', fontFamily: "'Jost', sans-serif", fontSize: '14px', marginTop: '10px' }}>
+        <p style={{ color: 'var(--value-neg-c, #D4959E)', fontFamily: "'Jost', sans-serif", fontSize: '14px', marginTop: '10px' }}>
           {error}
         </p>
       )}
@@ -280,15 +280,15 @@ export function UnitManager({ propertyId, initialUnits }: UnitManagerProps) {
           fontFamily: "'Cormorant Garamond', serif",
           fontSize: '18px',
           fontWeight: 500,
-          color: 'var(--text-primary, #FAF7F2)',
+          color: 'var(--text-primary-c)',
           margin: 0,
           display: 'flex',
           alignItems: 'center',
           gap: '8px',
         }}>
-          <span style={{ fontSize: '8px', color: '#C9A84C' }}>◆</span>
+          <span style={{ fontSize: '8px', color: 'var(--accent-c)' }}>◆</span>
           Units
-          <span style={{ fontFamily: "'Jost', sans-serif", fontSize: '15px', color: '#8A8A82', fontWeight: 400 }}>
+          <span style={{ fontFamily: "'Jost', sans-serif", fontSize: '15px', color: 'var(--text-muted-c)', fontWeight: 400 }}>
             ({units.length} added)
           </span>
         </h2>
@@ -332,7 +332,7 @@ export function UnitManager({ propertyId, initialUnits }: UnitManagerProps) {
 
       {/* Units list */}
       {units.length === 0 && !showAdd ? (
-        <p style={{ color: '#6B6B65', fontFamily: "'Jost', sans-serif", fontSize: '15px', textAlign: 'center', padding: '24px 0' }}>
+        <p style={{ color: 'var(--text-muted-c)', fontFamily: "'Jost', sans-serif", fontSize: '15px', textAlign: 'center', padding: '24px 0' }}>
           No units added yet. Click &ldquo;Add Unit&rdquo; to start.
         </p>
       ) : (
@@ -351,8 +351,8 @@ export function UnitManager({ propertyId, initialUnits }: UnitManagerProps) {
                 />
               ) : (
                 <div style={{
-                  background: 'rgba(255,255,255,0.025)',
-                  border: '1px solid rgba(201,168,76,0.08)',
+                  background: 'var(--table-row-hover-bg)',
+                  border: '1px solid var(--card-border-color)',
                   borderRadius: '2px',
                   padding: '14px 18px',
                   display: 'flex',
@@ -361,10 +361,10 @@ export function UnitManager({ propertyId, initialUnits }: UnitManagerProps) {
                   gap: '12px',
                 }}>
                   <div style={{ minWidth: 0, flex: 1 }}>
-                    <span style={{ fontFamily: "'Jost', sans-serif", fontSize: '15px', color: 'var(--text-primary, #FAF7F2)', fontWeight: 500 }}>
+                    <span style={{ fontFamily: "'Jost', sans-serif", fontSize: '15px', color: 'var(--text-primary-c)', fontWeight: 500 }}>
                       Unit {unit.unit_number}
                     </span>
-                    <span style={{ fontFamily: "'Jost', sans-serif", fontSize: '15px', color: '#8A8A82', marginLeft: '12px' }}>
+                    <span style={{ fontFamily: "'Jost', sans-serif", fontSize: '15px', color: 'var(--text-muted-c)', marginLeft: '12px' }}>
                       {[
                         unit.bedrooms != null && `${unit.bedrooms}BR`,
                         unit.bathrooms != null && `${unit.bathrooms}BA`,
@@ -396,17 +396,17 @@ export function UnitManager({ propertyId, initialUnits }: UnitManagerProps) {
                     {/* Edit / Delete */}
                     {deleteId === unit.id ? (
                       <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-                        <span style={{ fontSize: '15px', color: '#D4959E', fontFamily: "'Jost', sans-serif" }}>Delete?</span>
+                        <span style={{ fontSize: '13px', color: 'var(--value-neg-c, #D4959E)', fontFamily: "'Jost', sans-serif", letterSpacing: '0.06em' }}>Delete unit?</span>
                         <button
                           onClick={() => handleDelete(unit.id)}
                           disabled={isPending}
-                          style={{ color: '#D4959E', background: 'none', border: 'none', cursor: 'pointer', padding: '2px' }}
+                          style={{ color: 'var(--value-neg-c, #D4959E)', background: 'none', border: 'none', cursor: 'pointer', padding: '2px' }}
                         >
                           <Check size={14} strokeWidth={1.5} />
                         </button>
                         <button
                           onClick={() => setDeleteId(null)}
-                          style={{ color: '#8A8A82', background: 'none', border: 'none', cursor: 'pointer', padding: '2px' }}
+                          style={{ color: 'var(--text-muted-c)', background: 'none', border: 'none', cursor: 'pointer', padding: '2px' }}
                         >
                           <X size={14} strokeWidth={1.5} />
                         </button>
@@ -415,14 +415,14 @@ export function UnitManager({ propertyId, initialUnits }: UnitManagerProps) {
                       <div style={{ display: 'flex', gap: '6px' }}>
                         <button
                           onClick={() => startEdit(unit)}
-                          style={{ color: '#8A8A82', background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}
+                          style={{ color: 'var(--text-muted-c)', background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}
                           title="Edit unit"
                         >
                           <Pencil size={13} strokeWidth={1.4} />
                         </button>
                         <button
                           onClick={() => setDeleteId(unit.id)}
-                          style={{ color: '#8A8A82', background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}
+                          style={{ color: 'var(--text-muted-c)', background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}
                           title="Delete unit"
                         >
                           <Trash2 size={13} strokeWidth={1.4} />
