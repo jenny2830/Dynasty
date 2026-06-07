@@ -196,16 +196,16 @@ export default async function OverviewPage() {
             action={
               <Link
                 href="/transactions"
-                className="flex items-center gap-1.5 font-sans text-[12px] font-normal uppercase tracking-[0.18em] text-dynasty-gold transition-colors hover:text-dynasty-gold-light"
+                className="flex items-center gap-1.5 font-sans text-[12px] font-normal uppercase tracking-[0.18em] text-[var(--accent-c)] transition-colors hover:opacity-80"
               >
                 View All <ArrowRight className="h-3 w-3" strokeWidth={1.2} />
               </Link>
             }
           />
-          <div className="divide-y divide-[rgba(255,255,255,0.025)]">
+          <div className="divide-y divide-[var(--divider-c)]">
             {recentTx.length === 0 ? (
               <div className="flex flex-col items-center justify-center px-6 py-10 text-center">
-                <p className="mb-3 font-sans text-[12px] tracking-[0.4em] text-[rgba(201,168,76,0.3)]">
+                <p className="mb-3 font-sans text-[12px] tracking-[0.4em] text-[var(--accent-c)] opacity-30">
                   ◆ ◇ ◆
                 </p>
                 <p className="font-serif text-[20px] font-medium text-dynasty-gray-400">
@@ -222,7 +222,7 @@ export default async function OverviewPage() {
               recentTx.map((tx) => (
                 <div
                   key={tx.id}
-                  className="flex items-center justify-between px-7 py-3.5 transition-colors hover:bg-[rgba(201,168,76,0.025)]"
+                  className="flex items-center justify-between px-7 py-3.5 transition-colors hover:bg-[var(--table-row-hover-bg)]"
                 >
                   <div className="min-w-0">
                     <p className="truncate font-sans text-[15px] font-normal text-dynasty-warm-white">
@@ -240,7 +240,7 @@ export default async function OverviewPage() {
                       fontSize: '15px',
                       fontWeight: 500,
                       letterSpacing: '-0.025em',
-                      color: tx.type === 'income' ? '#C9A84C' : '#B76E79',
+                      color: tx.type === 'income' ? 'var(--value-pos-c)' : 'var(--value-neg-c)',
                     }}
                   >
                     {tx.type === 'income' ? '+' : '−'}$
@@ -261,20 +261,20 @@ export default async function OverviewPage() {
             action={
               <Link
                 href="/properties"
-                className="flex items-center gap-1.5 font-sans text-[12px] font-normal uppercase tracking-[0.18em] text-dynasty-gold transition-colors hover:text-dynasty-gold-light"
+                className="flex items-center gap-1.5 font-sans text-[12px] font-normal uppercase tracking-[0.18em] text-[var(--accent-c)] transition-colors hover:opacity-80"
               >
                 View All <ArrowRight className="h-3 w-3" strokeWidth={1.2} />
               </Link>
             }
           />
-          <div className="divide-y divide-[rgba(255,255,255,0.025)]">
+          <div className="divide-y divide-[var(--divider-c)]">
             {properties.length === 0 ? (
               <div className="flex flex-col items-center justify-center px-6 py-10 text-center">
-                <p className="mb-3 font-sans text-[12px] tracking-[0.4em] text-[rgba(201,168,76,0.3)]">
+                <p className="mb-3 font-sans text-[12px] tracking-[0.4em] text-[var(--accent-c)] opacity-30">
                   ◆ ◇ ◆
                 </p>
                 <Building2
-                  className="h-9 w-9 text-[rgba(201,168,76,0.2)]"
+                  className="h-9 w-9 text-[var(--accent-c)] opacity-20"
                   strokeWidth={1}
                 />
                 <p className="mt-3 font-serif text-[20px] font-medium text-dynasty-gray-400">
@@ -292,7 +292,7 @@ export default async function OverviewPage() {
                 <Link
                   key={p.id}
                   href={`/properties/${p.id}`}
-                  className="flex items-center justify-between px-7 py-4 transition-colors hover:bg-[rgba(201,168,76,0.025)]"
+                  className="flex items-center justify-between px-7 py-4 transition-colors hover:bg-[var(--table-row-hover-bg)]"
                 >
                   <div className="min-w-0">
                     <p className="truncate font-sans text-[15px] text-dynasty-warm-white">
@@ -315,13 +315,13 @@ export default async function OverviewPage() {
             action={
               <Link
                 href="/recurring"
-                className="flex items-center gap-1.5 font-sans text-[12px] font-normal uppercase tracking-[0.18em] text-dynasty-gold transition-colors hover:text-dynasty-gold-light"
+                className="flex items-center gap-1.5 font-sans text-[12px] font-normal uppercase tracking-[0.18em] text-[var(--accent-c)] transition-colors hover:opacity-80"
               >
                 View All <ArrowRight className="h-3 w-3" strokeWidth={1.2} />
               </Link>
             }
           />
-          <div className="divide-y divide-[rgba(255,255,255,0.025)]">
+          <div className="divide-y divide-[var(--divider-c)]">
             {reminders.length === 0 ? (
               <div className="flex items-center gap-3 px-7 py-5">
                 <Bell className="h-4 w-4 shrink-0 text-dynasty-gold" strokeWidth={1.2} />
@@ -353,7 +353,7 @@ export default async function OverviewPage() {
                         fontSize: '15px',
                         fontWeight: 500,
                         letterSpacing: '-0.025em',
-                        color: '#C9A84C',
+                        color: 'var(--accent-c)',
                       }}>
                         ${payment.amount.toLocaleString('en-CA', { minimumFractionDigits: 0 })}
                       </span>

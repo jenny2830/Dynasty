@@ -77,11 +77,11 @@ export default async function RecurringPage() {
           gap: '12px',
           padding: '16px 20px',
           borderRadius: '2px',
-          background: 'rgba(201,168,76,0.06)',
-          border: '1px solid rgba(201,168,76,0.22)',
-          borderLeft: '3px solid #C9A84C',
+          background: 'var(--badge-pos-bg)',
+          border: '1px solid var(--badge-pos-border)',
+          borderLeft: '3px solid var(--accent-c)',
         }}>
-          <Bell size={16} strokeWidth={1.4} style={{ color: '#C9A84C', flexShrink: 0, marginTop: '1px' }} />
+          <Bell size={16} strokeWidth={1.4} style={{ color: 'var(--accent-c)', flexShrink: 0, marginTop: '1px' }} />
           <div>
             <p style={{
               fontFamily: "'Jost', sans-serif",
@@ -89,7 +89,7 @@ export default async function RecurringPage() {
               fontWeight: 600,
               letterSpacing: '0.14em',
               textTransform: 'uppercase',
-              color: '#C9A84C',
+              color: 'var(--accent-c)',
               margin: '0 0 4px',
             }}>
               {attentionPayments.length === 1

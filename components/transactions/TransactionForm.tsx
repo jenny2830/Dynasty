@@ -117,7 +117,7 @@ export function TransactionForm({
       {/* Type toggle — sharp art deco segmented control */}
       <div className="space-y-2">
         <Label>Transaction Type *</Label>
-        <div className="tx-type-segment flex overflow-hidden rounded-[1px] border border-[rgba(201,168,76,0.15)]">
+        <div className="tx-type-segment flex overflow-hidden rounded-[1px] border border-[var(--card-border-color)]">
           {(['expense', 'income'] as const).map((t) => (
             <button
               key={t}
@@ -127,9 +127,9 @@ export function TransactionForm({
               className={`flex-1 py-3 font-sans text-[10px] font-light uppercase tracking-[0.22em] transition-colors ${
                 txType === t
                   ? t === 'income'
-                    ? 'bg-[rgba(201,168,76,0.08)] text-dynasty-gold'
-                    : 'bg-[rgba(183,110,121,0.08)] text-dynasty-rose-gold'
-                  : 'text-dynasty-gray-500 hover:text-dynasty-gold hover:bg-[rgba(201,168,76,0.04)]'
+                    ? 'bg-[var(--badge-pos-bg)] text-[var(--badge-pos-text)]'
+                    : 'bg-[var(--badge-neg-bg)] text-[var(--badge-neg-text)]'
+                  : 'text-dynasty-gray-500 hover:text-dynasty-gold hover:bg-[var(--table-row-hover-bg)]'
               }`}
             >
               {t}
@@ -260,7 +260,7 @@ export function TransactionForm({
         </div>
       )}
 
-      <div className="flex flex-col sm:flex-row gap-3 pt-3 border-t border-[rgba(201,168,76,0.08)]">
+      <div className="flex flex-col sm:flex-row gap-3 pt-3 border-t border-[var(--divider-c)]">
         <SubmitButton label={mode === 'create' ? 'Add Transaction' : 'Save Changes'} className="w-full sm:w-auto" />
         <Button type="button" variant="outline" onClick={() => window.history.back()} className="w-full sm:w-auto">
           Cancel

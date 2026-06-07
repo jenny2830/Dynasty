@@ -13,28 +13,28 @@ const badgeVariants = cva(
     variants: {
       variant: {
         default: [
-          'bg-[rgba(201,168,76,0.06)] text-dynasty-gold-muted',
-          'border-[rgba(201,168,76,0.18)]',
+          'bg-[var(--badge-pos-bg)] text-[var(--badge-pos-text)]',
+          'border-[var(--badge-pos-border)]',
         ].join(' '),
         secondary: [
-          'bg-[rgba(74,74,69,0.15)] text-dynasty-gray-400',
-          'border-[rgba(74,74,69,0.25)]',
+          'bg-[var(--section-bg,rgba(74,74,69,0.15))] text-[var(--text-muted-c)]',
+          'border-[var(--divider-c,rgba(74,74,69,0.25))]',
         ].join(' '),
         destructive: [
-          'bg-[rgba(183,110,121,0.07)] text-dynasty-rose-gold',
-          'border-[rgba(183,110,121,0.18)]',
+          'bg-[var(--badge-neg-bg)] text-[var(--badge-neg-text)]',
+          'border-[var(--badge-neg-border)]',
         ].join(' '),
         outline: [
-          'bg-transparent text-dynasty-gray-300',
-          'border-[rgba(201,168,76,0.12)]',
+          'bg-transparent text-[var(--text-secondary-c)]',
+          'border-[var(--card-border-color,rgba(201,168,76,0.12))]',
         ].join(' '),
         success: [
-          'bg-[rgba(201,168,76,0.07)] text-dynasty-gold',
-          'border-[rgba(201,168,76,0.18)]',
+          'bg-[var(--badge-pos-bg)] text-[var(--badge-pos-text)]',
+          'border-[var(--badge-pos-border)]',
         ].join(' '),
         warning: [
-          'bg-[rgba(183,110,121,0.07)] text-dynasty-rose-gold',
-          'border-[rgba(183,110,121,0.18)]',
+          'bg-[var(--badge-neg-bg)] text-[var(--badge-neg-text)]',
+          'border-[var(--badge-neg-border)]',
         ].join(' '),
       },
     },

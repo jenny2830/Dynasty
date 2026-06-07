@@ -706,14 +706,14 @@ button, label, p, span, a, input, textarea, select {
 .deco-corners::before {
   top: 6px;
   left: 6px;
-  border-top: 1px solid rgba(201,168,76,0.5);
-  border-left: 1px solid rgba(201,168,76,0.5);
+  border-top: 1px solid var(--corner-color, rgba(201,168,76,0.5));
+  border-left: 1px solid var(--corner-color, rgba(201,168,76,0.5));
 }
 .deco-corners::after {
   bottom: 6px;
   right: 6px;
-  border-bottom: 1px solid rgba(201,168,76,0.5);
-  border-right: 1px solid rgba(201,168,76,0.5);
+  border-bottom: 1px solid var(--corner-color, rgba(201,168,76,0.5));
+  border-right: 1px solid var(--corner-color, rgba(201,168,76,0.5));
 }
 
 /* Four-corner brackets for premium cards (pure CSS gradient brackets) */
@@ -728,14 +728,14 @@ button, label, p, span, a, input, textarea, select {
   z-index: 1;
   opacity: 0.45;
   background:
-    linear-gradient(#C9A84C, #C9A84C) left top / 14px 1px no-repeat,
-    linear-gradient(#C9A84C, #C9A84C) left top / 1px 14px no-repeat,
-    linear-gradient(#C9A84C, #C9A84C) right top / 14px 1px no-repeat,
-    linear-gradient(#C9A84C, #C9A84C) right top / 1px 14px no-repeat,
-    linear-gradient(#C9A84C, #C9A84C) left bottom / 14px 1px no-repeat,
-    linear-gradient(#C9A84C, #C9A84C) left bottom / 1px 14px no-repeat,
-    linear-gradient(#C9A84C, #C9A84C) right bottom / 14px 1px no-repeat,
-    linear-gradient(#C9A84C, #C9A84C) right bottom / 1px 14px no-repeat;
+    linear-gradient(var(--corner-color, #C9A84C), var(--corner-color, #C9A84C)) left top / 14px 1px no-repeat,
+    linear-gradient(var(--corner-color, #C9A84C), var(--corner-color, #C9A84C)) left top / 1px 14px no-repeat,
+    linear-gradient(var(--corner-color, #C9A84C), var(--corner-color, #C9A84C)) right top / 14px 1px no-repeat,
+    linear-gradient(var(--corner-color, #C9A84C), var(--corner-color, #C9A84C)) right top / 1px 14px no-repeat,
+    linear-gradient(var(--corner-color, #C9A84C), var(--corner-color, #C9A84C)) left bottom / 14px 1px no-repeat,
+    linear-gradient(var(--corner-color, #C9A84C), var(--corner-color, #C9A84C)) left bottom / 1px 14px no-repeat,
+    linear-gradient(var(--corner-color, #C9A84C), var(--corner-color, #C9A84C)) right bottom / 14px 1px no-repeat,
+    linear-gradient(var(--corner-color, #C9A84C), var(--corner-color, #C9A84C)) right bottom / 1px 14px no-repeat;
 }
 
 /* ============================================
@@ -754,10 +754,10 @@ button, label, p, span, a, input, textarea, select {
   content: '';
   flex: 1;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(201,168,76,0.3), transparent);
+  background: linear-gradient(90deg, transparent, var(--divider-c, rgba(201,168,76,0.3)), transparent);
 }
 .deco-divider-mark {
-  color: var(--gold);
+  color: var(--accent-c, var(--gold, #C9A84C));
   font-size: 9px;
 }
 
@@ -773,7 +773,7 @@ button, label, p, span, a, input, textarea, select {
   left: 15%;
   right: 15%;
   height: 1px;
-  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  background: linear-gradient(90deg, transparent, var(--accent-c, var(--gold, #C9A84C)), transparent);
   pointer-events: none;
 }
 

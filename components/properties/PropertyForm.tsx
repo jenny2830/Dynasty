@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { CANADIAN_PROVINCES, PROPERTY_TYPES, PROPERTY_SUBTYPES, PROPERTY_STATUSES } from '@/lib/constants'
+import { CANADIAN_PROVINCES, COUNTRIES, PROPERTY_TYPES, PROPERTY_SUBTYPES, PROPERTY_STATUSES } from '@/lib/constants'
 import { NumberInput } from '@/components/ui/NumberInput'
 import type { Property } from '@/types/database.types'
 
@@ -29,7 +29,7 @@ function SubmitButton({ label, className }: { label: string; className?: string 
 
 function FormSectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <h2 className="mb-5 pb-2 border-b border-[rgba(201,168,76,0.08)] font-sans text-[9px] font-light uppercase tracking-[0.2em] text-dynasty-gray-500">
+    <h2 className="mb-5 pb-2 border-b border-[var(--divider-c)] font-sans text-[9px] font-light uppercase tracking-[0.2em] text-dynasty-gray-500">
       {children}
     </h2>
   )
@@ -193,6 +193,22 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
               placeholder="M5V 3A8"
               defaultValue={property?.postal_code ?? ''}
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="country">Country</Label>
+            <Select name="country" defaultValue={property?.country ?? 'CA'}>
+              <SelectTrigger id="country">
+                <SelectValue placeholder="Select country" />
+              </SelectTrigger>
+              <SelectContent>
+                {COUNTRIES.map((c) => (
+                  <SelectItem key={c.value} value={c.value}>
+                    {c.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </section>

@@ -299,11 +299,11 @@ export default async function TransactionsPage({
                         className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-[1px]"
                         style={{
                           background: tx.type === 'income'
-                            ? 'rgba(201,168,76,0.08)'
-                            : 'rgba(183,110,121,0.08)',
+                            ? 'var(--badge-pos-bg)'
+                            : 'var(--badge-neg-bg)',
                           border: tx.type === 'income'
-                            ? '1px solid rgba(201,168,76,0.2)'
-                            : '1px solid rgba(183,110,121,0.2)',
+                            ? '1px solid var(--badge-pos-border)'
+                            : '1px solid var(--badge-neg-border)',
                         }}
                       >
                         {tx.type === 'income' ? (
@@ -399,8 +399,8 @@ export default async function TransactionsPage({
                                 className="flex h-6 w-6 shrink-0 items-center justify-center rounded-[1px]"
                                 style={{
                                   background: tx.type === 'income'
-                                    ? 'rgba(201,168,76,0.07)'
-                                    : 'rgba(183,110,121,0.07)',
+                                    ? 'var(--badge-pos-bg)'
+                                    : 'var(--badge-neg-bg)',
                                 }}
                               >
                                 {tx.type === 'income' ? (

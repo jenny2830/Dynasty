@@ -82,8 +82,10 @@ function ThemedInner({ sidebar, children }: { sidebar: React.ReactNode; children
     /* ── Badge ── */
     '--badge-pos-bg': theme.badgePositiveBg,
     '--badge-pos-text': theme.badgePositiveText,
+    '--badge-pos-border': theme.badgePositiveBorder,
     '--badge-neg-bg': theme.badgeNegativeBg,
     '--badge-neg-text': theme.badgeNegativeText,
+    '--badge-neg-border': theme.badgeNegativeBorder,
 
     /* ── Accent text overlay ── */
     '--text-on-accent': theme.textOnAccent,
@@ -123,6 +125,42 @@ function ThemedInner({ sidebar, children }: { sidebar: React.ReactNode; children
     root.style.colorScheme = mode
     root.style.backgroundColor = theme.pageBg
     document.body.style.backgroundColor = theme.pageBg
+
+    // Mirror all Tailwind dynasty-* color tokens onto <html> so that Radix
+    // portals rendered at document.body (Select dropdowns, Dialogs, etc.)
+    // also pick up the correct theme colors.  Inside .dashboard-landscape-shell
+    // these are already overridden via the globals.css remapping block; setting
+    // them on :root makes the same values available outside that subtree.
+    const tokenMap: Record<string, string> = {
+      '--color-dynasty-warm-white':  theme.textPrimary,
+      '--color-dynasty-cream':       theme.textSecondary,
+      '--color-dynasty-gray-200':    theme.textSecondary,
+      '--color-dynasty-gray-300':    theme.textSecondary,
+      '--color-dynasty-gray-400':    theme.textMuted,
+      '--color-dynasty-gray-500':    theme.textMuted,
+      '--color-dynasty-gray-600':    theme.inputPlaceholder,
+      '--color-dynasty-black-soft':  theme.inputBg,
+      '--color-dynasty-black-card':  theme.tableBg,
+      '--color-dynasty-black-warm':  theme.tableHeaderBg,
+      '--color-dynasty-gray-900':    theme.tableBg,
+      '--color-dynasty-gray-800':    theme.tableHeaderBg,
+      '--color-dynasty-gray-700':    theme.tableBg,
+      '--color-dynasty-gold':        theme.accent,
+      '--color-dynasty-gold-light':  theme.accentLight,
+      '--color-dynasty-gold-dark':   theme.accentDark,
+      '--color-dynasty-gold-muted':  theme.accentMuted,
+      '--color-dynasty-rose-gold':   theme.valueNegative,
+      '--color-dynasty-rose-dark':   theme.valueNegative,
+      '--color-dynasty-rose-light':  theme.valueNegative,
+      '--color-dynasty-black':       theme.textOnAccent,
+      '--badge-pos-bg':              theme.badgePositiveBg,
+      '--badge-pos-text':            theme.badgePositiveText,
+      '--badge-pos-border':          theme.badgePositiveBorder,
+      '--badge-neg-bg':              theme.badgeNegativeBg,
+      '--badge-neg-text':            theme.badgeNegativeText,
+      '--badge-neg-border':          theme.badgeNegativeBorder,
+    }
+    Object.entries(tokenMap).forEach(([k, v]) => root.style.setProperty(k, v))
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [themeId, textThickness])
 

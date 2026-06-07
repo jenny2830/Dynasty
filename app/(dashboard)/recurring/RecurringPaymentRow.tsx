@@ -195,8 +195,9 @@ export function RecurringPaymentRow({ payment }: { payment: RecurringPayment }) 
     <div
       className="flex items-center gap-4 px-7 py-4 transition-colors"
       style={{
-        background: needsAttention ? 'rgba(201,168,76,0.02)' : 'transparent',
-        borderLeft: needsAttention ? '2px solid rgba(201,168,76,0.3)' : '2px solid transparent',
+        background: needsAttention ? 'var(--table-row-hover-bg)' : 'transparent',
+        borderLeft: needsAttention ? '2px solid var(--accent-c)' : '2px solid transparent',
+        opacity: needsAttention ? 1 : undefined,
       }}
     >
       {/* Bell icon for reminder emphasis */}
@@ -226,18 +227,18 @@ export function RecurringPaymentRow({ payment }: { payment: RecurringPayment }) 
           </span>
           <span style={{
             ...BADGE_STYLE,
-            background: 'rgba(201,168,76,0.06)',
+            background: 'var(--badge-pos-bg)',
             color: 'var(--text-muted-c)',
-            border: '1px solid rgba(201,168,76,0.12)',
+            border: '1px solid var(--badge-pos-border)',
           }}>
             {payment.category}
           </span>
           {payment.auto_log_transaction && (
             <span style={{
               ...BADGE_STYLE,
-              background: 'rgba(201,168,76,0.10)',
-              color: '#C9A84C',
-              border: '1px solid rgba(201,168,76,0.22)',
+              background: 'var(--badge-pos-bg)',
+              color: 'var(--badge-pos-text)',
+              border: '1px solid var(--badge-pos-border)',
             }}>
               Auto-log
             </span>
@@ -245,9 +246,9 @@ export function RecurringPaymentRow({ payment }: { payment: RecurringPayment }) 
         </div>
         <div className="mt-1 flex items-center gap-3 font-sans text-[11px] font-light" style={{ color: 'var(--text-muted-c)' }}>
           <span>{(payment.properties as { name: string } | null)?.name ?? '—'}</span>
-          <span style={{ color: 'rgba(201,168,76,0.4)' }}>·</span>
+          <span style={{ color: 'var(--divider-c)' }}>·</span>
           <span>{frequencyLabels[payment.frequency] ?? payment.frequency}</span>
-          <span style={{ color: 'rgba(201,168,76,0.4)' }}>·</span>
+          <span style={{ color: 'var(--divider-c)' }}>·</span>
           <span style={{ color: needsAttention ? statusConfig.color : 'var(--text-muted-c)' }}>
             {isPaid ? `Paid — next due ${formatDate(payment.next_due_date)}` : `Due ${formatDate(payment.next_due_date)}`}
           </span>
@@ -278,9 +279,9 @@ export function RecurringPaymentRow({ payment }: { payment: RecurringPayment }) 
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
-                background: needsAttention ? 'rgba(201,168,76,0.14)' : 'rgba(201,168,76,0.08)',
-                border: `1px solid ${needsAttention ? 'rgba(201,168,76,0.40)' : 'rgba(201,168,76,0.22)'}`,
-                color: '#C9A84C',
+                background: needsAttention ? 'var(--badge-pos-bg)' : 'transparent',
+                border: `1px solid var(--badge-pos-border)`,
+                color: 'var(--badge-pos-text)',
                 fontFamily: "'Jost', sans-serif",
                 fontSize: '10px',
                 fontWeight: 500,

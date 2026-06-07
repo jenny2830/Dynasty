@@ -378,7 +378,7 @@ export function UnitManager({ propertyId, initialUnits }: UnitManagerProps) {
                       <span style={{
                         fontFamily: "'JetBrains Mono', monospace",
                         fontSize: '15px',
-                        color: unit.status === 'occupied' ? '#C9A84C' : '#B76E79',
+                        color: unit.status === 'occupied' ? 'var(--value-pos-c)' : 'var(--value-neg-c)',
                       }}>
                         {formatCurrency(unit.rent_amount)}/mo
                       </span>

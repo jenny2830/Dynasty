@@ -198,7 +198,7 @@ export function RecurringForm({ mode, payment, properties }: RecurringFormProps)
         />
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-3 pt-3 border-t border-[rgba(201,168,76,0.08)]">
+      <div className="flex flex-col sm:flex-row gap-3 pt-3 border-t border-[var(--divider-c)]">
         <SubmitButton label={mode === 'create' ? 'Add Payment' : 'Save Changes'} className="w-full sm:w-auto" />
         <Button type="button" variant="outline" onClick={() => window.history.back()} className="w-full sm:w-auto">
           Cancel

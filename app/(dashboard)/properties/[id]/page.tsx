@@ -71,7 +71,7 @@ export default async function PropertyDetailPage({
       </Link>
 
       {/* Header */}
-      <header className="mb-2 pb-5 border-b border-[rgba(201,168,76,0.08)]">
+      <header className="mb-2 pb-5 border-b border-[var(--divider-c)]">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-3">
@@ -97,7 +97,7 @@ export default async function PropertyDetailPage({
                 {property.num_units} unit{property.num_units !== 1 ? 's' : ''}
               </Badge>
             </div>
-            <div className="mt-3.5 h-px w-10 bg-dynasty-gold/50" aria-hidden />
+            <div className="mt-3.5 h-px w-10 bg-[var(--accent-c)] opacity-50" aria-hidden />
           </div>
           <div className="flex shrink-0 gap-2">
             <Button asChild variant="outline" size="sm">
@@ -206,18 +206,18 @@ export default async function PropertyDetailPage({
             action={
               <Link
                 href={`/transactions?property_id=${id}`}
-                className="font-sans text-[10px] font-light uppercase tracking-[0.18em] text-dynasty-gold transition-colors hover:text-dynasty-gold-light"
+                className="font-sans text-[10px] font-light uppercase tracking-[0.18em] text-[var(--accent-c)] transition-colors hover:opacity-80"
               >
                 View All
               </Link>
             }
           />
-          <div className="flex gap-8 px-7 py-4 border-b border-[rgba(255,255,255,0.025)]">
+          <div className="flex gap-8 px-7 py-4 border-b border-[var(--divider-c)]">
             <div>
               <p className="font-sans text-[9px] font-light uppercase tracking-[0.22em] text-dynasty-gray-500">
                 Income
               </p>
-              <p className="mt-1 font-mono text-[14px] font-medium text-dynasty-gold">
+              <p className="mt-1 font-mono text-[14px] font-medium text-[var(--value-pos-c)]">
                 {formatCurrency(income)}
               </p>
             </div>
@@ -225,7 +225,7 @@ export default async function PropertyDetailPage({
               <p className="font-sans text-[9px] font-light uppercase tracking-[0.22em] text-dynasty-gray-500">
                 Expenses
               </p>
-              <p className="mt-1 font-mono text-[14px] font-medium text-dynasty-rose-gold">
+              <p className="mt-1 font-mono text-[14px] font-medium text-[var(--value-neg-c)]">
                 {formatCurrency(expenses)}
               </p>
             </div>
@@ -234,15 +234,14 @@ export default async function PropertyDetailPage({
                 Net
               </p>
               <p
-                className={`mt-1 font-mono text-[14px] font-medium ${
-                  income - expenses >= 0 ? 'text-dynasty-gold' : 'text-dynasty-rose-gold'
-                }`}
+                className="mt-1 font-mono text-[14px] font-medium"
+                style={{ color: income - expenses >= 0 ? 'var(--value-pos-c)' : 'var(--value-neg-c)' }}
               >
                 {formatCurrency(income - expenses)}
               </p>
             </div>
           </div>
-          <div className="max-h-72 divide-y divide-[rgba(255,255,255,0.025)] overflow-y-auto">
+          <div className="max-h-72 divide-y divide-[var(--divider-c)] overflow-y-auto">
             {transactions.length === 0 ? (
               <div className="flex items-center justify-center py-10">
                 <p className="font-sans text-[12px] font-light text-dynasty-gray-500">
@@ -261,9 +260,8 @@ export default async function PropertyDetailPage({
                     </p>
                   </div>
                   <span
-                    className={`ml-3 shrink-0 font-mono text-[13px] font-medium tracking-tight ${
-                      tx.type === 'income' ? 'text-dynasty-gold' : 'text-dynasty-rose-gold'
-                    }`}
+                    className="ml-3 shrink-0 font-mono text-[13px] font-medium tracking-tight"
+                    style={{ color: tx.type === 'income' ? 'var(--value-pos-c)' : 'var(--value-neg-c)' }}
                   >
                     {tx.type === 'income' ? '+' : '−'}
                     {formatCurrency(tx.amount)}

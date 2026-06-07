@@ -17,7 +17,7 @@ const Separator = React.forwardRef<
       decorative={decorative}
       orientation={orientation}
       className={cn(
-        'shrink-0 bg-[rgba(201,168,76,0.1)]',
+        'shrink-0 bg-[var(--divider-c,rgba(201,168,76,0.1))]',
         orientation === 'horizontal' ? 'h-px w-full' : 'h-full w-px',
         className
       )}
