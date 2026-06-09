@@ -4,6 +4,7 @@ import { useState, useTransition, useEffect, useRef } from 'react'
 import { Bell, CheckCircle2, MoreHorizontal, Power, Trash2, Edit, Clock, AlertTriangle, RotateCcw } from 'lucide-react'
 import Link from 'next/link'
 import { formatCurrency, formatDate } from '@/lib/utils'
+import { isRecurringPaymentPaidThisMonth, isRecurringPaymentPending } from '@/lib/recurring-utils'
 import { markAsPaid, markAsUnpaid, toggleRecurringActive, deleteRecurringPayment } from '@/app/actions/recurring'
 
 interface RecurringPayment {
@@ -37,14 +38,8 @@ function getReminderStatus(payment: RecurringPayment): ReminderStatus {
   const due = new Date(payment.next_due_date)
   due.setHours(0, 0, 0, 0)
 
-  // Paid only when the recorded payment covers the CURRENT due date. The
-  // "Mark Paid" action stores last_paid_date as the due date it settled, so
-  // editing the due date to a new (unpaid) cycle clears the paid status and
-  // changing the date can never make a payment look paid on its own.
-  if (payment.last_paid_date) {
-    const lastPaid = new Date(payment.last_paid_date)
-    lastPaid.setHours(0, 0, 0, 0)
-    if (lastPaid >= due) return 'paid'
+  if (isRecurringPaymentPaidThisMonth(payment.last_paid_date)) {
+    return 'paid'
   }
 
   const diffDays = Math.floor((due.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))

@@ -24,6 +24,14 @@ export function formatCurrency(
   }).format(amount)
 }
 
+/** Format an amount using a property's stored currency. */
+export function formatPropertyCurrency(
+  amount: number | null | undefined,
+  currency = 'CAD',
+): string {
+  return formatCurrency(amount, currency)
+}
+
 /**
  * Format a plain number with comma separators.
  * formatNumber(1234567) → "1,234,567"

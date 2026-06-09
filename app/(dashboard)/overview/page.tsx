@@ -1,7 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { StatsCards } from '@/components/dashboard/StatsCards'
 import { IncomeExpenseChart } from '@/components/dashboard/IncomeExpenseChart'
-import { formatDate } from '@/lib/utils'
+import { formatCurrency, formatDate } from '@/lib/utils'
+import { isRecurringPaymentPending } from '@/lib/recurring-utils'
 import { Building2, Plus, ArrowRight, Bell } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
@@ -71,13 +72,20 @@ export default async function OverviewPage() {
   const monthStart = format(startOfMonth(now), 'yyyy-MM-dd')
   const monthEnd = format(endOfMonth(now), 'yyyy-MM-dd')
   const sixMonthsAgo = format(startOfMonth(subMonths(now, 5)), 'yyyy-MM-dd')
+  const sevenDaysFromNow = format(
+    new Date(now.getFullYear(), now.getMonth(), now.getDate() + 7),
+    'yyyy-MM-dd',
+  )
 
   const [
     propertiesResult,
     recentTxResult,
-    monthlyTxResult,
+    incomeResult,
+    expenseResult,
     chartTxResult,
-    remindersResult,
+    pendingPaymentsResult,
+    portfolioResult,
+    activeCountResult,
   ] = await Promise.all([
     supabase
       .from('properties')
@@ -94,8 +102,16 @@ export default async function OverviewPage() {
       .limit(5),
     supabase
       .from('transactions')
-      .select('type, amount')
+      .select('amount')
       .eq('landlord_id', landlord.id)
+      .eq('type', 'income')
+      .gte('transaction_date', monthStart)
+      .lte('transaction_date', monthEnd),
+    supabase
+      .from('transactions')
+      .select('amount')
+      .eq('landlord_id', landlord.id)
+      .eq('type', 'expense')
       .gte('transaction_date', monthStart)
       .lte('transaction_date', monthEnd),
     supabase
@@ -105,36 +121,42 @@ export default async function OverviewPage() {
       .gte('transaction_date', sixMonthsAgo)
       .order('transaction_date', { ascending: true }),
     supabase
-      .from('reminders')
-      .select('id, due_date, recurring_payments(name, amount)')
+      .from('recurring_payments')
+      .select('id, name, amount, next_due_date, last_paid_date, is_active')
       .eq('landlord_id', landlord.id)
-      .eq('status', 'pending')
-      .order('due_date', { ascending: true })
-      .limit(4),
+      .eq('is_active', true)
+      .lte('next_due_date', sevenDaysFromNow)
+      .order('next_due_date', { ascending: true }),
+    supabase
+      .from('properties')
+      .select('current_value')
+      .eq('landlord_id', landlord.id)
+      .eq('status', 'active'),
+    supabase
+      .from('properties')
+      .select('*', { count: 'exact', head: true })
+      .eq('landlord_id', landlord.id)
+      .eq('status', 'active'),
   ])
 
   const properties = propertiesResult.data ?? []
   const recentTx = recentTxResult.data ?? []
-  const monthlyTx = monthlyTxResult.data ?? []
   const chartTx = chartTxResult.data ?? []
-  const reminders = remindersResult.data ?? []
+  const pendingPayments = (pendingPaymentsResult.data ?? []).filter((payment) =>
+    isRecurringPaymentPending(payment),
+  )
+  const upcomingReminders = pendingPayments.slice(0, 5)
 
-  const { data: allActiveProps } = await supabase
-    .from('properties')
-    .select('current_value')
-    .eq('landlord_id', landlord.id)
-    .eq('status', 'active')
+  const totalValue = (portfolioResult.data ?? []).reduce(
+    (s, p) => s + (p.current_value ?? 0),
+    0,
+  )
+  const activeCount = activeCountResult.count ?? 0
 
-  const totalValue = (allActiveProps ?? []).reduce((s, p) => s + (p.current_value ?? 0), 0)
-  const activeCount = allActiveProps?.length ?? 0
-
-  const monthlyIncome = monthlyTx
-    .filter((t) => t.type === 'income')
-    .reduce((s, t) => s + t.amount, 0)
-  const monthlyExpenses = monthlyTx
-    .filter((t) => t.type === 'expense')
-    .reduce((s, t) => s + t.amount, 0)
+  const monthlyIncome = (incomeResult.data ?? []).reduce((sum, t) => sum + t.amount, 0)
+  const monthlyExpenses = (expenseResult.data ?? []).reduce((sum, t) => sum + t.amount, 0)
   const monthlyNetIncome = monthlyIncome - monthlyExpenses
+  const pendingCount = pendingPayments.length
 
   const months = Array.from({ length: 6 }, (_, i) => subMonths(now, 5 - i))
   const chartData = buildChartData(chartTx, months)
@@ -173,7 +195,7 @@ export default async function OverviewPage() {
         totalPortfolioValue={totalValue}
         monthlyNetIncome={monthlyNetIncome}
         activeProperties={activeCount}
-        pendingReminders={reminders.length}
+        pendingReminders={pendingCount}
       />
 
       {/* Chart + Recent */}
@@ -322,7 +344,7 @@ export default async function OverviewPage() {
             }
           />
           <div className="divide-y divide-[var(--divider-c)]">
-            {reminders.length === 0 ? (
+            {upcomingReminders.length === 0 ? (
               <div className="flex items-center gap-3 px-7 py-5">
                 <Bell className="h-4 w-4 shrink-0 text-dynasty-gold" strokeWidth={1.2} />
                 <p className="font-sans text-[14px] font-normal tracking-[0.04em] text-dynasty-gray-400">
@@ -330,37 +352,32 @@ export default async function OverviewPage() {
                 </p>
               </div>
             ) : (
-              reminders.map((r) => {
-                const payment = r.recurring_payments as { name: string; amount: number } | null
-                return (
-                  <div
-                    key={r.id}
-                    className="flex items-center justify-between px-7 py-4"
-                  >
-                    <div className="min-w-0">
-                      <p className="truncate font-sans text-[15px] text-dynasty-warm-white">
-                        {payment?.name ?? 'Payment due'}
-                      </p>
-                      <p className="mt-0.5 font-sans text-[13px] font-normal text-dynasty-gray-500">
-                        Due {formatDate(r.due_date)}
-                      </p>
-                    </div>
-                    {payment?.amount && (
-                      <span style={{
-                        marginLeft: '12px',
-                        flexShrink: 0,
-                        fontFamily: "'JetBrains Mono', monospace",
-                        fontSize: '15px',
-                        fontWeight: 500,
-                        letterSpacing: '-0.025em',
-                        color: 'var(--accent-c)',
-                      }}>
-                        ${payment.amount.toLocaleString('en-CA', { minimumFractionDigits: 0 })}
-                      </span>
-                    )}
+              upcomingReminders.map((payment) => (
+                <div
+                  key={payment.id}
+                  className="flex items-center justify-between px-7 py-4"
+                >
+                  <div className="min-w-0">
+                    <p className="truncate font-sans text-[15px] text-dynasty-warm-white">
+                      {payment.name}
+                    </p>
+                    <p className="mt-0.5 font-sans text-[13px] font-normal text-dynasty-gray-500">
+                      Due {formatDate(payment.next_due_date)}
+                    </p>
                   </div>
-                )
-              })
+                  <span style={{
+                    marginLeft: '12px',
+                    flexShrink: 0,
+                    fontFamily: "'JetBrains Mono', monospace",
+                    fontSize: '15px',
+                    fontWeight: 500,
+                    letterSpacing: '-0.025em',
+                    color: 'var(--value-neg-c)',
+                  }}>
+                    {formatCurrency(payment.amount)}
+                  </span>
+                </div>
+              ))
             )}
           </div>
         </Section>

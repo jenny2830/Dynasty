@@ -121,6 +121,7 @@ export type Database = {
           province: string
           postal_code: string | null
           country: string
+          currency: string
           type: 'rental' | 'condo' | 'strata'
           property_subtype: 'residential' | 'commercial'
           num_units: number
@@ -143,6 +144,7 @@ export type Database = {
           province: string
           postal_code?: string | null
           country?: string
+          currency?: string
           type: 'rental' | 'condo' | 'strata'
           property_subtype: 'residential' | 'commercial'
           num_units?: number
@@ -165,6 +167,7 @@ export type Database = {
           province?: string
           postal_code?: string | null
           country?: string
+          currency?: string
           type?: 'rental' | 'condo' | 'strata'
           property_subtype?: 'residential' | 'commercial'
           num_units?: number

@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { PageHeader } from '@/components/ui/page-header'
 import { Section, SectionHeader } from '@/components/ui/section'
 import { formatCurrency } from '@/lib/utils'
+import { isRecurringPaymentPending } from '@/lib/recurring-utils'
 import { RecurringPaymentRow } from './RecurringPaymentRow'
 
 export const metadata = { title: 'Recurring Payments' }
@@ -36,24 +37,9 @@ export default async function RecurringPage() {
     .filter((p) => p.frequency === 'monthly')
     .reduce((s, p) => s + p.amount, 0)
 
-  // Compute attention items: overdue or due today (not already paid this period)
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-
   const attentionPayments = active.filter((p) => {
-    const due = new Date(p.next_due_date)
-    due.setHours(0, 0, 0, 0)
-    const diffDays = Math.floor((due.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
-    // Skip if already paid for this due date (paid record covers the cycle)
-    if (p.last_paid_date) {
-      const lp = new Date(p.last_paid_date)
-      lp.setHours(0, 0, 0, 0)
-      if (lp >= due) {
-        return false
-      }
-    }
     const reminderDays = (p as { reminder_days_before?: number | null }).reminder_days_before ?? 5
-    return diffDays <= reminderDays // includes overdue (negative) + today (0) + upcoming window
+    return isRecurringPaymentPending(p, reminderDays)
   })
 
   return (

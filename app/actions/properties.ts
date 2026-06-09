@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { z } from 'zod'
 import { PLAN_FEATURES, type PlanId } from '@/lib/plans'
+import { getCurrencyForCountry } from '@/lib/constants'
 
 const propertySchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -109,6 +110,7 @@ export async function createProperty(
 
   const { error } = await supabase.from('properties').insert({
     ...parsed.data,
+    currency: getCurrencyForCountry(parsed.data.country),
     landlord_id: landlordId,
   })
 
@@ -159,7 +161,10 @@ export async function updateProperty(
 
   const { error } = await supabase
     .from('properties')
-    .update(parsed.data)
+    .update({
+      ...parsed.data,
+      currency: getCurrencyForCountry(parsed.data.country),
+    })
     .eq('id', propertyId)
     .eq('landlord_id', landlordId)
 

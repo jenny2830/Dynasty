@@ -161,18 +161,14 @@ export async function markAsPaid(id: string): Promise<{ error?: string }> {
   if (fetchError || !payment) return { error: 'Payment not found' }
 
   const today = format(new Date(), 'yyyy-MM-dd')
+  const nextDueStr = advanceDate(payment.next_due_date, payment.frequency)
 
-  // Record the paid state against the CURRENT due date — not "today". This ties
-  // the paid flag to a specific billing cycle so that simply editing the due
-  // date can never make a payment look paid. A payment counts as paid only when
-  // last_paid_date covers its current next_due_date; changing the date to a new
-  // (unpaid) cycle automatically clears the paid status. Paid is set explicitly
-  // here via the "Mark Paid" action — never as a side effect of date changes.
   const { error: updateError } = await supabase
     .from('recurring_payments')
     .update({
-      last_paid_date: payment.next_due_date,
+      last_paid_date: today,
       last_paid_amount: payment.amount,
+      next_due_date: nextDueStr,
     })
     .eq('id', id)
 

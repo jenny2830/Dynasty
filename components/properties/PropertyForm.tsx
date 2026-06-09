@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { CANADIAN_PROVINCES, COUNTRIES, PROPERTY_TYPES, PROPERTY_SUBTYPES, PROPERTY_STATUSES } from '@/lib/constants'
+import { CANADIAN_PROVINCES, COUNTRIES, PROPERTY_TYPES, PROPERTY_SUBTYPES, PROPERTY_STATUSES, getCurrencyForCountry, getRegionLabel, getRegionsForCountry } from '@/lib/constants'
 import { NumberInput } from '@/components/ui/NumberInput'
 import type { Property } from '@/types/database.types'
 
@@ -42,6 +42,12 @@ interface PropertyFormProps {
 
 export function PropertyForm({ mode, property }: PropertyFormProps) {
   const [type, setType] = useState<string>(property?.type ?? 'rental')
+  const [country, setCountry] = useState<string>(property?.country ?? 'CA')
+  const [province, setProvince] = useState<string>(property?.province ?? 'ON')
+
+  const regions = getRegionsForCountry(country)
+  const regionLabel = getRegionLabel(country)
+  const currencyLabel = getCurrencyForCountry(country)
 
   const action =
     mode === 'create'
@@ -170,13 +176,17 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="province">Province *</Label>
-            <Select name="province" defaultValue={property?.province ?? 'ON'}>
+            <Label htmlFor="province">{regionLabel} *</Label>
+            <Select
+              name="province"
+              value={province}
+              onValueChange={setProvince}
+            >
               <SelectTrigger id="province">
-                <SelectValue placeholder="Select province" />
+                <SelectValue placeholder={`Select ${regionLabel.toLowerCase()}`} />
               </SelectTrigger>
               <SelectContent>
-                {CANADIAN_PROVINCES.map((p) => (
+                {regions.map((p) => (
                   <SelectItem key={p.value} value={p.value}>
                     {p.label}
                   </SelectItem>
@@ -197,7 +207,14 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
 
           <div className="space-y-2">
             <Label htmlFor="country">Country</Label>
-            <Select name="country" defaultValue={property?.country ?? 'CA'}>
+            <Select
+              name="country"
+              value={country}
+              onValueChange={(value) => {
+                setCountry(value)
+                setProvince('')
+              }}
+            >
               <SelectTrigger id="country">
                 <SelectValue placeholder="Select country" />
               </SelectTrigger>
@@ -217,7 +234,7 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
         <FormSectionLabel>Financial Details</FormSectionLabel>
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="purchase_price">Purchase Price (CAD)</Label>
+            <Label htmlFor="purchase_price">Purchase Price ({currencyLabel})</Label>
             <NumberInput
               id="purchase_price"
               name="purchase_price"
@@ -229,7 +246,7 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="current_value">Current Value (CAD)</Label>
+            <Label htmlFor="current_value">Current Value ({currencyLabel})</Label>
             <NumberInput
               id="current_value"
               name="current_value"
@@ -241,7 +258,7 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="mortgage_balance">Mortgage Balance (CAD)</Label>
+            <Label htmlFor="mortgage_balance">Mortgage Balance ({currencyLabel})</Label>
             <NumberInput
               id="mortgage_balance"
               name="mortgage_balance"
@@ -253,7 +270,7 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="monthly_mortgage">Monthly Mortgage (CAD)</Label>
+            <Label htmlFor="monthly_mortgage">Monthly Mortgage ({currencyLabel})</Label>
             <NumberInput
               id="monthly_mortgage"
               name="monthly_mortgage"
@@ -266,7 +283,7 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
 
           {type === 'condo' && (
             <div className="space-y-2">
-              <Label htmlFor="condo_fee">Monthly Condo Fee (CAD)</Label>
+              <Label htmlFor="condo_fee">Monthly Condo Fee ({currencyLabel})</Label>
               <NumberInput
                 id="condo_fee"
                 name="condo_fee"
@@ -280,7 +297,7 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
 
           {type === 'strata' && (
             <div className="space-y-2">
-              <Label htmlFor="strata_fee">Monthly Strata Fee (CAD)</Label>
+              <Label htmlFor="strata_fee">Monthly Strata Fee ({currencyLabel})</Label>
               <NumberInput
                 id="strata_fee"
                 name="strata_fee"

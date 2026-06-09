@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useAppTheme } from '@/lib/theme-context'
 import { useThemeStyles } from '@/lib/useThemeStyles'
-import { formatCurrency } from '@/lib/utils'
+import { formatPropertyCurrency } from '@/lib/utils'
 import Link from 'next/link'
 import { Building2, MapPin, RefreshCw } from 'lucide-react'
 
@@ -249,20 +249,20 @@ export default function PropertiesPage() {
                   <div>
                     <p style={{ ...styles.cardLabel, fontSize: '9px', marginBottom: '4px' }}>Current Value</p>
                     <p style={{ ...styles.financial, color: theme.accent, fontSize: '15px' }}>
-                      {property.current_value ? formatCurrency(property.current_value) : '—'}
+                      {property.current_value ? formatPropertyCurrency(property.current_value, property.currency ?? 'CAD') : '—'}
                     </p>
                   </div>
                   <div>
                     <p style={{ ...styles.cardLabel, fontSize: '9px', marginBottom: '4px' }}>Purchase Price</p>
                     <p style={{ ...styles.financial, color: theme.textPrimary, fontSize: '15px' }}>
-                      {property.purchase_price ? formatCurrency(property.purchase_price) : '—'}
+                      {property.purchase_price ? formatPropertyCurrency(property.purchase_price, property.currency ?? 'CAD') : '—'}
                     </p>
                   </div>
                   {property.monthly_mortgage > 0 && (
                     <div>
                       <p style={{ ...styles.cardLabel, fontSize: '9px', marginBottom: '4px' }}>Mortgage/mo</p>
                       <p style={{ ...styles.financial, color: theme.valueNegative, fontSize: '15px' }}>
-                        {formatCurrency(property.monthly_mortgage)}
+                        {formatPropertyCurrency(property.monthly_mortgage, property.currency ?? 'CAD')}
                       </p>
                     </div>
                   )}

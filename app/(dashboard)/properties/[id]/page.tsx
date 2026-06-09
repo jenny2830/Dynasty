@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Section, SectionHeader } from '@/components/ui/section'
-import { formatCurrency, formatDate } from '@/lib/utils'
+import { formatCurrency, formatPropertyCurrency, formatDate } from '@/lib/utils'
 import { ChevronLeft, Edit, MapPin, Building2 } from 'lucide-react'
 import { DeletePropertyButton } from './DeletePropertyButton'
 import { UnitManager } from './UnitManager'
@@ -60,6 +60,8 @@ export default async function PropertyDetailPage({
       ? property.current_value - property.mortgage_balance
       : null
 
+  const propertyCurrency = property.currency ?? 'CAD'
+
   return (
     <div className="space-y-7">
       {/* Back link */}
@@ -113,10 +115,10 @@ export default async function PropertyDetailPage({
       {/* Financial stats */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         {[
-          { label: 'Purchase Price', value: property.purchase_price ? formatCurrency(property.purchase_price) : '—', accent: false },
-          { label: 'Current Value', value: property.current_value ? formatCurrency(property.current_value) : '—', accent: true },
-          { label: 'Mortgage Balance', value: property.mortgage_balance ? formatCurrency(property.mortgage_balance) : '—', accent: false },
-          { label: 'Equity', value: equity ? formatCurrency(equity) : '—', accent: true },
+          { label: 'Purchase Price', value: property.purchase_price ? formatPropertyCurrency(property.purchase_price, propertyCurrency) : '—', accent: false },
+          { label: 'Current Value', value: property.current_value ? formatPropertyCurrency(property.current_value, propertyCurrency) : '—', accent: true },
+          { label: 'Mortgage Balance', value: property.mortgage_balance ? formatPropertyCurrency(property.mortgage_balance, propertyCurrency) : '—', accent: false },
+          { label: 'Equity', value: equity ? formatPropertyCurrency(equity, propertyCurrency) : '—', accent: true },
         ].map((stat) => (
           <div
             key={stat.label}
@@ -162,7 +164,7 @@ export default async function PropertyDetailPage({
                   Mortgage
                 </p>
                 <p className="mt-1 font-mono text-[14px] font-medium text-dynasty-cream">
-                  {formatCurrency(property.monthly_mortgage)}
+                  {formatPropertyCurrency(property.monthly_mortgage, propertyCurrency)}
                   <span className="ml-1 text-dynasty-gray-500 font-light">/mo</span>
                 </p>
               </div>
@@ -173,7 +175,7 @@ export default async function PropertyDetailPage({
                   Condo Fee
                 </p>
                 <p className="mt-1 font-mono text-[14px] font-medium text-dynasty-cream">
-                  {formatCurrency(property.condo_fee)}
+                  {formatPropertyCurrency(property.condo_fee, propertyCurrency)}
                   <span className="ml-1 text-dynasty-gray-500 font-light">/mo</span>
                 </p>
               </div>
@@ -184,7 +186,7 @@ export default async function PropertyDetailPage({
                   Strata Fee
                 </p>
                 <p className="mt-1 font-mono text-[14px] font-medium text-dynasty-cream">
-                  {formatCurrency(property.strata_fee)}
+                  {formatPropertyCurrency(property.strata_fee, propertyCurrency)}
                   <span className="ml-1 text-dynasty-gray-500 font-light">/mo</span>
                 </p>
               </div>

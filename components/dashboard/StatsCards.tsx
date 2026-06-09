@@ -13,9 +13,10 @@ interface StatCardProps {
   icon: React.ReactNode
   highlight?: boolean
   negative?: boolean
+  alert?: boolean
 }
 
-function StatCard({ label, value, subtext, trend, icon, highlight, negative }: StatCardProps) {
+function StatCard({ label, value, subtext, trend, icon, highlight, negative, alert }: StatCardProps) {
   const { theme, fontWeights } = useAppTheme()
   const styles = useThemeStyles()
 
@@ -68,8 +69,27 @@ function StatCard({ label, value, subtext, trend, icon, highlight, negative }: S
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
           }}>
-            {value}
+            {alert && (
+              <span
+                aria-hidden
+                style={{
+                  display: 'inline-block',
+                  width: '8px',
+                  height: '8px',
+                  borderRadius: '50%',
+                  background: theme.accent,
+                  flexShrink: 0,
+                  animation: 'dynasty-pulse 2s ease-in-out infinite',
+                }}
+              />
+            )}
+            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {value}
+            </span>
           </p>
 
           {subtext && (
@@ -143,7 +163,7 @@ export function StatsCards({
       <StatCard
         label="Monthly Net Income"
         value={formatCurrency(monthlyNetIncome)}
-        subtext="Income minus expenses"
+        subtext="This month · income minus expenses"
         icon={<TrendingUp style={{ width: '16px', height: '16px' }} strokeWidth={1.2} />}
         highlight
         negative={monthlyNetIncome < 0}
@@ -159,6 +179,7 @@ export function StatsCards({
         value={pendingReminders.toString()}
         subtext={pendingReminders === 0 ? 'All clear' : 'Action required'}
         icon={<Bell style={{ width: '16px', height: '16px' }} strokeWidth={1.2} />}
+        alert={pendingReminders > 0}
       />
     </div>
   )
