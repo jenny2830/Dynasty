@@ -423,6 +423,7 @@ export type Database = {
           ai_raw_json: Json | null
           ai_confidence: number | null
           status: 'pending' | 'confirmed' | 'rejected'
+          currency: string | null
           created_at: string
         }
         Insert: {
@@ -437,6 +438,7 @@ export type Database = {
           ai_raw_json?: Json | null
           ai_confidence?: number | null
           status?: 'pending' | 'confirmed' | 'rejected'
+          currency?: string | null
           created_at?: string
         }
         Update: {
@@ -451,6 +453,7 @@ export type Database = {
           ai_raw_json?: Json | null
           ai_confidence?: number | null
           status?: 'pending' | 'confirmed' | 'rejected'
+          currency?: string | null
           created_at?: string
         }
         Relationships: [
