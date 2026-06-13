@@ -40,55 +40,81 @@ interface AppThemeProviderProps {
   initialThemeId?: ThemeId
 }
 
+// Read the theme from localStorage SYNCHRONOUSLY before the first render so the
+// user's saved choice persists across refreshes with no flash/reset. The
+// server-provided value is only a fallback for first load on a fresh device
+// (no localStorage yet); after that, localStorage is authoritative.
+function getInitialTheme(initialThemeId?: ThemeId): ThemeId {
+  if (typeof window === 'undefined') {
+    return initialThemeId && THEMES[initialThemeId] ? initialThemeId : 'dark-gold'
+  }
+  try {
+    const saved = localStorage.getItem('dynasty-theme') as ThemeId | null
+    if (saved && THEMES[saved]) return saved
+  } catch {}
+  if (initialThemeId && THEMES[initialThemeId]) {
+    try {
+      localStorage.setItem('dynasty-theme', initialThemeId)
+    } catch {}
+    return initialThemeId
+  }
+  return 'dark-gold'
+}
+
+function getInitialTextThickness(): TextThickness {
+  if (typeof window === 'undefined') return 'light'
+  try {
+    const saved = localStorage.getItem('dynasty-text-thickness') as TextThickness | null
+    if (saved === 'light' || saved === 'regular' || saved === 'bold') return saved
+  } catch {}
+  return 'light'
+}
+
 export function AppThemeProvider({ children, initialThemeId }: AppThemeProviderProps) {
-  // The server (DB) value is authoritative on load. Using it as the initial
-  // state keeps SSR and client hydration identical, which prevents the theme
-  // from flashing/snapping to a stale localStorage value on refresh (e.g.
-  // background going dark while Settings still shows the rose theme).
-  // localStorage is only a fallback for when the server didn't provide a value.
-  const [themeId, setThemeIdState] = useState<ThemeId>(() => {
-    if (initialThemeId && THEMES[initialThemeId]) {
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('dynasty-theme', initialThemeId)
-      }
-      return initialThemeId
-    }
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('dynasty-theme') as ThemeId
-      if (saved && THEMES[saved]) return saved
-    }
-    return 'dark-gold'
-  })
-  const [textThickness, setTextThicknessState] = useState<TextThickness>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('dynasty-text-thickness') as TextThickness
-      if (saved === 'light' || saved === 'regular' || saved === 'bold') return saved
-    }
-    return 'light'
-  })
+  const [themeId, setThemeIdState] = useState<ThemeId>(() => getInitialTheme(initialThemeId))
+  const [textThickness, setTextThicknessState] = useState<TextThickness>(getInitialTextThickness)
   const supabase = createClient()
 
+  // After mount, sync with Supabase in case the user changed the theme on
+  // another device. Only override when the DB value actually differs from what
+  // localStorage already applied — this avoids snapping back to a stale value.
   useEffect(() => {
-    const load = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (user) {
+    const syncFromSupabase = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) return
+
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { data } = await (supabase
           .from('landlords')
           .select('theme_preference, text_thickness')
           .eq('auth_user_id', user.id)
           .maybeSingle() as any) as { data: { theme_preference?: string; text_thickness?: string } | null }
+
         if (data?.theme_preference && THEMES[data.theme_preference as ThemeId]) {
-          setThemeIdState(data.theme_preference as ThemeId)
-          localStorage.setItem('dynasty-theme', data.theme_preference)
+          const localTheme = localStorage.getItem('dynasty-theme')
+          if (data.theme_preference !== localTheme) {
+            setThemeIdState(data.theme_preference as ThemeId)
+            localStorage.setItem('dynasty-theme', data.theme_preference)
+          }
         }
-        if (data?.text_thickness === 'light' || data?.text_thickness === 'regular' || data?.text_thickness === 'bold') {
-          setTextThicknessState(data.text_thickness)
-          localStorage.setItem('dynasty-text-thickness', data.text_thickness)
+
+        if (
+          data?.text_thickness === 'light' ||
+          data?.text_thickness === 'regular' ||
+          data?.text_thickness === 'bold'
+        ) {
+          const localThickness = localStorage.getItem('dynasty-text-thickness')
+          if (data.text_thickness !== localThickness) {
+            setTextThicknessState(data.text_thickness)
+            localStorage.setItem('dynasty-text-thickness', data.text_thickness)
+          }
         }
+      } catch (err) {
+        console.error('Theme sync error:', err)
       }
     }
-    load()
+    syncFromSupabase()
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
