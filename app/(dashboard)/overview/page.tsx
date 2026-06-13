@@ -1,7 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
 import { OverviewDashboard } from '@/components/dashboard/OverviewDashboard'
-import { Button } from '@/components/ui/button'
-import Link from 'next/link'
 import { isRecurringPaymentPending } from '@/lib/recurring-utils'
 import { subMonths, format, startOfMonth, endOfMonth } from 'date-fns'
 
@@ -38,35 +36,36 @@ export default async function OverviewPage() {
 
   const { data: landlord } = await supabase
     .from('landlords')
-    .select('id, full_name, plan, display_currency, onboarding_completed')
+    .select('id, full_name, plan, display_currency')
     .eq('auth_user_id', user.id)
     .maybeSingle()
 
-  // Check if user has any properties (bypass onboarding if they do)
-  const { count: propertyCount } = landlord
-    ? await supabase
-        .from('properties')
-        .select('*', { count: 'exact', head: true })
-        .eq('landlord_id', landlord.id)
-    : { count: 0 }
-
-  if (!landlord || (!landlord.onboarding_completed && (propertyCount ?? 0) === 0)) {
+  // No landlord record yet — show the dashboard with empty state rather than
+  // blocking the user with a welcome/onboarding wall.
+  if (!landlord) {
+    const now = new Date()
+    const months = Array.from({ length: 6 }, (_, i) => subMonths(now, 5 - i))
+    const hour = now.getHours()
+    const greeting = hour < 12 ? 'Good Morning' : hour < 17 ? 'Good Afternoon' : 'Good Evening'
     return (
-      <div className="flex min-h-[60vh] flex-col items-center justify-center text-center">
-        <p className="font-sans text-[11px] font-normal uppercase tracking-[0.3em] text-dynasty-gold/60">
-          Welcome
-        </p>
-        <h1 className="mt-3 font-serif text-[40px] font-semibold tracking-[0.04em] text-dynasty-warm-white">
-          To Your Dynasty
-        </h1>
-        <div className="mx-auto mt-4 h-px w-12 bg-dynasty-gold/50" />
-        <p className="mt-5 max-w-md font-sans text-[15px] font-normal text-dynasty-gray-400">
-          Complete your profile to begin managing your portfolio.
-        </p>
-        <Button asChild className="mt-7">
-          <Link href="/settings">Set Up Profile</Link>
-        </Button>
-      </div>
+      <OverviewDashboard
+        greeting={`${greeting}, there`}
+        dateSubtitle={now.toLocaleDateString('en-CA', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        })}
+        initialDisplayCurrency="CAD"
+        totalPortfolioValue={0}
+        monthlyNetIncome={0}
+        activeProperties={0}
+        pendingReminders={0}
+        chartData={buildChartData([], months)}
+        recentTx={[]}
+        properties={[]}
+        upcomingReminders={[]}
+      />
     )
   }
 
