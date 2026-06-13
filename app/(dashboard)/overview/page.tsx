@@ -38,11 +38,19 @@ export default async function OverviewPage() {
 
   const { data: landlord } = await supabase
     .from('landlords')
-    .select('id, full_name, plan, display_currency')
+    .select('id, full_name, plan, display_currency, onboarding_completed')
     .eq('auth_user_id', user.id)
     .maybeSingle()
 
-  if (!landlord) {
+  // Check if user has any properties (bypass onboarding if they do)
+  const { count: propertyCount } = landlord
+    ? await supabase
+        .from('properties')
+        .select('*', { count: 'exact', head: true })
+        .eq('landlord_id', landlord.id)
+    : { count: 0 }
+
+  if (!landlord || (!landlord.onboarding_completed && (propertyCount ?? 0) === 0)) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center text-center">
         <p className="font-sans text-[11px] font-normal uppercase tracking-[0.3em] text-dynasty-gold/60">
@@ -155,7 +163,7 @@ export default async function OverviewPage() {
   const months = Array.from({ length: 6 }, (_, i) => subMonths(now, 5 - i))
   const chartData = buildChartData(chartTx, months)
 
-  const firstName = landlord.full_name.split(' ')[0]
+  const firstName = (landlord.full_name ?? '').split(' ')[0] || 'there'
   const hour = now.getHours()
   const greeting =
     hour < 12 ? 'Good Morning' : hour < 17 ? 'Good Afternoon' : 'Good Evening'

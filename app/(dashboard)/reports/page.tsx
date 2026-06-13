@@ -23,8 +23,9 @@ export default async function ReportsPage() {
   const { data: properties } = landlord
     ? await supabase
         .from('properties')
-        .select('id, name')
+        .select('id, name, city')
         .eq('landlord_id', landlord.id)
+        .eq('status', 'active')
         .order('name')
     : { data: [] }
 

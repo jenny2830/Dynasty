@@ -11,6 +11,7 @@ export interface ConfirmReceiptData {
   category: string
   description: string | null
   propertyId: string | null
+  currency?: string
 }
 
 export async function confirmReceipt(
@@ -41,6 +42,7 @@ export async function confirmReceipt(
       category: data.category,
       description: data.description,
       property_id: data.propertyId,
+      currency: data.currency ?? 'CAD',
     })
     .eq('id', data.receiptId)
     .eq('landlord_id', landlord.id)

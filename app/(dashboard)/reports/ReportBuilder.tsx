@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition, useRef } from 'react'
+import { useState, useTransition } from 'react'
 import {
   BarChart3,
   FileDown,
@@ -9,7 +9,7 @@ import {
   Minus,
 } from 'lucide-react'
 import jsPDF from 'jspdf'
-import html2canvas from 'html2canvas'
+import autoTable from 'jspdf-autotable'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
@@ -30,6 +30,7 @@ import { useAppTheme } from '@/lib/theme-context'
 interface Property {
   id: string
   name: string
+  city?: string | null
 }
 
 type ReportType = 'pl' | 'cash_flow' | 'tax_summary' | 'expense_breakdown'
@@ -88,7 +89,6 @@ function downloadCSV(content: string, filename: string) {
 
 export function ReportBuilder({ properties }: ReportBuilderProps) {
   const { theme } = useAppTheme()
-  const reportRef = useRef<HTMLDivElement>(null)
   const [downloading, setDownloading] = useState(false)
   const [reportType, setReportType] = useState<ReportType>('pl')
   const [propertyId, setPropertyId] = useState<string>('all')
@@ -175,84 +175,176 @@ export function ReportBuilder({ properties }: ReportBuilderProps) {
   }
 
   const handleDownloadPDF = async () => {
-    if (!reportRef.current) return
+    if (!generated || transactions.length === 0) return
     setDownloading(true)
 
     try {
-      const canvas = await html2canvas(reportRef.current, {
-        scale: 2,
-        backgroundColor: '#0A0A0A',
-        useCORS: true,
-        logging: false,
-        windowWidth: reportRef.current.scrollWidth,
-        windowHeight: reportRef.current.scrollHeight,
-      })
-
-      const imgData = canvas.toDataURL('image/png')
-      const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4',
-      })
-
-      const pdfWidth = pdf.internal.pageSize.getWidth()
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width
+      const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
+      const pageWidth = pdf.internal.pageSize.getWidth()
       const pageHeight = pdf.internal.pageSize.getHeight()
+      let yPos = 0
 
+      // ── HEADER ──
       pdf.setFillColor(10, 10, 10)
-      pdf.rect(0, 0, pdfWidth, 20, 'F')
+      pdf.rect(0, 0, pageWidth, 28, 'F')
       pdf.setTextColor(201, 168, 76)
-      pdf.setFontSize(14)
-      pdf.text('DYNASTY — Property Wealth Platform', pdfWidth / 2, 13, { align: 'center' })
+      pdf.setFontSize(16)
+      pdf.setFont('helvetica', 'bold')
+      pdf.text('DYNASTY', pageWidth / 2, 12, { align: 'center' })
+      pdf.setFontSize(9)
+      pdf.setFont('helvetica', 'normal')
+      pdf.text('Property Wealth Platform', pageWidth / 2, 18, { align: 'center' })
+      pdf.setTextColor(138, 138, 130)
+      pdf.setFontSize(8)
+      pdf.text('dynasty-alpha.vercel.app', pageWidth / 2, 24, { align: 'center' })
 
-      let yOffset = 22
-      let remainingHeight = pdfHeight
-      let sourceY = 0
-      const sliceHeight = ((pageHeight - 30) * canvas.width) / pdfWidth
+      yPos = 36
 
-      while (remainingHeight > 0) {
-        const pageCanvas = document.createElement('canvas')
-        pageCanvas.width = canvas.width
-        pageCanvas.height = Math.min(sliceHeight, canvas.height - sourceY)
-        const ctx = pageCanvas.getContext('2d')
-        if (ctx) {
-          ctx.drawImage(
-            canvas,
-            0,
-            sourceY,
-            canvas.width,
-            pageCanvas.height,
-            0,
-            0,
-            canvas.width,
-            pageCanvas.height,
-          )
-        }
-        const pageImg = pageCanvas.toDataURL('image/png')
-        const slicePdfHeight = (pageCanvas.height * pdfWidth) / canvas.width
-        pdf.addImage(pageImg, 'PNG', 0, yOffset, pdfWidth, slicePdfHeight)
+      // ── REPORT TITLE ──
+      pdf.setTextColor(20, 20, 20)
+      pdf.setFontSize(18)
+      pdf.setFont('helvetica', 'bold')
+      const titles: Record<string, string> = {
+        pl: 'Profit & Loss Statement',
+        cash_flow: 'Cash Flow Report',
+        tax_summary: 'Tax Summary Report',
+        expense_breakdown: 'Expense Breakdown Report',
+      }
+      pdf.text(titles[reportType] || 'Financial Report', 14, yPos)
+      yPos += 8
 
-        remainingHeight -= slicePdfHeight
-        sourceY += pageCanvas.height
+      // ── REPORT META ──
+      pdf.setFontSize(9)
+      pdf.setFont('helvetica', 'normal')
+      pdf.setTextColor(100, 100, 100)
+      const propertyLabel =
+        propertyId === 'all'
+          ? 'All Properties'
+          : properties.find((p) => p.id === propertyId)?.name ?? 'Selected Property'
+      pdf.text(`Property: ${propertyLabel}`, 14, yPos)
+      yPos += 6
+      pdf.text(`Period: ${dateStart} to ${dateEnd}`, 14, yPos)
+      yPos += 6
+      pdf.text(`Generated: ${new Date().toLocaleDateString('en-CA')}`, 14, yPos)
+      yPos += 10
 
-        if (remainingHeight > 0) {
-          pdf.addPage()
-          yOffset = 10
-        }
+      // ── DIVIDER ──
+      pdf.setDrawColor(201, 168, 76)
+      pdf.setLineWidth(0.5)
+      pdf.line(14, yPos, pageWidth - 14, yPos)
+      yPos += 8
+
+      // ── SUMMARY CARDS ──
+      const colW = (pageWidth - 28) / 3 - 4
+      pdf.setFillColor(245, 240, 232)
+      pdf.rect(14, yPos, colW, 22, 'F')
+      pdf.rect(14 + colW + 4, yPos, colW, 22, 'F')
+      pdf.rect(14 + (colW + 4) * 2, yPos, colW, 22, 'F')
+
+      pdf.setFontSize(7)
+      pdf.setTextColor(100, 100, 100)
+      pdf.text('TOTAL INCOME', 16, yPos + 6)
+      pdf.text('TOTAL EXPENSES', 16 + colW + 4, yPos + 6)
+      pdf.text('NET INCOME', 16 + (colW + 4) * 2, yPos + 6)
+
+      pdf.setFontSize(11)
+      pdf.setFont('helvetica', 'bold')
+      pdf.setTextColor(10, 10, 10)
+      pdf.text(formatCurrency(totalIncome), 16, yPos + 16)
+      pdf.text(formatCurrency(totalExpenses), 16 + colW + 4, yPos + 16)
+      if (netIncome >= 0) {
+        pdf.setTextColor(0, 120, 60)
+      } else {
+        pdf.setTextColor(183, 110, 121)
+      }
+      pdf.text(formatCurrency(netIncome), 16 + (colW + 4) * 2, yPos + 16)
+
+      yPos += 30
+
+      // ── TRANSACTIONS TABLE ──
+      pdf.setFont('helvetica', 'normal')
+      pdf.setTextColor(20, 20, 20)
+      pdf.setFontSize(11)
+      pdf.text('Transactions', 14, yPos)
+      yPos += 6
+
+      autoTable(pdf, {
+        startY: yPos,
+        head: [['Date', 'Description', 'Property', 'Category', 'Type', 'Amount']],
+        body: transactions.map((t) => [
+          new Date(t.transaction_date).toLocaleDateString('en-CA'),
+          t.description ?? '—',
+          (t.properties as { name: string } | null)?.name ?? '—',
+          t.category ?? '—',
+          t.type === 'income' ? 'Income' : 'Expense',
+          `${t.type === 'expense' ? '-' : '+'}${formatCurrency(t.amount)}`,
+        ]),
+        headStyles: {
+          fillColor: [10, 10, 10],
+          textColor: [201, 168, 76],
+          fontSize: 8,
+          fontStyle: 'bold',
+          cellPadding: 3,
+        },
+        bodyStyles: {
+          fontSize: 8,
+          cellPadding: 3,
+          textColor: [40, 40, 40],
+        },
+        alternateRowStyles: { fillColor: [248, 245, 242] },
+        columnStyles: { 5: { halign: 'right' } },
+        margin: { left: 14, right: 14 },
+      })
+
+      // ── TAX SUMMARY extra table ──
+      if (reportType === 'tax_summary') {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const finalY = (pdf as any).lastAutoTable?.finalY ?? yPos + 20
+
+        pdf.setFontSize(11)
+        pdf.setFont('helvetica', 'bold')
+        pdf.setTextColor(20, 20, 20)
+        pdf.text('Tax Deductible Expenses by Category', 14, finalY + 12)
+
+        const deductibleByCategory = expenses
+          .filter((t) => t.is_tax_deductible)
+          .reduce<Record<string, number>>((acc, t) => {
+            acc[t.category] = (acc[t.category] ?? 0) + t.amount
+            return acc
+          }, {})
+
+        autoTable(pdf, {
+          startY: finalY + 18,
+          head: [['Expense Category', 'Total Amount', 'Tax Deductible']],
+          body: Object.entries(deductibleByCategory).map(([cat, amount]) => [
+            cat,
+            formatCurrency(amount),
+            'Yes',
+          ]),
+          headStyles: { fillColor: [10, 10, 10], textColor: [201, 168, 76], fontSize: 8 },
+          bodyStyles: { fontSize: 8 },
+          margin: { left: 14, right: 14 },
+        })
       }
 
-      pdf.setFontSize(8)
-      pdf.setTextColor(138, 138, 130)
-      pdf.text(
-        `Generated ${new Date().toLocaleDateString('en-CA')} · dynasty-alpha.vercel.app`,
-        pdfWidth / 2,
-        pageHeight - 8,
-        { align: 'center' },
-      )
+      // ── FOOTER on every page ──
+      const totalPages = pdf.getNumberOfPages()
+      for (let i = 1; i <= totalPages; i++) {
+        pdf.setPage(i)
+        pdf.setFontSize(7)
+        pdf.setTextColor(150, 150, 150)
+        pdf.text(
+          `Page ${i} of ${totalPages} · DYNASTY Property Wealth Platform · dynasty-alpha.vercel.app`,
+          pageWidth / 2,
+          pageHeight - 8,
+          { align: 'center' },
+        )
+      }
 
-      pdf.save(`dynasty-report-${new Date().toISOString().split('T')[0]}.pdf`)
+      pdf.save(`dynasty-${reportType}-${dateStart}-${dateEnd}.pdf`)
     } catch (err) {
-      console.error('PDF generation error:', err)
+      console.error('PDF error:', err)
+      alert('PDF generation failed. Please try again.')
     } finally {
       setDownloading(false)
     }
@@ -290,7 +382,9 @@ export function ReportBuilder({ properties }: ReportBuilderProps) {
               <SelectContent>
                 <SelectItem value="all">All properties</SelectItem>
                 {properties.map((p) => (
-                  <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                  <SelectItem key={p.id} value={p.id}>
+                    {p.name}{p.city ? ` — ${p.city}` : ''}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -367,7 +461,6 @@ export function ReportBuilder({ properties }: ReportBuilderProps) {
           </div>
 
           <div
-            ref={reportRef}
             style={{
               padding: '32px',
               background: theme.pageBg ?? '#0A0A0A',

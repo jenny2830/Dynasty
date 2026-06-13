@@ -66,6 +66,7 @@ export function ReceiptScanner({ properties, recentReceipts }: ReceiptScannerPro
 
   const [editData, setEditData] = useState<ExtractedData | null>(null)
   const [selectedProperty, setSelectedProperty] = useState<string>('none')
+  const [receiptCurrency, setReceiptCurrency] = useState<string>('CAD')
 
   const processFile = useCallback(async (file: File) => {
     if (!file.type.match(/^image\/(jpeg|png|webp|gif)$/)) {
@@ -142,6 +143,7 @@ export function ReceiptScanner({ properties, recentReceipts }: ReceiptScannerPro
         category: editData.category!,
         description: editData.description,
         propertyId: selectedProperty === 'none' || !selectedProperty ? null : selectedProperty,
+        currency: receiptCurrency,
       })
 
       if (result.error) {
@@ -342,20 +344,45 @@ export function ReceiptScanner({ properties, recentReceipts }: ReceiptScannerPro
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="amount">Amount (CAD) *</Label>
-                  <NumberInput
-                    id="amount"
-                    value={editData.amount}
-                    onChange={(v) => setEditData({ ...editData, amount: v })}
-                    prefix="$"
-                    decimals={2}
-                    placeholder="0.00"
-                    required
-                  />
+                  <Label htmlFor="amount">Amount *</Label>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '8px', alignItems: 'end' }}>
+                    <NumberInput
+                      id="amount"
+                      value={editData.amount}
+                      onChange={(v) => setEditData({ ...editData, amount: v })}
+                      prefix="$"
+                      decimals={2}
+                      placeholder="0.00"
+                      required
+                    />
+                    <select
+                      value={receiptCurrency}
+                      onChange={(e) => setReceiptCurrency(e.target.value)}
+                      style={{
+                        background: theme.inputBg,
+                        border: `1px solid ${theme.inputBorder}`,
+                        color: theme.inputText,
+                        fontFamily: "'Jost', sans-serif",
+                        fontSize: '13px',
+                        padding: '11px 10px',
+                        borderRadius: '1px',
+                        width: '76px',
+                        outline: 'none',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <option value="CAD">CAD</option>
+                      <option value="USD">USD</option>
+                      <option value="COP">COP</option>
+                      <option value="GBP">GBP</option>
+                      <option value="AUD">AUD</option>
+                      <option value="MXN">MXN</option>
+                    </select>
+                  </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="receipt_date">Date *</Label>
+                  <Label htmlFor="receipt_date">Due Date *</Label>
                   <Input
                     id="receipt_date"
                     type="date"
