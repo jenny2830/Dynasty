@@ -950,13 +950,63 @@ input[style*="background:#2A2A2A"]::placeholder {
 }
 
 /* ─────────────────────────────────────────────
+   Auth gate inputs — always dark, override autofill
+   ───────────────────────────────────────────── */
+.auth-gate .auth-input {
+  width: 100%;
+  background-color: #2A2A2A !important;
+  border: 1px solid rgba(201, 168, 76, 0.12);
+  border-radius: 1px;
+  color: #D4D4CC !important;
+  padding: 12px 16px;
+  font-size: 13px;
+  font-family: 'Jost', sans-serif;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+  caret-color: #D4D4CC;
+}
+
+.auth-gate .auth-input::placeholder {
+  color: #6B6B65 !important;
+  opacity: 1 !important;
+}
+
+.auth-gate .auth-input:focus {
+  border-color: rgba(201, 168, 76, 0.4);
+  box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.06);
+}
+
+.auth-gate .auth-input:-webkit-autofill,
+.auth-gate .auth-input:-webkit-autofill:hover,
+.auth-gate .auth-input:-webkit-autofill:focus,
+.auth-gate .auth-input:-webkit-autofill:active {
+  -webkit-text-fill-color: #D4D4CC !important;
+  -webkit-box-shadow: 0 0 0 1000px #2A2A2A inset !important;
+  box-shadow: 0 0 0 1000px #2A2A2A inset !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+html[data-color-palette="white-black"] .auth-gate .auth-input,
+html[data-color-palette="white-black"] .auth-gate .auth-input:-webkit-autofill,
+html[data-color-palette="white-black"] .auth-gate .auth-input:-webkit-autofill:focus {
+  background-color: #2A2A2A !important;
+  color: #D4D4CC !important;
+  -webkit-text-fill-color: #D4D4CC !important;
+  -webkit-box-shadow: 0 0 0 1000px #2A2A2A inset !important;
+  box-shadow: 0 0 0 1000px #2A2A2A inset !important;
+  border-color: rgba(201, 168, 76, 0.12) !important;
+}
+
+/* ─────────────────────────────────────────────
    Input autofill — keep our dark backgrounds
    ───────────────────────────────────────────── */
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus {
-  -webkit-text-fill-color: #FAF7F2;
-  -webkit-box-shadow: 0 0 0px 1000px #111111 inset;
+  -webkit-text-fill-color: #D4D4CC !important;
+  -webkit-box-shadow: 0 0 0 1000px #2A2A2A inset !important;
+  box-shadow: 0 0 0 1000px #2A2A2A inset !important;
   transition: background-color 5000s ease-in-out 0s;
 }
 

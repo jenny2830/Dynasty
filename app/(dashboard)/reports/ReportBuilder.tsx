@@ -1,14 +1,15 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useState, useTransition, useRef } from 'react'
 import {
   BarChart3,
   FileDown,
-  Printer,
   TrendingUp,
   TrendingDown,
   Minus,
 } from 'lucide-react'
+import jsPDF from 'jspdf'
+import html2canvas from 'html2canvas'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
@@ -87,6 +88,8 @@ function downloadCSV(content: string, filename: string) {
 
 export function ReportBuilder({ properties }: ReportBuilderProps) {
   const { theme } = useAppTheme()
+  const reportRef = useRef<HTMLDivElement>(null)
+  const [downloading, setDownloading] = useState(false)
   const [reportType, setReportType] = useState<ReportType>('pl')
   const [propertyId, setPropertyId] = useState<string>('all')
   const [preset, setPreset] = useState<string>('this_year')
@@ -171,6 +174,90 @@ export function ReportBuilder({ properties }: ReportBuilderProps) {
     downloadCSV(csv, `dynasty-report-${dateStart}-${dateEnd}.csv`)
   }
 
+  const handleDownloadPDF = async () => {
+    if (!reportRef.current) return
+    setDownloading(true)
+
+    try {
+      const canvas = await html2canvas(reportRef.current, {
+        scale: 2,
+        backgroundColor: '#0A0A0A',
+        useCORS: true,
+        logging: false,
+        windowWidth: reportRef.current.scrollWidth,
+        windowHeight: reportRef.current.scrollHeight,
+      })
+
+      const imgData = canvas.toDataURL('image/png')
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4',
+      })
+
+      const pdfWidth = pdf.internal.pageSize.getWidth()
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width
+      const pageHeight = pdf.internal.pageSize.getHeight()
+
+      pdf.setFillColor(10, 10, 10)
+      pdf.rect(0, 0, pdfWidth, 20, 'F')
+      pdf.setTextColor(201, 168, 76)
+      pdf.setFontSize(14)
+      pdf.text('DYNASTY — Property Wealth Platform', pdfWidth / 2, 13, { align: 'center' })
+
+      let yOffset = 22
+      let remainingHeight = pdfHeight
+      let sourceY = 0
+      const sliceHeight = ((pageHeight - 30) * canvas.width) / pdfWidth
+
+      while (remainingHeight > 0) {
+        const pageCanvas = document.createElement('canvas')
+        pageCanvas.width = canvas.width
+        pageCanvas.height = Math.min(sliceHeight, canvas.height - sourceY)
+        const ctx = pageCanvas.getContext('2d')
+        if (ctx) {
+          ctx.drawImage(
+            canvas,
+            0,
+            sourceY,
+            canvas.width,
+            pageCanvas.height,
+            0,
+            0,
+            canvas.width,
+            pageCanvas.height,
+          )
+        }
+        const pageImg = pageCanvas.toDataURL('image/png')
+        const slicePdfHeight = (pageCanvas.height * pdfWidth) / canvas.width
+        pdf.addImage(pageImg, 'PNG', 0, yOffset, pdfWidth, slicePdfHeight)
+
+        remainingHeight -= slicePdfHeight
+        sourceY += pageCanvas.height
+
+        if (remainingHeight > 0) {
+          pdf.addPage()
+          yOffset = 10
+        }
+      }
+
+      pdf.setFontSize(8)
+      pdf.setTextColor(138, 138, 130)
+      pdf.text(
+        `Generated ${new Date().toLocaleDateString('en-CA')} · dynasty-alpha.vercel.app`,
+        pdfWidth / 2,
+        pageHeight - 8,
+        { align: 'center' },
+      )
+
+      pdf.save(`dynasty-report-${new Date().toISOString().split('T')[0]}.pdf`)
+    } catch (err) {
+      console.error('PDF generation error:', err)
+    } finally {
+      setDownloading(false)
+    }
+  }
+
   const reportTypeLabel = {
     pl: 'Profit & Loss',
     cash_flow: 'Cash Flow',
@@ -249,8 +336,7 @@ export function ReportBuilder({ properties }: ReportBuilderProps) {
       {/* Results */}
       {generated && (
         <div className="space-y-7" id="report-output">
-          {/* Report header */}
-          <div className="flex flex-wrap items-center justify-between gap-4 pb-5" style={{ borderBottom: `1px solid ${theme.dividerColor}` }}>
+          <div className="flex flex-wrap items-center justify-between gap-4 pb-5 no-print" style={{ borderBottom: `1px solid ${theme.dividerColor}` }}>
             <div>
               <h2 className="flex items-center gap-3 font-serif text-[26px] font-semibold tracking-[0.04em] text-dynasty-warm-white">
                 <span className="text-[10px] text-dynasty-gold/70 leading-none">◆</span>
@@ -265,15 +351,38 @@ export function ReportBuilder({ properties }: ReportBuilderProps) {
                   : ' · All properties'}
               </p>
             </div>
-            <div className="flex gap-2 no-print">
+            <div className="flex gap-2">
               <Button variant="outline" size="sm" onClick={handleExportCSV}>
                 <FileDown /> CSV
               </Button>
-              <Button variant="outline" size="sm" onClick={() => window.print()}>
-                <Printer /> Print
+              <Button
+                size="sm"
+                onClick={handleDownloadPDF}
+                disabled={downloading}
+                style={{ opacity: downloading ? 0.7 : 1 }}
+              >
+                <FileDown /> {downloading ? 'Generating…' : 'Download PDF'}
               </Button>
             </div>
           </div>
+
+          <div
+            ref={reportRef}
+            style={{
+              padding: '32px',
+              background: theme.pageBg ?? '#0A0A0A',
+            }}
+          >
+            <div className="mb-6 pb-4" style={{ borderBottom: `1px solid ${theme.dividerColor}` }}>
+              <h2 className="font-serif text-[22px] font-semibold tracking-[0.04em] text-dynasty-warm-white">
+                {reportTypeLabel} Report
+              </h2>
+              <p className="mt-1 font-sans text-[11px] font-light uppercase tracking-[0.14em] text-dynasty-gray-500">
+                {dateStart && dateEnd
+                  ? `${formatDate(dateStart)} — ${formatDate(dateEnd)}`
+                  : ''}
+              </p>
+            </div>
 
           {transactions.length === 0 ? (
             <Section className="flex items-center justify-center py-16">
@@ -407,6 +516,7 @@ export function ReportBuilder({ properties }: ReportBuilderProps) {
               )}
             </>
           )}
+          </div>
         </div>
       )}
     </div>

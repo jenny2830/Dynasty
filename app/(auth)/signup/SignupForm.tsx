@@ -1,19 +1,5 @@
 'use client'
 
-const inputStyle: React.CSSProperties = {
-  width: '100%',
-  background: '#2A2A2A',
-  border: '1px solid rgba(201,168,76,0.12)',
-  borderRadius: '1px',
-  color: '#D4D4CC',
-  padding: '12px 16px',
-  fontSize: '13px',
-  fontFamily: "'Jost', sans-serif",
-  outline: 'none',
-  transition: 'border-color 0.2s, box-shadow 0.2s',
-  boxSizing: 'border-box',
-}
-
 const labelStyle: React.CSSProperties = {
   color: '#8A8A82',
   fontFamily: "'Jost', sans-serif",
@@ -22,15 +8,6 @@ const labelStyle: React.CSSProperties = {
   textTransform: 'uppercase',
   marginBottom: '7px',
   display: 'block',
-}
-
-function onFocus(e: React.FocusEvent<HTMLInputElement>) {
-  e.currentTarget.style.borderColor = 'rgba(201,168,76,0.4)'
-  e.currentTarget.style.boxShadow = '0 0 0 3px rgba(201,168,76,0.06)'
-}
-function onBlur(e: React.FocusEvent<HTMLInputElement>) {
-  e.currentTarget.style.borderColor = 'rgba(201,168,76,0.12)'
-  e.currentTarget.style.boxShadow = 'none'
 }
 
 interface SignupFormProps {
@@ -52,17 +29,17 @@ export function SignupForm({ action, error }: SignupFormProps) {
       <form action={action} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
         <div>
           <label htmlFor="full_name" style={labelStyle}>Full Name</label>
-          <input id="full_name" name="full_name" type="text" placeholder="Jane Smith" autoComplete="name" required style={inputStyle} onFocus={onFocus} onBlur={onBlur} />
+          <input id="full_name" name="full_name" type="text" placeholder="Jane Smith" autoComplete="name" required className="auth-input" />
         </div>
 
         <div>
           <label htmlFor="email" style={labelStyle}>Email Address</label>
-          <input id="email" name="email" type="email" placeholder="you@example.com" autoComplete="email" required style={inputStyle} onFocus={onFocus} onBlur={onBlur} />
+          <input id="email" name="email" type="email" placeholder="you@example.com" autoComplete="email" required className="auth-input" />
         </div>
 
         <div>
           <label htmlFor="password" style={labelStyle}>Password</label>
-          <input id="password" name="password" type="password" placeholder="Minimum 8 characters" autoComplete="new-password" minLength={8} required style={inputStyle} onFocus={onFocus} onBlur={onBlur} />
+          <input id="password" name="password" type="password" placeholder="Minimum 8 characters" autoComplete="new-password" minLength={8} required className="auth-input" />
         </div>
 
         <button

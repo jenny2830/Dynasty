@@ -1,19 +1,5 @@
 'use client'
 
-const inputStyle: React.CSSProperties = {
-  width: '100%',
-  background: '#2A2A2A',
-  border: '1px solid rgba(201,168,76,0.12)',
-  borderRadius: '1px',
-  color: '#D4D4CC',
-  padding: '12px 16px',
-  fontSize: '13px',
-  fontFamily: "'Jost', sans-serif",
-  outline: 'none',
-  transition: 'border-color 0.2s, box-shadow 0.2s',
-  boxSizing: 'border-box',
-}
-
 const labelStyle: React.CSSProperties = {
   color: '#8A8A82',
   fontFamily: "'Jost', sans-serif",
@@ -22,15 +8,6 @@ const labelStyle: React.CSSProperties = {
   textTransform: 'uppercase',
   marginBottom: '7px',
   display: 'block',
-}
-
-function onFocus(e: React.FocusEvent<HTMLInputElement>) {
-  e.currentTarget.style.borderColor = 'rgba(201,168,76,0.4)'
-  e.currentTarget.style.boxShadow = '0 0 0 3px rgba(201,168,76,0.06)'
-}
-function onBlur(e: React.FocusEvent<HTMLInputElement>) {
-  e.currentTarget.style.borderColor = 'rgba(201,168,76,0.12)'
-  e.currentTarget.style.boxShadow = 'none'
 }
 
 interface LoginFormProps {
@@ -62,9 +39,7 @@ export function LoginForm({ action, error, next }: LoginFormProps) {
             placeholder="you@example.com"
             autoComplete="email"
             required
-            style={inputStyle}
-            onFocus={onFocus}
-            onBlur={onBlur}
+            className="auth-input"
           />
         </div>
 
@@ -85,9 +60,7 @@ export function LoginForm({ action, error, next }: LoginFormProps) {
             placeholder="••••••••"
             autoComplete="current-password"
             required
-            style={inputStyle}
-            onFocus={onFocus}
-            onBlur={onBlur}
+            className="auth-input"
           />
         </div>
 

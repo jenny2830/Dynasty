@@ -1,14 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
-import { StatsCards } from '@/components/dashboard/StatsCards'
-import { IncomeExpenseChart } from '@/components/dashboard/IncomeExpenseChart'
-import { formatCurrency, formatDate } from '@/lib/utils'
-import { isRecurringPaymentPending } from '@/lib/recurring-utils'
-import { Building2, Plus, ArrowRight, Bell } from 'lucide-react'
-import Link from 'next/link'
+import { OverviewDashboard } from '@/components/dashboard/OverviewDashboard'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { PageHeader } from '@/components/ui/page-header'
-import { Section, SectionHeader } from '@/components/ui/section'
+import Link from 'next/link'
+import { isRecurringPaymentPending } from '@/lib/recurring-utils'
 import { subMonths, format, startOfMonth, endOfMonth } from 'date-fns'
 
 export const dynamic = 'force-dynamic'
@@ -44,7 +38,7 @@ export default async function OverviewPage() {
 
   const { data: landlord } = await supabase
     .from('landlords')
-    .select('id, full_name, plan')
+    .select('id, full_name, plan, display_currency')
     .eq('auth_user_id', user.id)
     .maybeSingle()
 
@@ -167,221 +161,23 @@ export default async function OverviewPage() {
     hour < 12 ? 'Good Morning' : hour < 17 ? 'Good Afternoon' : 'Good Evening'
 
   return (
-    <div className="space-y-9">
-      {/* Header */}
-      <PageHeader
-        title={`${greeting}, ${firstName}`}
-        subtitle={now.toLocaleDateString('en-CA', {
-          weekday: 'long',
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-        })}
-      >
-        <Button asChild variant="outline" size="sm">
-          <Link href="/transactions/new">
-            <Plus /> Transaction
-          </Link>
-        </Button>
-        <Button asChild size="sm">
-          <Link href="/properties/new">
-            <Plus /> Property
-          </Link>
-        </Button>
-      </PageHeader>
-
-      {/* Stats */}
-      <StatsCards
-        totalPortfolioValue={totalValue}
-        monthlyNetIncome={monthlyNetIncome}
-        activeProperties={activeCount}
-        pendingReminders={pendingCount}
-      />
-
-      {/* Chart + Recent */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
-        {/* Income vs Expense chart — 3/5 width */}
-        <Section className="lg:col-span-3">
-          <SectionHeader
-            title="Income vs Expenses"
-            description="Last six months"
-          />
-          <div className="px-5 py-5">
-            <IncomeExpenseChart data={chartData} />
-          </div>
-        </Section>
-
-        {/* Recent transactions — 2/5 width */}
-        <Section className="lg:col-span-2">
-          <SectionHeader
-            title="Recent Transactions"
-            action={
-              <Link
-                href="/transactions"
-                className="flex items-center gap-1.5 font-sans text-[12px] font-normal uppercase tracking-[0.18em] text-[var(--accent-c)] transition-colors hover:opacity-80"
-              >
-                View All <ArrowRight className="h-3 w-3" strokeWidth={1.2} />
-              </Link>
-            }
-          />
-          <div className="divide-y divide-[var(--divider-c)]">
-            {recentTx.length === 0 ? (
-              <div className="flex flex-col items-center justify-center px-6 py-10 text-center">
-                <p className="mb-3 font-sans text-[12px] tracking-[0.4em] text-[var(--accent-c)] opacity-30">
-                  ◆ ◇ ◆
-                </p>
-                <p className="font-serif text-[20px] font-medium text-dynasty-gray-400">
-                  No transactions yet
-                </p>
-                <p className="mt-1 font-sans text-[14px] font-normal tracking-[0.06em] text-dynasty-gray-600">
-                  Your ledger awaits its first entry
-                </p>
-                <Button asChild variant="outline" size="sm" className="mt-4">
-                  <Link href="/transactions/new">Add First</Link>
-                </Button>
-              </div>
-            ) : (
-              recentTx.map((tx) => (
-                <div
-                  key={tx.id}
-                  className="flex items-center justify-between px-7 py-3.5 transition-colors hover:bg-[var(--table-row-hover-bg)]"
-                >
-                  <div className="min-w-0">
-                    <p className="truncate font-sans text-[15px] font-normal text-dynasty-warm-white">
-                      {tx.description ?? tx.category}
-                    </p>
-                    <p className="mt-0.5 font-sans text-[13px] font-normal text-dynasty-gray-500">
-                      {formatDate(tx.transaction_date)}
-                    </p>
-                  </div>
-                  <span
-                    style={{
-                      marginLeft: '12px',
-                      flexShrink: 0,
-                      fontFamily: "'JetBrains Mono', monospace",
-                      fontSize: '15px',
-                      fontWeight: 500,
-                      letterSpacing: '-0.025em',
-                      color: tx.type === 'income' ? 'var(--value-pos-c)' : 'var(--value-neg-c)',
-                    }}
-                  >
-                    {tx.type === 'income' ? '+' : '−'}$
-                    {tx.amount.toLocaleString('en-CA', { minimumFractionDigits: 0 })}
-                  </span>
-                </div>
-              ))
-            )}
-          </div>
-        </Section>
-      </div>
-
-      {/* Properties + Reminders */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <Section>
-          <SectionHeader
-            title="Properties"
-            action={
-              <Link
-                href="/properties"
-                className="flex items-center gap-1.5 font-sans text-[12px] font-normal uppercase tracking-[0.18em] text-[var(--accent-c)] transition-colors hover:opacity-80"
-              >
-                View All <ArrowRight className="h-3 w-3" strokeWidth={1.2} />
-              </Link>
-            }
-          />
-          <div className="divide-y divide-[var(--divider-c)]">
-            {properties.length === 0 ? (
-              <div className="flex flex-col items-center justify-center px-6 py-10 text-center">
-                <p className="mb-3 font-sans text-[12px] tracking-[0.4em] text-[var(--accent-c)] opacity-30">
-                  ◆ ◇ ◆
-                </p>
-                <Building2
-                  className="h-9 w-9 text-[var(--accent-c)] opacity-20"
-                  strokeWidth={1}
-                />
-                <p className="mt-3 font-serif text-[20px] font-medium text-dynasty-gray-400">
-                  No properties yet
-                </p>
-                <p className="mt-1 font-sans text-[14px] font-normal tracking-[0.06em] text-dynasty-gray-600">
-                  Begin building your portfolio
-                </p>
-                <Button asChild variant="outline" size="sm" className="mt-4">
-                  <Link href="/properties/new">Add Property</Link>
-                </Button>
-              </div>
-            ) : (
-              properties.map((p) => (
-                <Link
-                  key={p.id}
-                  href={`/properties/${p.id}`}
-                  className="flex items-center justify-between px-7 py-4 transition-colors hover:bg-[var(--table-row-hover-bg)]"
-                >
-                  <div className="min-w-0">
-                    <p className="truncate font-sans text-[15px] text-dynasty-warm-white">
-                      {p.name}
-                    </p>
-                    <p className="mt-0.5 font-sans text-[13px] font-normal text-dynasty-gray-500">
-                      {p.city}, {p.province}
-                    </p>
-                  </div>
-                  <Badge className="ml-4 shrink-0">{p.type}</Badge>
-                </Link>
-              ))
-            )}
-          </div>
-        </Section>
-
-        <Section>
-          <SectionHeader
-            title="Upcoming Reminders"
-            action={
-              <Link
-                href="/recurring"
-                className="flex items-center gap-1.5 font-sans text-[12px] font-normal uppercase tracking-[0.18em] text-[var(--accent-c)] transition-colors hover:opacity-80"
-              >
-                View All <ArrowRight className="h-3 w-3" strokeWidth={1.2} />
-              </Link>
-            }
-          />
-          <div className="divide-y divide-[var(--divider-c)]">
-            {upcomingReminders.length === 0 ? (
-              <div className="flex items-center gap-3 px-7 py-5">
-                <Bell className="h-4 w-4 shrink-0 text-dynasty-gold" strokeWidth={1.2} />
-                <p className="font-sans text-[14px] font-normal tracking-[0.04em] text-dynasty-gray-400">
-                  All clear — no pending reminders
-                </p>
-              </div>
-            ) : (
-              upcomingReminders.map((payment) => (
-                <div
-                  key={payment.id}
-                  className="flex items-center justify-between px-7 py-4"
-                >
-                  <div className="min-w-0">
-                    <p className="truncate font-sans text-[15px] text-dynasty-warm-white">
-                      {payment.name}
-                    </p>
-                    <p className="mt-0.5 font-sans text-[13px] font-normal text-dynasty-gray-500">
-                      Due {formatDate(payment.next_due_date)}
-                    </p>
-                  </div>
-                  <span style={{
-                    marginLeft: '12px',
-                    flexShrink: 0,
-                    fontFamily: "'JetBrains Mono', monospace",
-                    fontSize: '15px',
-                    fontWeight: 500,
-                    letterSpacing: '-0.025em',
-                    color: 'var(--value-neg-c)',
-                  }}>
-                    {formatCurrency(payment.amount)}
-                  </span>
-                </div>
-              ))
-            )}
-          </div>
-        </Section>
-      </div>
-    </div>
+    <OverviewDashboard
+      greeting={`${greeting}, ${firstName}`}
+      dateSubtitle={now.toLocaleDateString('en-CA', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      })}
+      initialDisplayCurrency={(landlord as { display_currency?: string }).display_currency ?? 'CAD'}
+      totalPortfolioValue={totalValue}
+      monthlyNetIncome={monthlyNetIncome}
+      activeProperties={activeCount}
+      pendingReminders={pendingCount}
+      chartData={chartData}
+      recentTx={recentTx}
+      properties={properties}
+      upcomingReminders={upcomingReminders}
+    />
   )
 }

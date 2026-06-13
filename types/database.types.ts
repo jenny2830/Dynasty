@@ -33,6 +33,7 @@ export type Database = {
           signup_ip: string | null
           signup_fingerprint: string | null
           is_blocked: boolean
+          display_currency: string
         }
         Insert: {
           id?: string
@@ -57,6 +58,7 @@ export type Database = {
           signup_ip?: string | null
           signup_fingerprint?: string | null
           is_blocked?: boolean
+          display_currency?: string
         }
         Update: {
           id?: string
@@ -81,6 +83,7 @@ export type Database = {
           signup_ip?: string | null
           signup_fingerprint?: string | null
           is_blocked?: boolean
+          display_currency?: string
         }
         Relationships: []
       }

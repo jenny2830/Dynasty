@@ -24,6 +24,8 @@ import { useAppTheme } from '@/lib/theme-context'
 interface Property {
   id: string
   name: string
+  address?: string
+  city?: string
 }
 
 interface RecentReceipt {
@@ -394,12 +396,15 @@ export function ReceiptScanner({ properties, recentReceipts }: ReceiptScannerPro
                   <Label htmlFor="property">Associate with Property</Label>
                   <Select value={selectedProperty} onValueChange={setSelectedProperty}>
                     <SelectTrigger id="property">
-                      <SelectValue placeholder="Select property (optional)" />
+                      <SelectValue placeholder="Select a property (optional)" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="none">No property</SelectItem>
+                      <SelectItem value="none">Select a property (optional)</SelectItem>
                       {properties.map((p) => (
-                        <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                        <SelectItem key={p.id} value={p.id}>
+                          {p.name}
+                          {p.address && p.city ? ` — ${p.address}, ${p.city}` : ''}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>

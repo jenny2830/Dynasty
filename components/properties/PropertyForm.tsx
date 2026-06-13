@@ -14,7 +14,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { CANADIAN_PROVINCES, COUNTRIES, PROPERTY_TYPES, PROPERTY_SUBTYPES, PROPERTY_STATUSES, getCurrencyForCountry, getRegionLabel, getRegionsForCountry } from '@/lib/constants'
+import {
+  COUNTRIES,
+  getCurrencyForCountry,
+  getRegionLabel,
+  getRegionOptions,
+  normalizeRegion,
+} from '@/lib/geo'
+import { PROPERTY_TYPES, PROPERTY_SUBTYPES, PROPERTY_STATUSES } from '@/lib/constants'
 import { NumberInput } from '@/components/ui/NumberInput'
 import type { Property } from '@/types/database.types'
 
@@ -41,12 +48,19 @@ interface PropertyFormProps {
 }
 
 export function PropertyForm({ mode, property }: PropertyFormProps) {
+  const initialCountry = property?.country ?? 'CA'
   const [type, setType] = useState<string>(property?.type ?? 'rental')
-  const [country, setCountry] = useState<string>(property?.country ?? 'CA')
-  const [province, setProvince] = useState<string>(property?.province ?? 'ON')
+  const [country, setCountry] = useState<string>(initialCountry)
+  const [province, setProvince] = useState<string>(() =>
+    normalizeRegion(initialCountry, property?.province) || '',
+  )
+  const [status, setStatus] = useState<string>(property?.status ?? 'active')
+  const [propertySubtype, setPropertySubtype] = useState<string>(
+    property?.property_subtype ?? 'residential',
+  )
 
-  const regions = getRegionsForCountry(country)
   const regionLabel = getRegionLabel(country)
+  const regions = getRegionOptions(country, province)
   const currencyLabel = getCurrencyForCountry(country)
 
   const action =
@@ -58,6 +72,12 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
 
   return (
     <form action={formAction} className="space-y-9">
+      <input type="hidden" name="country" value={country} />
+      <input type="hidden" name="province" value={province} />
+      <input type="hidden" name="status" value={status} />
+      <input type="hidden" name="type" value={type} />
+      <input type="hidden" name="property_subtype" value={propertySubtype} />
+
       {state?.errors?._form && (
         <div className="rounded-[1px] border border-[rgba(183,110,121,0.3)] bg-[rgba(183,110,121,0.08)] px-4 py-3">
           <p className="font-sans text-[12px] font-light text-dynasty-rose-light">
@@ -87,7 +107,7 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
 
           <div className="space-y-2">
             <Label htmlFor="status">Status</Label>
-            <Select name="status" defaultValue={property?.status ?? 'active'}>
+            <Select value={status} onValueChange={setStatus}>
               <SelectTrigger id="status">
                 <SelectValue placeholder="Select status" />
               </SelectTrigger>
@@ -103,11 +123,7 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
 
           <div className="space-y-2">
             <Label htmlFor="type">Property Type *</Label>
-            <Select
-              name="type"
-              defaultValue={property?.type ?? 'rental'}
-              onValueChange={setType}
-            >
+            <Select value={type} onValueChange={setType}>
               <SelectTrigger id="type">
                 <SelectValue placeholder="Select type" />
               </SelectTrigger>
@@ -123,7 +139,7 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
 
           <div className="space-y-2">
             <Label htmlFor="property_subtype">Subtype *</Label>
-            <Select name="property_subtype" defaultValue={property?.property_subtype ?? 'residential'}>
+            <Select value={propertySubtype} onValueChange={setPropertySubtype}>
               <SelectTrigger id="property_subtype">
                 <SelectValue placeholder="Select subtype" />
               </SelectTrigger>
@@ -178,21 +194,25 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
           <div className="space-y-2">
             <Label htmlFor="province">{regionLabel} *</Label>
             <Select
-              name="province"
-              value={province}
+              value={province || undefined}
               onValueChange={setProvince}
             >
               <SelectTrigger id="province">
                 <SelectValue placeholder={`Select ${regionLabel.toLowerCase()}`} />
               </SelectTrigger>
               <SelectContent>
-                {regions.map((p) => (
-                  <SelectItem key={p.value} value={p.value}>
-                    {p.label}
+                {regions.map((r) => (
+                  <SelectItem key={r} value={r}>
+                    {r}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
+            {state?.errors?.province && (
+              <p className="font-sans text-[11px] font-light text-dynasty-rose-light">
+                {state.errors.province[0]}
+              </p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -208,7 +228,6 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
           <div className="space-y-2">
             <Label htmlFor="country">Country</Label>
             <Select
-              name="country"
               value={country}
               onValueChange={(value) => {
                 setCountry(value)
@@ -220,8 +239,8 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
               </SelectTrigger>
               <SelectContent>
                 {COUNTRIES.map((c) => (
-                  <SelectItem key={c.value} value={c.value}>
-                    {c.label}
+                  <SelectItem key={c.code} value={c.code}>
+                    {c.name}
                   </SelectItem>
                 ))}
               </SelectContent>

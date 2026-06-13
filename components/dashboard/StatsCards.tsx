@@ -5,6 +5,14 @@ import { formatCurrency } from '@/lib/utils'
 import { useAppTheme } from '@/lib/theme-context'
 import { useThemeStyles } from '@/lib/useThemeStyles'
 
+function getValueFontSize(value: string): string {
+  const len = value.length
+  if (len <= 8) return 'clamp(28px, 4vw, 42px)'
+  if (len <= 11) return 'clamp(22px, 3vw, 34px)'
+  if (len <= 14) return 'clamp(18px, 2.5vw, 28px)'
+  return 'clamp(14px, 2vw, 22px)'
+}
+
 interface StatCardProps {
   label: string
   value: string
@@ -14,9 +22,20 @@ interface StatCardProps {
   highlight?: boolean
   negative?: boolean
   alert?: boolean
+  responsiveValue?: boolean
 }
 
-function StatCard({ label, value, subtext, trend, icon, highlight, negative, alert }: StatCardProps) {
+function StatCard({
+  label,
+  value,
+  subtext,
+  trend,
+  icon,
+  highlight,
+  negative,
+  alert,
+  responsiveValue = false,
+}: StatCardProps) {
   const { theme, fontWeights } = useAppTheme()
   const styles = useThemeStyles()
 
@@ -40,8 +59,7 @@ function StatCard({ label, value, subtext, trend, icon, highlight, negative, ale
       <div style={{ position: 'absolute', top: 0, left: '15%', right: '15%', height: '1px', background: theme.topLine }} />
 
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px' }}>
-        <div style={{ minWidth: 0, flex: 1 }}>
-          {/* Label */}
+        <div style={{ minWidth: 0, flex: 1, overflow: 'hidden' }}>
           <p style={{
             ...styles.cardLabel,
             display: 'flex',
@@ -53,11 +71,10 @@ function StatCard({ label, value, subtext, trend, icon, highlight, negative, ale
             <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{label}</span>
           </p>
 
-          {/* Value — gradient fill */}
           <p style={{
             fontFamily: "'Bebas Neue', 'Helvetica Neue', sans-serif",
             fontWeight: fontWeights.medium,
-            fontSize: '40px',
+            fontSize: responsiveValue ? getValueFontSize(value) : '40px',
             lineHeight: 1,
             letterSpacing: '0.04em',
             background: negative ? negativeGradient : theme.accentGradient,
@@ -69,6 +86,7 @@ function StatCard({ label, value, subtext, trend, icon, highlight, negative, ale
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
+            maxWidth: '100%',
             display: 'flex',
             alignItems: 'center',
             gap: '10px',
@@ -87,7 +105,7 @@ function StatCard({ label, value, subtext, trend, icon, highlight, negative, ale
                 }}
               />
             )}
-            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>
               {value}
             </span>
           </p>
@@ -118,7 +136,6 @@ function StatCard({ label, value, subtext, trend, icon, highlight, negative, ale
           )}
         </div>
 
-        {/* Icon box */}
         <div style={{
           display: 'flex',
           height: '36px',
@@ -143,6 +160,7 @@ interface StatsCardsProps {
   monthlyNetIncome: number
   activeProperties: number
   pendingReminders: number
+  displayCurrency?: string
 }
 
 export function StatsCards({
@@ -150,23 +168,29 @@ export function StatsCards({
   monthlyNetIncome,
   activeProperties,
   pendingReminders,
+  displayCurrency = 'CAD',
 }: StatsCardsProps) {
+  const portfolioFormatted = formatCurrency(totalPortfolioValue, displayCurrency, 0)
+  const netFormatted = formatCurrency(monthlyNetIncome, displayCurrency, 0)
+
   return (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px' }}>
       <StatCard
         label="Portfolio Value"
-        value={formatCurrency(totalPortfolioValue)}
+        value={portfolioFormatted}
         subtext="Total current value"
         icon={<Building2 style={{ width: '16px', height: '16px' }} strokeWidth={1.2} />}
         highlight
+        responsiveValue
       />
       <StatCard
         label="Monthly Net Income"
-        value={formatCurrency(monthlyNetIncome)}
+        value={netFormatted}
         subtext="This month · income minus expenses"
         icon={<TrendingUp style={{ width: '16px', height: '16px' }} strokeWidth={1.2} />}
         highlight
         negative={monthlyNetIncome < 0}
+        responsiveValue
       />
       <StatCard
         label="Active Properties"

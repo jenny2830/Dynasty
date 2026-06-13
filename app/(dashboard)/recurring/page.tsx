@@ -7,6 +7,7 @@ import { Section, SectionHeader } from '@/components/ui/section'
 import { formatCurrency } from '@/lib/utils'
 import { isRecurringPaymentPending } from '@/lib/recurring-utils'
 import { RecurringPaymentRow } from './RecurringPaymentRow'
+import { RecurringPaymentHistory } from '@/components/recurring/RecurringPaymentHistory'
 
 export const metadata = { title: 'Recurring Payments' }
 
@@ -29,6 +30,29 @@ export default async function RecurringPage() {
     .select('*, properties(name)')
     .eq('landlord_id', landlord.id)
     .order('next_due_date', { ascending: true })
+
+  const [{ data: historyRows }, { data: propertyList }] = await Promise.all([
+    supabase
+      .from('transactions')
+      .select('id, amount, category, transaction_date, description, property_id')
+      .eq('landlord_id', landlord.id)
+      .eq('source', 'recurring')
+      .order('transaction_date', { ascending: false }),
+    supabase
+      .from('properties')
+      .select('id, name')
+      .eq('landlord_id', landlord.id)
+      .eq('status', 'active')
+      .order('name'),
+  ])
+
+  const propertyNameById = new Map((propertyList ?? []).map((p) => [p.id, p.name]))
+  const history = (historyRows ?? []).map((row) => ({
+    ...row,
+    properties: row.property_id
+      ? { name: propertyNameById.get(row.property_id) ?? '—' }
+      : null,
+  }))
 
   const active = (payments ?? []).filter((p) => p.is_active)
   const inactive = (payments ?? []).filter((p) => !p.is_active)
@@ -97,7 +121,7 @@ export default async function RecurringPage() {
 
       {!payments?.length ? (
         <div
-          className="flex min-h-[50vh] flex-col items-center justify-center rounded-[2px] border border-dashed px-6 py-16 text-center"
+          className="flex flex-col items-center justify-center rounded-[2px] border border-dashed px-6 py-16 text-center"
           style={{ background: 'var(--section-bg)', borderColor: 'var(--card-border-color)' }}
         >
           <RefreshCw className="h-7 w-7" strokeWidth={1} style={{ color: 'var(--accent-c)', opacity: 0.15 }} />
@@ -144,6 +168,11 @@ export default async function RecurringPage() {
           )}
         </div>
       )}
+
+      <RecurringPaymentHistory
+        history={history}
+        properties={propertyList ?? []}
+      />
     </div>
   )
 }

@@ -35,7 +35,7 @@ export default async function LoginPage({
   }
 
   return (
-    <div style={{
+    <div className="auth-gate" style={{
       minHeight: '100vh',
       backgroundColor: '#080808',
       backgroundImage: 'radial-gradient(ellipse 80% 60% at 50% 40%, #1C1A17 0%, #080808 70%), linear-gradient(135deg, rgba(201,168,76,0.06) 0%, transparent 40%), linear-gradient(225deg, rgba(201,168,76,0.04) 0%, transparent 40%)',

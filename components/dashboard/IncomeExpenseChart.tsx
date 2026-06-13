@@ -10,6 +10,7 @@ import {
   ResponsiveContainer,
   Legend,
 } from 'recharts'
+import { formatCurrency } from '@/lib/utils'
 import { useAppTheme } from '@/lib/theme-context'
 
 interface ChartDataPoint {
@@ -20,6 +21,7 @@ interface ChartDataPoint {
 
 interface IncomeExpenseChartProps {
   data: ChartDataPoint[]
+  displayCurrency?: string
 }
 
 interface TooltipPayloadEntry {
@@ -37,6 +39,7 @@ function CustomTooltip({
   axisText,
   textPrimary,
   textSecondary,
+  displayCurrency,
 }: {
   active?: boolean
   payload?: TooltipPayloadEntry[]
@@ -46,6 +49,7 @@ function CustomTooltip({
   axisText: string
   textPrimary: string
   textSecondary: string
+  displayCurrency: string
 }) {
   if (!active || !payload?.length) return null
 
@@ -81,7 +85,7 @@ function CustomTooltip({
             {entry.name}:
           </span>
           <span style={{ fontFamily: "'JetBrains Mono', monospace", fontWeight: 500, color: textPrimary }}>
-            ${entry.value.toLocaleString('en-CA', { minimumFractionDigits: 0 })}
+            {formatCurrency(entry.value, displayCurrency, 0)}
           </span>
         </div>
       ))}
@@ -89,7 +93,7 @@ function CustomTooltip({
   )
 }
 
-export function IncomeExpenseChart({ data }: IncomeExpenseChartProps) {
+export function IncomeExpenseChart({ data, displayCurrency = 'CAD' }: IncomeExpenseChartProps) {
   const { theme } = useAppTheme()
 
   if (data.length === 0) {
@@ -140,6 +144,7 @@ export function IncomeExpenseChart({ data }: IncomeExpenseChartProps) {
               axisText={theme.chartAxisText}
               textPrimary={theme.textPrimary}
               textSecondary={theme.textSecondary}
+              displayCurrency={displayCurrency}
             />
           }
           cursor={{ fill: `${theme.accent}08` }}

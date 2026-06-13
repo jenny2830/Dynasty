@@ -4,20 +4,6 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 
-const inputStyle: React.CSSProperties = {
-  width: '100%',
-  background: '#2A2A2A',
-  border: '1px solid rgba(201,168,76,0.12)',
-  borderRadius: '1px',
-  color: '#D4D4CC',
-  padding: '12px 16px',
-  fontSize: '13px',
-  fontFamily: "'Jost', sans-serif",
-  outline: 'none',
-  transition: 'border-color 0.2s, box-shadow 0.2s',
-  boxSizing: 'border-box',
-}
-
 const labelStyle: React.CSSProperties = {
   color: '#8A8A82',
   fontFamily: "'Jost', sans-serif",
@@ -52,7 +38,7 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div style={{
+    <div className="auth-gate" style={{
       minHeight: '100vh',
       backgroundColor: '#080808',
       backgroundImage: 'radial-gradient(ellipse 80% 60% at 50% 40%, #1C1A17 0%, #080808 70%)',
@@ -129,15 +115,7 @@ export default function ForgotPasswordPage() {
                     placeholder="you@example.com"
                     autoComplete="email"
                     required
-                    style={inputStyle}
-                    onFocus={(e) => {
-                      e.currentTarget.style.borderColor = 'rgba(201,168,76,0.4)'
-                      e.currentTarget.style.boxShadow = '0 0 0 3px rgba(201,168,76,0.06)'
-                    }}
-                    onBlur={(e) => {
-                      e.currentTarget.style.borderColor = 'rgba(201,168,76,0.12)'
-                      e.currentTarget.style.boxShadow = 'none'
-                    }}
+                    className="auth-input"
                   />
                 </div>
 
