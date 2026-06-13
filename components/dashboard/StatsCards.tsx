@@ -7,10 +7,10 @@ import { useThemeStyles } from '@/lib/useThemeStyles'
 
 function getValueFontSize(value: string): string {
   const len = value.length
-  if (len <= 8) return 'clamp(28px, 4vw, 42px)'
-  if (len <= 11) return 'clamp(22px, 3vw, 34px)'
-  if (len <= 14) return 'clamp(18px, 2.5vw, 28px)'
-  return 'clamp(14px, 2vw, 22px)'
+  if (len <= 8) return 'clamp(22px, 3vw, 32px)'
+  if (len <= 11) return 'clamp(18px, 2.5vw, 26px)'
+  if (len <= 14) return 'clamp(15px, 2vw, 22px)'
+  return 'clamp(13px, 1.6vw, 18px)'
 }
 
 interface StatCardProps {
@@ -197,6 +197,7 @@ export function StatsCards({
         value={activeProperties.toString()}
         subtext="Across all units"
         icon={<DollarSign style={{ width: '16px', height: '16px' }} strokeWidth={1.2} />}
+        responsiveValue
       />
       <StatCard
         label="Pending Reminders"
@@ -204,6 +205,7 @@ export function StatsCards({
         subtext={pendingReminders === 0 ? 'All clear' : 'Action required'}
         icon={<Bell style={{ width: '16px', height: '16px' }} strokeWidth={1.2} />}
         alert={pendingReminders > 0}
+        responsiveValue
       />
     </div>
   )
