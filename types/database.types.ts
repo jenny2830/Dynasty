@@ -33,7 +33,7 @@ export type Database = {
           signup_ip: string | null
           signup_fingerprint: string | null
           is_blocked: boolean
-          display_currency: string
+          display_currency?: string  // alias — actual column is `currency`
         }
         Insert: {
           id?: string

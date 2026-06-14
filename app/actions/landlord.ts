@@ -12,7 +12,7 @@ export async function updateDisplayCurrency(currency: string): Promise<{ error?:
 
   const { error } = await supabase
     .from('landlords')
-    .update({ display_currency: currency })
+    .update({ currency: currency })
     .eq('auth_user_id', user.id)
 
   if (error) return { error: error.message }

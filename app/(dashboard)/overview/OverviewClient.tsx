@@ -115,35 +115,29 @@ export function OverviewClient() {
       const months = Array.from({ length: 6 }, (_, i) => subMonths(now, 5 - i))
 
       try {
-        // ── Step 1: Ensure a valid session (mirrors the pattern used by Properties page) ──
-        console.log('[Overview] step 1: checking session')
+        // ── Step 1: Ensure a valid session ──
         const { data: sessionData } = await supabase.auth.getSession()
         if (!sessionData.session) {
-          console.log('[Overview] no session, refreshing')
           const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession()
           if (refreshError || !refreshData.session) {
-            console.error('[Overview] refresh failed:', refreshError)
             router.push('/login')
             return
           }
         }
 
-        console.log('[Overview] step 2: getting user')
         const { data: { user } } = await supabase.auth.getUser()
         if (!user) {
-          console.error('[Overview] no user after getUser()')
           router.push('/login')
           return
         }
 
-        // ── Step 2: Resolve landlord with up to 3 retries (guards against transient auth lag) ──
-        console.log('[Overview] step 3: fetching landlord for user', user.id)
-        type LandlordRow = { id: string; full_name: string; email: string; display_currency: string }
+        // ── Step 2: Resolve landlord with up to 3 retries ──
+        type LandlordRow = { id: string; full_name: string; email: string; currency: string }
         let landlord: LandlordRow | null = null
         for (let attempt = 0; attempt < 3; attempt++) {
           const { data: landlordData, error: lErr } = await supabase
             .from('landlords')
-            .select('id, full_name, email, display_currency')
+            .select('id, full_name, email, currency')
             .eq('auth_user_id', user.id)
             .maybeSingle()
           if (landlordData) { landlord = landlordData as LandlordRow; break }
@@ -157,7 +151,6 @@ export function OverviewClient() {
           setLoading(false)
           return
         }
-        console.log('[Overview] step 4: landlord found', landlord.id)
         const monthStart = format(startOfMonth(now), 'yyyy-MM-dd')
         const monthEnd   = format(endOfMonth(now),   'yyyy-MM-dd')
         const sevenDaysFromNow = format(
@@ -166,7 +159,6 @@ export function OverviewClient() {
         )
 
         // ── Step 3: Parallel data load ──
-        console.log('[Overview] step 5: starting parallel queries')
         const [
           propertiesResult,
           allTxResult,
@@ -199,12 +191,6 @@ export function OverviewClient() {
         ])
 
         // Log any query errors for debugging without crashing
-        console.log('[Overview] step 6: queries done',
-          'props:', propertiesResult.data?.length, propertiesResult.error?.message,
-          'allTx:', allTxResult.data?.length, allTxResult.error?.message,
-          'recentTx:', recentTxResult.data?.length, recentTxResult.error?.message,
-          'recurring:', recurringResult.data?.length, recurringResult.error?.message,
-        )
         if (propertiesResult.error) console.error('[Overview] properties error:', propertiesResult.error)
         if (allTxResult.error)      console.error('[Overview] transactions error:', allTxResult.error)
         if (recentTxResult.error)   console.error('[Overview] recent-tx error:',  recentTxResult.error)
@@ -245,12 +231,10 @@ export function OverviewClient() {
           (landlord.email ?? '').split('@')[0] ||
           'there'
 
-        console.log('[Overview] step 7: derived', { portfolioValue, income, expenses, activeProps: activeProps.length })
-
         setData({
           greeting: `${greetingFor(now)}, ${displayName}`,
           dateSubtitle: dateSubtitleFor(now),
-          displayCurrency: landlord.display_currency ?? 'CAD',
+          displayCurrency: landlord.currency ?? 'CAD',
           portfolioValue,
           monthlyNetIncome: income - expenses,
           activeProperties: activeProps.length,
@@ -261,8 +245,7 @@ export function OverviewClient() {
           upcomingReminders: pendingPayments.slice(0, 5) as UpcomingPayment[],
         })
       } catch (err) {
-        const msg = err instanceof Error ? err.message : String(err)
-        console.error('[Overview] unexpected error:', msg, err)
+        console.error('[Overview] unexpected error:', err)
         setLoadError(true)
       } finally {
         setLoading(false)
