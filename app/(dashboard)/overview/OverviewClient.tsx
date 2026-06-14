@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { OverviewDashboard } from '@/components/dashboard/OverviewDashboard'
 import { isRecurringPaymentPending } from '@/lib/recurring-utils'
@@ -70,7 +71,7 @@ function buildChartData(
 
 function greetingFor(now: Date): string {
   const hour = now.getHours()
-  return hour < 12 ? 'Good Morning' : hour < 17 ? 'Good Afternoon' : 'Good Evening'
+  return hour < 12 ? 'Good Morning' : hour < 18 ? 'Good Afternoon' : 'Good Evening'
 }
 
 function dateSubtitleFor(now: Date): string {
@@ -102,7 +103,9 @@ function emptyData(): OverviewData {
 
 export function OverviewClient() {
   const { theme } = useAppTheme()
+  const router = useRouter()
   const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState(false)
   const [data, setData] = useState<OverviewData>(emptyData)
 
   useEffect(() => {
@@ -112,58 +115,71 @@ export function OverviewClient() {
       const months = Array.from({ length: 6 }, (_, i) => subMonths(now, 5 - i))
 
       try {
-        const {
-          data: { user },
-        } = await supabase.auth.getUser()
+        // ── Step 1: Ensure a valid session (mirrors the pattern used by Properties page) ──
+        const { data: sessionData } = await supabase.auth.getSession()
+        if (!sessionData.session) {
+          const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession()
+          if (refreshError || !refreshData.session) {
+            router.push('/login')
+            return
+          }
+        }
+
+        const { data: { user } } = await supabase.auth.getUser()
         if (!user) {
-          setLoading(false)
+          router.push('/login')
           return
         }
 
-        const { data: landlord } = await supabase
-          .from('landlords')
-          .select('id, full_name, display_currency')
-          .eq('auth_user_id', user.id)
-          .maybeSingle()
+        // ── Step 2: Resolve landlord with up to 3 retries (guards against transient auth lag) ──
+        type LandlordRow = { id: string; full_name: string; email: string; display_currency: string }
+        let landlord: LandlordRow | null = null
+        for (let attempt = 0; attempt < 3; attempt++) {
+          const { data, error: lErr } = await supabase
+            .from('landlords')
+            .select('id, full_name, email, display_currency')
+            .eq('auth_user_id', user.id)
+            .maybeSingle()
+          if (data) { landlord = data as LandlordRow; break }
+          if (lErr) console.error(`[Overview] landlord attempt ${attempt + 1}:`, lErr)
+          if (attempt < 2) await new Promise(r => setTimeout(r, 600))
+        }
 
         if (!landlord) {
+          console.error('[Overview] landlord not found after 3 attempts for user', user.id)
+          setLoadError(true)
           setLoading(false)
           return
         }
 
         const monthStart = format(startOfMonth(now), 'yyyy-MM-dd')
-        const monthEnd = format(endOfMonth(now), 'yyyy-MM-dd')
-        const sixMonthsAgo = format(startOfMonth(subMonths(now, 5)), 'yyyy-MM-dd')
+        const monthEnd   = format(endOfMonth(now),   'yyyy-MM-dd')
         const sevenDaysFromNow = format(
           new Date(now.getFullYear(), now.getMonth(), now.getDate() + 7),
           'yyyy-MM-dd',
         )
 
+        // ── Step 3: Parallel data load ──
+        // NOTE: properties query has NO status filter so we capture the full portfolio,
+        // including 'vacant' properties. The active-count is derived client-side.
+        // transactions query has NO date filter — we load all so the chart always
+        // has data and the 6-month window is derived client-side.
         const [
           propertiesResult,
-          monthTxResult,
-          chartTxResult,
+          allTxResult,
           recentTxResult,
           recurringResult,
         ] = await Promise.all([
           supabase
             .from('properties')
-            .select('id, name, city, province, status, current_value, type')
+            .select('id, name, city, province, status, current_value, purchase_price, type')
             .eq('landlord_id', landlord.id)
-            .eq('status', 'active')
             .order('created_at', { ascending: false }),
           supabase
             .from('transactions')
-            .select('type, amount')
+            .select('id, type, amount, category, transaction_date, description')
             .eq('landlord_id', landlord.id)
-            .gte('transaction_date', monthStart)
-            .lte('transaction_date', monthEnd),
-          supabase
-            .from('transactions')
-            .select('type, amount, transaction_date')
-            .eq('landlord_id', landlord.id)
-            .gte('transaction_date', sixMonthsAgo)
-            .order('transaction_date', { ascending: true }),
+            .order('transaction_date', { ascending: false }),
           supabase
             .from('transactions')
             .select('id, type, amount, category, transaction_date, description')
@@ -179,47 +195,69 @@ export function OverviewClient() {
             .order('next_due_date', { ascending: true }),
         ])
 
-        const activeProps = (propertiesResult.data ?? []) as PropertyPreview[]
-        const portfolioValue = (propertiesResult.data ?? []).reduce(
-          (sum, p) => sum + ((p as { current_value?: number }).current_value || 0),
+        // Log any query errors for debugging without crashing
+        if (propertiesResult.error) console.error('[Overview] properties error:', propertiesResult.error)
+        if (allTxResult.error)      console.error('[Overview] transactions error:', allTxResult.error)
+        if (recentTxResult.error)   console.error('[Overview] recent-tx error:',  recentTxResult.error)
+        if (recurringResult.error)  console.error('[Overview] recurring error:',  recurringResult.error)
+
+        // ── Step 4: Derive stats ──
+        type PropRow = {
+          id: string; name: string; city: string; province: string
+          status: string; current_value: number | null; purchase_price: number | null; type: string
+        }
+        const allProps = (propertiesResult.data ?? []) as PropRow[]
+
+        // Portfolio value: use current_value, fall back to purchase_price if not set
+        const portfolioValue = allProps.reduce(
+          (sum, p) => sum + (p.current_value ?? p.purchase_price ?? 0),
           0,
         )
 
-        const monthTx = monthTxResult.data ?? []
-        const income = monthTx
-          .filter((t) => t.type === 'income')
-          .reduce((s, t) => s + (t.amount || 0), 0)
-        const expenses = monthTx
-          .filter((t) => t.type === 'expense')
-          .reduce((s, t) => s + (t.amount || 0), 0)
+        // Active count = properties that are not 'inactive' (active + vacant are live portfolio entries)
+        const activeProps = allProps.filter(p => p.status !== 'inactive') as PropertyPreview[]
 
-        const pendingPayments = (recurringResult.data ?? []).filter((payment) =>
+        const allTx = allTxResult.data ?? []
+
+        // Monthly net income — this calendar month
+        const monthTx = allTx.filter(t =>
+          t.transaction_date >= monthStart && t.transaction_date <= monthEnd
+        )
+        const income   = monthTx.filter(t => t.type === 'income').reduce((s, t) => s + (t.amount || 0), 0)
+        const expenses = monthTx.filter(t => t.type === 'expense').reduce((s, t) => s + (t.amount || 0), 0)
+
+        // Pending reminders
+        const pendingPayments = (recurringResult.data ?? []).filter(payment =>
           isRecurringPaymentPending(payment),
         )
 
+        const displayName =
+          (landlord.full_name ?? '').trim().split(' ')[0] ||
+          (landlord.email ?? '').split('@')[0] ||
+          'there'
+
         setData({
-          greeting: `${greetingFor(now)}, ${
-            (landlord.full_name ?? '').split(' ')[0] || 'there'
-          }`,
+          greeting: `${greetingFor(now)}, ${displayName}`,
           dateSubtitle: dateSubtitleFor(now),
-          displayCurrency:
-            (landlord as { display_currency?: string }).display_currency ?? 'CAD',
+          displayCurrency: landlord.display_currency ?? 'CAD',
           portfolioValue,
           monthlyNetIncome: income - expenses,
           activeProperties: activeProps.length,
           pendingReminders: pendingPayments.length,
-          chartData: buildChartData(chartTxResult.data ?? [], months),
+          chartData: buildChartData(allTx, months),
           recentTransactions: (recentTxResult.data ?? []) as RecentTx[],
           properties: activeProps,
           upcomingReminders: pendingPayments.slice(0, 5) as UpcomingPayment[],
         })
       } catch (err) {
-        console.error('Overview load error:', err)
+        console.error('[Overview] unexpected error:', err)
+        setLoadError(true)
       } finally {
         setLoading(false)
       }
     }
     load()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   if (loading) {
@@ -236,6 +274,45 @@ export function OverviewClient() {
           }}
         />
         <style>{`@keyframes dynasty-spin { to { transform: rotate(360deg); } }`}</style>
+      </div>
+    )
+  }
+
+  if (loadError) {
+    return (
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '300px',
+        gap: '16px',
+      }}>
+        <p style={{
+          fontFamily: "'Jost', sans-serif",
+          fontSize: '14px',
+          letterSpacing: '0.06em',
+          color: theme.valueNegative,
+        }}>
+          Failed to load your overview. Please refresh the page.
+        </p>
+        <button
+          onClick={() => window.location.reload()}
+          style={{
+            background: 'transparent',
+            border: `1px solid ${theme.accent}50`,
+            color: theme.accent,
+            fontFamily: "'Jost', sans-serif",
+            fontSize: '11px',
+            letterSpacing: '0.2em',
+            textTransform: 'uppercase',
+            padding: '10px 24px',
+            borderRadius: '1px',
+            cursor: 'pointer',
+          }}
+        >
+          Refresh
+        </button>
       </div>
     )
   }

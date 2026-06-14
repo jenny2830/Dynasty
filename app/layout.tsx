@@ -51,7 +51,7 @@ export default function RootLayout({
       className={`${cormorant.variable} ${jost.variable} ${bebas.variable} ${jetbrains.variable}`}
       suppressHydrationWarning
     >
-      <body className="bg-dynasty-black text-dynasty-warm-white antialiased">
+      <body className="bg-dynasty-warm-white text-dynasty-black-warm antialiased">
         {children}
       </body>
     </html>

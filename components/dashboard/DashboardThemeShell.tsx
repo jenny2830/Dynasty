@@ -16,7 +16,7 @@ function borderColor(b: string) {
 }
 
 function ThemedInner({ sidebar, children }: { sidebar: React.ReactNode; children: React.ReactNode }) {
-  const { theme, textThickness, fontWeights, themeId } = useAppTheme()
+  const { theme, textThickness, fontWeights, themeId, mounted } = useAppTheme()
   const mode: 'light' | 'dark' = themeId.startsWith('light') ? 'light' : 'dark'
 
   const cssVars: React.CSSProperties = {
@@ -125,6 +125,10 @@ function ThemedInner({ sidebar, children }: { sidebar: React.ReactNode; children
     root.style.colorScheme = mode
     root.style.backgroundColor = theme.pageBg
     document.body.style.backgroundColor = theme.pageBg
+
+    // Keep data-theme in sync so CSS selectors ([data-theme="light"/"dark"]) work correctly
+    root.dataset.theme = mode
+    root.dataset.colorPalette = mode === 'light' ? 'white-black' : 'dark-gold'
 
     // Mirror all Tailwind dynasty-* color tokens onto <html> so that Radix
     // portals rendered at document.body (Select dropdowns, Dialogs, etc.)

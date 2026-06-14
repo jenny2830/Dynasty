@@ -52,7 +52,7 @@ export function SectionHeader({
   className,
   ...props
 }: SectionHeaderProps) {
-  const { theme } = useAppTheme()
+  const { theme, fontWeights } = useAppTheme()
   return (
     <div
       className={cn(className)}
@@ -71,14 +71,10 @@ export function SectionHeader({
         <h2 style={{
           fontFamily: "'Cormorant Garamond', serif",
           fontSize: '22px',
-          fontWeight: 600,
+          fontWeight: fontWeights.semibold,
           letterSpacing: '0.02em',
           margin: 0,
-          background: theme.accentGradient,
-          WebkitBackgroundClip: 'text',
-          backgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          color: 'transparent',
+          color: theme.textPrimary,
         }}>
           {title}
         </h2>
@@ -86,11 +82,11 @@ export function SectionHeader({
           <p style={{
             marginTop: '2px',
             fontFamily: "'Jost', sans-serif",
-            fontWeight: 400,
+            fontWeight: fontWeights.body,
             fontSize: '13px',
             textTransform: 'uppercase',
             letterSpacing: '0.12em',
-            color: theme.textMuted,
+            color: theme.textSecondary,
             margin: '2px 0 0 0',
           }}>
             {description}

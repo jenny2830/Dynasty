@@ -20,15 +20,17 @@ interface ThemeContextValue {
   textThickness: TextThickness
   setTextThickness: (t: TextThickness) => void
   fontWeights: { thin: number; body: number; medium: number; semibold: number; bold: number }
+  mounted: boolean
 }
 
 const ThemeContext = createContext<ThemeContextValue>({
-  themeId: 'dark-gold',
-  theme: THEMES['dark-gold'],
+  themeId: 'light-gold',
+  theme: THEMES['light-gold'],
   setThemeId: () => {},
   textThickness: 'light',
   setTextThickness: () => {},
-  fontWeights: FONT_WEIGHT_MAP.light,  // updated with new scale
+  fontWeights: FONT_WEIGHT_MAP.light,
+  mounted: false,
 })
 
 export function useAppTheme() {
@@ -45,20 +47,20 @@ interface AppThemeProviderProps {
 // server-provided value is only a fallback for first load on a fresh device
 // (no localStorage yet); after that, localStorage is authoritative.
 function getInitialTheme(initialThemeId?: ThemeId): ThemeId {
+  // When the server provides a theme preference, keep it authoritative on both
+  // SSR and the first client render to avoid hydration mismatches.
+  if (initialThemeId && THEMES[initialThemeId]) {
+    return initialThemeId
+  }
+
   if (typeof window === 'undefined') {
-    return initialThemeId && THEMES[initialThemeId] ? initialThemeId : 'dark-gold'
+    return 'light-gold'
   }
   try {
     const saved = localStorage.getItem('dynasty-theme') as ThemeId | null
     if (saved && THEMES[saved]) return saved
   } catch {}
-  if (initialThemeId && THEMES[initialThemeId]) {
-    try {
-      localStorage.setItem('dynasty-theme', initialThemeId)
-    } catch {}
-    return initialThemeId
-  }
-  return 'dark-gold'
+  return 'light-gold'
 }
 
 function getInitialTextThickness(): TextThickness {
@@ -73,7 +75,24 @@ function getInitialTextThickness(): TextThickness {
 export function AppThemeProvider({ children, initialThemeId }: AppThemeProviderProps) {
   const [themeId, setThemeIdState] = useState<ThemeId>(() => getInitialTheme(initialThemeId))
   const [textThickness, setTextThicknessState] = useState<TextThickness>(getInitialTextThickness)
+  const [mounted, setMounted] = useState(false)
   const supabase = createClient()
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  // After hydration, localStorage becomes authoritative for this browser.
+  // This preserves the user's saved choice without risking SSR mismatch.
+  useEffect(() => {
+    if (!mounted) return
+    try {
+      const saved = localStorage.getItem('dynasty-theme') as ThemeId | null
+      if (saved && THEMES[saved] && saved !== themeId) {
+        setThemeIdState(saved)
+      }
+    } catch {}
+  }, [mounted, themeId])
 
   // After mount, sync with Supabase in case the user changed the theme on
   // another device. Only override when the DB value actually differs from what
@@ -157,6 +176,7 @@ export function AppThemeProvider({ children, initialThemeId }: AppThemeProviderP
       textThickness,
       setTextThickness,
       fontWeights,
+      mounted,
     }}>
       {children}
     </ThemeContext.Provider>

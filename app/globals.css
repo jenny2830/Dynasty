@@ -406,18 +406,21 @@ html[data-color-palette="white-black"] ::-webkit-scrollbar-thumb:hover { backgro
 html[data-color-palette="white-black"] ::selection { background: rgba(0,0,0,0.15); color: #1C1A17; }
 
 /* ─────────────────────────────────────────────
-   Base
+   Base — defaults to Light Gold (the platform default theme).
+   Auth pages override this with their own fixed dark background.
+   The bootstrap script and DashboardThemeShell override these for
+   dark theme users before the first paint, so there is no flash.
    ───────────────────────────────────────────── */
 html {
-  background-color: #080808;
-  color: #FAF7F2;
+  background-color: #FAF7F2;
+  color: #1C1A17;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-html.light {
-  background-color: #FAF7F2;
-  color: #1C1A17;
+html.dark-theme {
+  background-color: #0A0A0A;
+  color: #FAF7F2;
 }
 
 body {

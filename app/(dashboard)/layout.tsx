@@ -40,21 +40,27 @@ export default async function DashboardLayout({
 
   // Build a { themeId: pageBg } map so the pre-paint script can resolve the
   // correct background instantly (prefers the locally-saved theme, falls back
-  // to the server value). This prevents a dark/black flash on refresh when a
-  // light theme is active.
+  // to the server value). This prevents any flash on refresh.
   const pageBgMap = Object.fromEntries(
     (Object.keys(THEMES) as (keyof typeof THEMES)[]).map((id) => [id, THEMES[id].pageBg])
   )
+  // The bootstrap script runs synchronously before React hydrates. It:
+  //  1. Reads localStorage for the user's saved theme
+  //  2. Sets document.documentElement background color immediately (no flash)
+  //  3. Sets data-theme + data-color-palette so CSS selectors fire from first paint
+  //  4. Sets color-scheme so native controls (scrollbars, inputs) match
   const themeBootstrap = `(() => {try {
     var map = ${JSON.stringify(pageBgMap)};
     var saved = localStorage.getItem('dynasty-theme');
     var id = (saved && map[saved]) ? saved : ${JSON.stringify(initialThemeId)};
-    var bg = map[id];
-    if (bg) {
-      document.documentElement.style.backgroundColor = bg;
-      document.documentElement.style.colorScheme = id.indexOf('light') === 0 ? 'light' : 'dark';
-      if (document.body) document.body.style.backgroundColor = bg;
-    }
+    var bg = map[id] || '${THEMES['light-gold'].pageBg}';
+    var mode = id && id.indexOf('light') === 0 ? 'light' : 'dark';
+    var root = document.documentElement;
+    root.style.backgroundColor = bg;
+    root.style.colorScheme = mode;
+    root.dataset.theme = mode;
+    root.dataset.colorPalette = mode === 'light' ? 'white-black' : 'dark-gold';
+    if (document.body) document.body.style.backgroundColor = bg;
   } catch (e) {} })();`
 
   return (

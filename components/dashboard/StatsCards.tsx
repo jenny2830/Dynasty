@@ -39,9 +39,6 @@ function StatCard({
   const { theme, fontWeights } = useAppTheme()
   const styles = useThemeStyles()
 
-  const neg = theme.valueNegative
-  const negativeGradient = `linear-gradient(135deg, ${neg}DD 0%, ${neg} 60%, ${neg}88 100%)`
-
   return (
     <div style={{
       position: 'relative',
@@ -77,11 +74,7 @@ function StatCard({
             fontSize: responsiveValue ? getValueFontSize(value) : '40px',
             lineHeight: 1,
             letterSpacing: '0.04em',
-            background: negative ? negativeGradient : theme.accentGradient,
-            WebkitBackgroundClip: 'text',
-            backgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            color: 'transparent',
+            color: negative ? theme.valueNegative : theme.accent,
             margin: 0,
             overflow: 'hidden',
             textOverflow: 'ellipsis',
@@ -112,8 +105,11 @@ function StatCard({
 
           {subtext && (
             <p style={{
-              ...styles.mutedText,
+              fontFamily: "'Jost', sans-serif",
+              fontWeight: fontWeights.body,
               fontSize: '15px',
+              letterSpacing: '0.04em',
+              color: theme.textSecondary,
               margin: '8px 0 0 0',
             }}>
               {subtext}

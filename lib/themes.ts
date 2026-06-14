@@ -384,12 +384,13 @@ export const THEME_META: Record<ThemeId, { name: string; description: string }> 
   'light-rose': { name: 'Light Rose', description: 'Cream & rose gold — soft and premium' },
 }
 
-/** Returns a valid ThemeId, defaulting to 'dark-gold' for unknown values */
+/** Returns a valid ThemeId, defaulting to 'light-gold' for unknown/unset values */
 export function toThemeId(value: string | null | undefined): ThemeId {
   if (value === 'dark-gold' || value === 'light-gold' || value === 'dark-rose' || value === 'light-rose') {
     return value
   }
   // Legacy values from old 2-theme system
   if (value === 'light') return 'light-gold'
-  return 'dark-gold'
+  if (value === 'dark') return 'dark-gold'
+  return 'light-gold'
 }
