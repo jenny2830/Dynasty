@@ -66,7 +66,7 @@ export default async function SignupPage({
       <div style={{ width: '100%', maxWidth: '420px' }}>
         <div style={{ marginBottom: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/images/dynastynobg.png" alt="Dynasty" style={{ width: '280px', height: 'auto', objectFit: 'contain', display: 'block', margin: '0 auto' }} />
+          <img src="/dynasty_logo.png" alt="Dynasty" style={{ width: '280px', height: 'auto', objectFit: 'contain', display: 'block', margin: '0 auto' }} />
           <p style={{ marginTop: '12px', textAlign: 'center', fontFamily: "'Jost', sans-serif", fontSize: '8px', fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.35em', color: 'rgba(201,168,76,0.4)' }}>
             <span style={{ display: 'inline-block', marginRight: '8px' }}>◆</span>
             Legacy &middot; Luxury &middot; Timeless

@@ -90,7 +90,7 @@ export default function ResetPasswordPage() {
       <div style={{ width: '100%', maxWidth: '420px' }}>
         <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'center' }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/images/dynastynobg.png" alt="Dynasty" style={{ width: '200px', height: 'auto', objectFit: 'contain' }} />
+          <img src="/dynasty_logo.png" alt="Dynasty" style={{ width: '200px', height: 'auto', objectFit: 'contain' }} />
         </div>
 
         <div style={{

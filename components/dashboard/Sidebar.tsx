@@ -209,7 +209,7 @@ export function Sidebar({ userId }: SidebarProps) {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/images/dynastynobg.png"
+            src="/dynasty_logo.png"
             alt="Dynasty"
             style={{ height: compact ? '60px' : '190px', width: '100%', objectFit: 'contain', display: 'block', margin: '0 auto', padding: compact ? '4px 12px' : '8px 12px' }}
           />

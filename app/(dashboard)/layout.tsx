@@ -113,7 +113,7 @@ export default async function DashboardLayout({
 
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/images/dynastynobg.png"
+              src="/dynasty_logo.png"
               alt="Dynasty"
               style={{ height: '80px', objectFit: 'contain', margin: '0 auto 20px', display: 'block' }}
             />
