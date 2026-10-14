@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
@@ -34,16 +35,27 @@ export default function ResetPasswordPage() {
   const [confirm, setConfirm] = useState('')
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [message, setMessage] = useState('')
-  const [ready, setReady] = useState(false)
+  const [session, setSession] = useState<'checking' | 'ready' | 'missing'>('checking')
+  const ready = session === 'ready'
 
   useEffect(() => {
-    // Supabase exchanges the token from the URL hash automatically on load
+    // /auth/confirm establishes the recovery session server-side before redirecting here
     const supabase = createClient()
-    supabase.auth.onAuthStateChange((event) => {
-      if (event === 'PASSWORD_RECOVERY') {
-        setReady(true)
-      }
+    let cancelled = false
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'PASSWORD_RECOVERY' && !cancelled) setSession('ready')
     })
+
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (cancelled) return
+      setSession((current) => (current === 'ready' ? current : user ? 'ready' : 'missing'))
+    })
+
+    return () => {
+      cancelled = true
+      subscription.unsubscribe()
+    }
   }, [])
 
   async function handleSubmit(e: React.FormEvent) {
@@ -125,9 +137,23 @@ export default function ResetPasswordPage() {
                 Redirecting you to the dashboard…
               </p>
             </div>
+          ) : session === 'missing' ? (
+            <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <div style={{ borderRadius: '1px', border: '1px solid rgba(183,110,121,0.3)', background: 'rgba(183,110,121,0.08)', padding: '12px 16px' }}>
+                <p style={{ fontFamily: "'Jost', sans-serif", fontSize: '12px', fontWeight: 300, color: '#D4959E', margin: 0 }}>
+                  This reset link has expired or was already used.
+                </p>
+              </div>
+              <Link
+                href="/forgot-password"
+                style={{ display: 'block', width: '100%', padding: '14px', background: 'linear-gradient(135deg, #C9A84C, #9A7A2E)', color: '#080808', fontFamily: "'Jost', sans-serif", fontWeight: 600, fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', textAlign: 'center', textDecoration: 'none', borderRadius: '1px', boxShadow: '0 4px 20px rgba(201,168,76,0.25)', boxSizing: 'border-box' }}
+              >
+                Request a new reset link
+              </Link>
+            </div>
           ) : (
             <>
-              {!ready && (
+              {session === 'checking' && (
                 <p style={{ fontFamily: "'Jost', sans-serif", fontSize: '12px', color: '#8A8A82', textAlign: 'center', marginBottom: '20px' }}>
                   Verifying reset link…
                 </p>

@@ -34,8 +34,14 @@ export async function proxy(request: NextRequest) {
   const isStaticAsset = /\.[a-zA-Z0-9]+$/.test(pathname)
 
   const isAuthPage = pathname === '/login' || pathname === '/signup'
+  // Reachable whether or not a session exists (email links, recovery)
+  const isAuthFlowPage =
+    pathname === '/auth/confirm' ||
+    pathname === '/auth/reset-password' ||
+    pathname === '/forgot-password'
   const isPublicPath =
     isAuthPage ||
+    isAuthFlowPage ||
     pathname.startsWith('/_next') ||
     pathname.startsWith('/api/webhooks') ||
     pathname.startsWith('/images/') ||

@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { SignupCapture } from './SignupCapture'
 import { SignupForm } from './SignupForm'
+import { ResendConfirmation } from '@/components/auth/ResendConfirmation'
 
 export const metadata = { title: 'Create account' }
 
@@ -13,6 +14,7 @@ export default async function SignupPage({
   searchParams: Promise<{ error?: string; success?: string; email?: string }>
 }) {
   const { error, success, email: emailParam } = await searchParams
+  const sentTo = emailParam?.trim() || ''
 
   async function signup(formData: FormData) {
     'use server'
@@ -82,7 +84,7 @@ export default async function SignupPage({
 
           {success ? (
             <div style={{ textAlign: 'center' }}>
-              {emailParam && <SignupCapture email={decodeURIComponent(emailParam)} />}
+              {sentTo && <SignupCapture email={sentTo} />}
               <h1 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '26px', fontWeight: 500, letterSpacing: '0.04em', color: '#FAF7F2', margin: 0 }}>
                 Check Your Email
               </h1>
@@ -91,11 +93,24 @@ export default async function SignupPage({
               </p>
               <div style={{ margin: '16px auto 0', height: '1px', width: '40px', background: 'rgba(201,168,76,0.5)' }} />
               <p style={{ marginTop: '28px', fontFamily: "'Jost', sans-serif", fontSize: '13px', fontWeight: 300, lineHeight: 1.6, color: '#8A8A82' }}>
-                We&apos;ve sent a confirmation link to your email address. Click the link to activate your account and begin.
+                {sentTo ? (
+                  <>We&apos;ve sent a confirmation link to <strong style={{ color: '#C9A84C', fontWeight: 400, wordBreak: 'break-all' }}>{sentTo}</strong>.</>
+                ) : (
+                  <>We&apos;ve sent a confirmation link to your email address.</>
+                )}{' '}
+                Click the link to activate your account and begin.
               </p>
+              <p style={{ marginTop: '16px', fontFamily: "'Jost', sans-serif", fontSize: '12px', fontWeight: 300, lineHeight: 1.6, color: '#6B6B65' }}>
+                Don&apos;t see it within a few minutes? Check your spam or junk folder, or the &ldquo;Other&rdquo; / &ldquo;Promotions&rdquo; tab.
+              </p>
+              {sentTo && (
+                <div style={{ marginTop: '28px' }}>
+                  <ResendConfirmation email={sentTo} startWithCooldown />
+                </div>
+              )}
               <a
                 href="/login"
-                style={{ display: 'block', marginTop: '32px', width: '100%', padding: '14px', background: 'transparent', border: '1px solid rgba(201,168,76,0.3)', color: '#C9A84C', fontFamily: "'Jost', sans-serif", fontWeight: 400, fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', textAlign: 'center', textDecoration: 'none', borderRadius: '1px' }}
+                style={{ display: 'block', marginTop: sentTo ? '16px' : '32px', width: '100%', padding: '14px', background: 'transparent', border: '1px solid rgba(201,168,76,0.3)', color: '#C9A84C', fontFamily: "'Jost', sans-serif", fontWeight: 400, fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', textAlign: 'center', textDecoration: 'none', borderRadius: '1px', boxSizing: 'border-box' }}
               >
                 Back to Sign In
               </a>
