@@ -1,3 +1,6 @@
+/** Public brand site, for display (e.g. PDF reports). Not the app URL — see NEXT_PUBLIC_APP_URL. */
+export const PUBLIC_BRAND_DOMAIN = 'dynastypwp.com'
+
 export const EXPENSE_CATEGORIES = [
   'Rental income',
   'Other income',

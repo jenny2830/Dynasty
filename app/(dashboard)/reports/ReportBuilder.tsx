@@ -23,6 +23,7 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Section, SectionHeader } from '@/components/ui/section'
 import { formatCurrency, formatDate } from '@/lib/utils'
+import { PUBLIC_BRAND_DOMAIN } from '@/lib/constants'
 import { createClient } from '@/lib/supabase/client'
 import { format, startOfMonth, endOfMonth, startOfQuarter, endOfQuarter, startOfYear, endOfYear, subMonths } from 'date-fns'
 import { useAppTheme } from '@/lib/theme-context'
@@ -196,7 +197,7 @@ export function ReportBuilder({ properties }: ReportBuilderProps) {
       pdf.text('Property Wealth Platform', pageWidth / 2, 18, { align: 'center' })
       pdf.setTextColor(138, 138, 130)
       pdf.setFontSize(8)
-      pdf.text('dynasty-alpha.vercel.app', pageWidth / 2, 24, { align: 'center' })
+      pdf.text(PUBLIC_BRAND_DOMAIN, pageWidth / 2, 24, { align: 'center' })
 
       yPos = 36
 
@@ -334,7 +335,7 @@ export function ReportBuilder({ properties }: ReportBuilderProps) {
         pdf.setFontSize(7)
         pdf.setTextColor(150, 150, 150)
         pdf.text(
-          `Page ${i} of ${totalPages} · DYNASTY Property Wealth Platform · dynasty-alpha.vercel.app`,
+          `Page ${i} of ${totalPages} · DYNASTY Property Wealth Platform · ${PUBLIC_BRAND_DOMAIN}`,
           pageWidth / 2,
           pageHeight - 8,
           { align: 'center' },
