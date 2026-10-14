@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { z } from 'zod'
-import { PLAN_FEATURES, type PlanId } from '@/lib/plans'
+import { hasActiveMembership } from '@/lib/plans'
 import { getCurrencyForCountry } from '@/lib/geo'
 
 const propertySchema = z.object({
@@ -41,12 +41,13 @@ async function getLandlordId() {
 
   const { data: landlord } = await supabase
     .from('landlords')
-    .select('id, plan')
+    .select('id, plan, stripe_subscription_id')
     .eq('auth_user_id', user.id)
     .maybeSingle()
 
   if (!landlord) throw new Error('Landlord profile not found')
-  return { supabase, landlordId: landlord.id, plan: (landlord.plan ?? 'free') as PlanId }
+  const isMember = hasActiveMembership(landlord)
+  return { supabase, landlordId: landlord.id, isMember }
 }
 
 function nullifyEmpty(val: unknown) {
@@ -59,27 +60,29 @@ export async function createProperty(
   formData: FormData
 ): Promise<PropertyFormState> {
   let landlordId: string
-  let plan: PlanId
+  let isMember: boolean
   let supabase: Awaited<ReturnType<typeof createClient>>
   try {
-    ;({ supabase, landlordId, plan } = await getLandlordId())
+    ;({ supabase, landlordId, isMember } = await getLandlordId())
   } catch (e) {
     return { errors: { _form: [(e as Error).message] } }
   }
 
-  // Enforce per-plan property limit
-  const maxProperties = PLAN_FEATURES[plan].maxProperties
-  const { count } = await supabase
-    .from('properties')
-    .select('*', { count: 'exact', head: true })
-    .eq('landlord_id', landlordId)
-  if ((count ?? 0) >= maxProperties) {
-    return {
-      errors: {
-        _form: [
-          `Your ${plan} plan allows up to ${maxProperties} ${maxProperties === 1 ? 'property' : 'properties'}. Upgrade to add more.`,
-        ],
-      },
+  // Free trial: cap at 3 properties. Members: unlimited.
+  if (!isMember) {
+    const FREE_TRIAL_PROPERTY_LIMIT = 3
+    const { count } = await supabase
+      .from('properties')
+      .select('*', { count: 'exact', head: true })
+      .eq('landlord_id', landlordId)
+    if ((count ?? 0) >= FREE_TRIAL_PROPERTY_LIMIT) {
+      return {
+        errors: {
+          _form: [
+            `Free trial is limited to ${FREE_TRIAL_PROPERTY_LIMIT} properties. Become a member to add unlimited properties.`,
+          ],
+        },
+      }
     }
   }
 

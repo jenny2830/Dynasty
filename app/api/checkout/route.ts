@@ -4,22 +4,30 @@ import { createClient } from '@/lib/supabase/server'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
-const PRICE_MAP: Record<string, string> = {
-  starter:   process.env.STRIPE_PRICE_STARTER!,
-  landlord:  process.env.STRIPE_PRICE_LANDLORD!,
-  portfolio: process.env.STRIPE_PRICE_PORTFOLIO!,
-}
-
 export async function POST(request: Request) {
   try {
-    const { plan } = await request.json()
+    const body = await request.json()
+    const { billing } = body as { billing?: string }
 
-    if (!PRICE_MAP[plan]) {
-      return NextResponse.json({ error: 'Invalid plan' }, { status: 400 })
+    // Only 'monthly' or 'yearly' accepted — raw price IDs are never accepted from the client
+    if (billing !== 'monthly' && billing !== 'yearly') {
+      return NextResponse.json({ error: 'Invalid billing interval' }, { status: 400 })
+    }
+
+    const priceId =
+      billing === 'monthly'
+        ? process.env.STRIPE_PRICE_MEMBERSHIP_MONTHLY
+        : process.env.STRIPE_PRICE_MEMBERSHIP_YEARLY
+
+    if (!priceId) {
+      console.error(`Checkout: price ID not configured for billing=${billing}`)
+      return NextResponse.json({ error: 'Price not configured' }, { status: 500 })
     }
 
     const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
 
     if (!user) {
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
@@ -54,10 +62,11 @@ export async function POST(request: Request) {
       customer: customerId,
       mode: 'subscription',
       payment_method_types: ['card'],
-      line_items: [{ price: PRICE_MAP[plan], quantity: 1 }],
+      line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${process.env.NEXT_PUBLIC_APP_URL}/upgrade?success=true`,
-      cancel_url:  `${process.env.NEXT_PUBLIC_APP_URL}/upgrade?canceled=true`,
-      metadata: { landlord_id: landlord.id, plan },
+      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/upgrade?canceled=true`,
+      // billing interval stored in metadata; never the raw price ID
+      metadata: { landlord_id: landlord.id, billing },
     })
 
     return NextResponse.json({ url: session.url })

@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { ReportBuilder } from './ReportBuilder'
 import { PageHeader } from '@/components/ui/page-header'
 import { FeatureGate } from '@/components/FeatureGate'
-import type { PlanId } from '@/lib/plans'
+import { hasActiveMembership } from '@/lib/plans'
 
 export const metadata = { title: 'Reports' }
 
@@ -13,12 +13,11 @@ export default async function ReportsPage() {
 
   const { data: landlord } = await supabase
     .from('landlords')
-    .select('id, plan, free_trial_expired')
+    .select('id, plan, stripe_subscription_id')
     .eq('auth_user_id', user.id)
     .maybeSingle()
 
-  const plan = (landlord?.plan ?? 'free') as PlanId
-  const trialExpired = landlord?.free_trial_expired ?? false
+  const isMember = hasActiveMembership(landlord ?? {})
 
   const { data: properties } = landlord
     ? await supabase
@@ -35,7 +34,7 @@ export default async function ReportsPage() {
         title="Reports"
         subtitle="Profit &amp; loss · Cash flow · Tax summaries · Expense breakdowns"
       />
-      <FeatureGate feature="reports" plan={plan} trialExpired={trialExpired}>
+      <FeatureGate isMember={isMember} featureLabel="Reports">
         <ReportBuilder properties={properties ?? []} />
       </FeatureGate>
     </div>

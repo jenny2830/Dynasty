@@ -1,120 +1,48 @@
-export type PlanId = 'free' | 'starter' | 'landlord' | 'portfolio'
+// ─────────────────────────────────────────────────────────────────────────────
+//  Dynasty Membership — single all-access plan, two billing intervals.
+//  Price IDs are read from env vars only; never hardcoded or accepted from clients.
+// ─────────────────────────────────────────────────────────────────────────────
 
-export interface PlanFeatures {
-  maxProperties: number
-  maxUnitsPerProperty: number
-  transactions: boolean
-  recurringPayments: boolean
-  receiptScanner: boolean
-  reports: boolean
-  roiCalculator: boolean
-  exportPDF: boolean
-  exportCSV: boolean
-  aiInsights: boolean
-  listingsSync: boolean
-  apiAccess: boolean
-  prioritySupport: boolean
-}
+export const MEMBERSHIP = {
+  name: 'Dynasty Membership',
+  description:
+    'Full access to every feature — unlimited properties, all reports, AI scanner, and more.',
+  monthly: {
+    priceDisplay: 'CAD $16.90',
+    priceValue: 16.9,
+    interval: 'month' as const,
+    intervalLabel: '/month',
+    get stripePriceId() {
+      return process.env.STRIPE_PRICE_MEMBERSHIP_MONTHLY
+    },
+  },
+  yearly: {
+    priceDisplay: 'CAD $149',
+    priceValue: 149,
+    interval: 'year' as const,
+    intervalLabel: '/year',
+    monthlyEquivalent: '≈ CAD $12.42/month',
+    savingsLabel: 'Save 26%',
+    get stripePriceId() {
+      return process.env.STRIPE_PRICE_MEMBERSHIP_YEARLY
+    },
+  },
+} as const
 
-export const PLAN_FEATURES: Record<PlanId, PlanFeatures> = {
-  free: {
-    maxProperties: 3,
-    maxUnitsPerProperty: 50,
-    transactions: true,
-    recurringPayments: true,
-    receiptScanner: true,
-    reports: true,
-    roiCalculator: true,
-    exportPDF: true,
-    exportCSV: true,
-    aiInsights: true,
-    listingsSync: true,
-    apiAccess: true,
-    prioritySupport: false,
-  },
-  starter: {
-    maxProperties: 5,
-    maxUnitsPerProperty: 10,
-    transactions: true,
-    recurringPayments: true,
-    receiptScanner: false,
-    reports: true,
-    roiCalculator: false,
-    exportPDF: false,
-    exportCSV: true,
-    aiInsights: false,
-    listingsSync: false,
-    apiAccess: false,
-    prioritySupport: false,
-  },
-  landlord: {
-    maxProperties: 20,
-    maxUnitsPerProperty: 50,
-    transactions: true,
-    recurringPayments: true,
-    receiptScanner: true,
-    reports: true,
-    roiCalculator: true,
-    exportPDF: true,
-    exportCSV: true,
-    aiInsights: true,
-    listingsSync: false,
-    apiAccess: false,
-    prioritySupport: false,
-  },
-  portfolio: {
-    maxProperties: 999,
-    maxUnitsPerProperty: 999,
-    transactions: true,
-    recurringPayments: true,
-    receiptScanner: true,
-    reports: true,
-    roiCalculator: true,
-    exportPDF: true,
-    exportCSV: true,
-    aiInsights: true,
-    listingsSync: true,
-    apiAccess: true,
-    prioritySupport: true,
-  },
-}
+/** Everything that comes with the Dynasty Membership. */
+export const MEMBERSHIP_FEATURES = [
+  'Unlimited properties',
+  'Unlimited transactions & expense tracking',
+  'Recurring payments tracker',
+  'AI receipt scanner',
+  'Financial reports',
+  'ROI calculator',
+  'PDF & CSV export',
+  'Four-theme design system',
+  'Priority support',
+] as const
 
-export const PLAN_DETAILS: Record<PlanId, {
-  name: string
-  price: number
-  currency: string
-  interval: string
-  description: string
-}> = {
-  free: {
-    name: 'Free Trial',
-    price: 0,
-    currency: 'CAD',
-    interval: '',
-    description: 'Full access for 3 sessions — up to 3 properties',
-  },
-  starter: {
-    name: 'Starter',
-    price: 29,
-    currency: 'CAD',
-    interval: '/month',
-    description: 'For landlords with up to 5 properties',
-  },
-  landlord: {
-    name: 'Landlord',
-    price: 79,
-    currency: 'CAD',
-    interval: '/month',
-    description: 'Full power for growing portfolios up to 20 properties',
-  },
-  portfolio: {
-    name: 'Portfolio',
-    price: 149,
-    currency: 'CAD',
-    interval: '/month',
-    description: 'Unlimited properties with API access and priority support',
-  },
-}
+// ── Free Trial ────────────────────────────────────────────────────────────────
 
 export const FREE_TRIAL_MAX_SESSIONS = 3
 
@@ -122,13 +50,26 @@ export function getSessionsRemaining(sessionsUsed: number): number {
   return Math.max(0, FREE_TRIAL_MAX_SESSIONS - sessionsUsed)
 }
 
-export function hasFeatureAccess(
-  plan: PlanId,
-  feature: keyof PlanFeatures,
-  trialExpired: boolean,
-): boolean {
-  if (plan === 'free' && trialExpired) return false
-  if (plan === 'free') return true
-  const val = PLAN_FEATURES[plan][feature]
-  return val === true || (typeof val === 'number' && val > 0)
+// ── Legacy plan type ──────────────────────────────────────────────────────────
+// Kept for DB column compatibility. The `landlords.plan` column stores these
+// values. New members receive `plan = 'landlord'` (full-access, DB-safe value)
+// until a future migration widens the enum.
+export type PlanId = 'free' | 'starter' | 'landlord' | 'portfolio'
+
+// ── Single access check ───────────────────────────────────────────────────────
+/**
+ * Returns true when the landlord has an active Dynasty Membership.
+ * Works for both new subscribers and legacy tier subscribers.
+ *
+ * Logic (in priority order):
+ *  1. Any live `stripe_subscription_id` → member (covers all new & legacy prices)
+ *  2. `plan` column set to a paid tier → member (manual / legacy back-fill)
+ */
+export function hasActiveMembership(landlord: {
+  stripe_subscription_id?: string | null
+  plan?: string | null
+}): boolean {
+  if (landlord.stripe_subscription_id) return true
+  if (landlord.plan && landlord.plan !== 'free') return true
+  return false
 }

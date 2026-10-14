@@ -6,6 +6,17 @@ export const dynamic = 'force-dynamic'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
+// Legacy price IDs — subscriptions on these prices are still valid memberships.
+// We never gate access by which price was used; any active subscription = full access.
+const LEGACY_PRICE_IDS = new Set(
+  [
+    process.env.STRIPE_PRICE_STARTER,
+    process.env.STRIPE_PRICE_LANDLORD,
+    process.env.STRIPE_PRICE_PORTFOLIO,
+  ].filter(Boolean),
+)
+void LEGACY_PRICE_IDS // referenced only for documentation; not used in logic below
+
 export async function POST(request: Request) {
   const body = await request.text()
   const signature = request.headers.get('stripe-signature')!
@@ -16,7 +27,7 @@ export async function POST(request: Request) {
     event = stripe.webhooks.constructEvent(
       body,
       signature,
-      process.env.STRIPE_WEBHOOK_SECRET!
+      process.env.STRIPE_WEBHOOK_SECRET!,
     )
   } catch (err) {
     console.error('Webhook signature verification failed:', err)
@@ -29,14 +40,15 @@ export async function POST(request: Request) {
     case 'checkout.session.completed': {
       const session = event.data.object as Stripe.Checkout.Session
       const landlordId = session.metadata?.landlord_id
-      const plan = session.metadata?.plan
       const subscriptionId = session.subscription as string
 
-      if (landlordId && plan) {
+      if (landlordId) {
+        // Set plan = 'landlord' (DB-compatible full-access value)
+        // and store subscription + customer IDs so hasActiveMembership() works.
         await supabase
           .from('landlords')
           .update({
-            plan: plan as 'free' | 'starter' | 'landlord' | 'portfolio',
+            plan: 'landlord',
             stripe_subscription_id: subscriptionId,
             stripe_customer_id: session.customer as string,
           })
@@ -48,11 +60,22 @@ export async function POST(request: Request) {
     case 'customer.subscription.updated': {
       const subscription = event.data.object as Stripe.Subscription
       const customerId = subscription.customer as string
+      const isActive =
+        subscription.status === 'active' || subscription.status === 'trialing'
 
-      await supabase
-        .from('landlords')
-        .update({ stripe_subscription_id: subscription.id })
-        .eq('stripe_customer_id', customerId)
+      if (isActive) {
+        // Keep subscription reference up-to-date
+        await supabase
+          .from('landlords')
+          .update({ stripe_subscription_id: subscription.id })
+          .eq('stripe_customer_id', customerId)
+      } else {
+        // Past-due / canceled / unpaid / paused → revoke membership
+        await supabase
+          .from('landlords')
+          .update({ plan: 'free', stripe_subscription_id: null })
+          .eq('stripe_customer_id', customerId)
+      }
       break
     }
 
@@ -62,7 +85,7 @@ export async function POST(request: Request) {
 
       await supabase
         .from('landlords')
-        .update({ plan: 'starter', stripe_subscription_id: null })
+        .update({ plan: 'free', stripe_subscription_id: null })
         .eq('stripe_customer_id', customerId)
       break
     }

@@ -5,15 +5,17 @@ import { getSessionsRemaining, FREE_TRIAL_MAX_SESSIONS } from '@/lib/plans'
 import { useAppTheme } from '@/lib/theme-context'
 
 interface TrialBannerProps {
-  plan: string
+  isMember: boolean
   sessionsUsed: number
   trialExpired: boolean
 }
 
-export function TrialBanner({ plan, sessionsUsed, trialExpired }: TrialBannerProps) {
+export function TrialBanner({ isMember, sessionsUsed, trialExpired }: TrialBannerProps) {
   const router = useRouter()
   const { theme } = useAppTheme()
-  if (plan !== 'free') return null
+
+  // Members see no trial banner
+  if (isMember) return null
 
   const remaining = getSessionsRemaining(sessionsUsed)
 
@@ -36,7 +38,7 @@ export function TrialBanner({ plan, sessionsUsed, trialExpired }: TrialBannerPro
             Your free trial has ended.
           </span>
           <span style={{ fontFamily: "'Jost', sans-serif", fontSize: '15px', color: theme.textMuted, marginLeft: '8px' }}>
-            Upgrade to continue using Dynasty.
+            Become a member to continue using Dynasty.
           </span>
         </div>
         <button
@@ -56,7 +58,7 @@ export function TrialBanner({ plan, sessionsUsed, trialExpired }: TrialBannerPro
             whiteSpace: 'nowrap',
           }}
         >
-          Upgrade Now
+          Become a Member
         </button>
       </div>
     )
@@ -99,7 +101,7 @@ export function TrialBanner({ plan, sessionsUsed, trialExpired }: TrialBannerPro
           whiteSpace: 'nowrap',
         }}
       >
-        View Plans
+        Become a Member
       </button>
     </div>
   )

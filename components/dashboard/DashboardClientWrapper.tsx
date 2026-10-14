@@ -5,11 +5,10 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { TrialBanner } from '@/components/TrialBanner'
 import { FREE_TRIAL_MAX_SESSIONS } from '@/lib/plans'
-import type { PlanId } from '@/lib/plans'
 
 interface DashboardClientWrapperProps {
   landlordId: string
-  plan: PlanId
+  isMember: boolean
   sessionsUsed: number
   trialExpired: boolean
   children: React.ReactNode
@@ -17,7 +16,7 @@ interface DashboardClientWrapperProps {
 
 export function DashboardClientWrapper({
   landlordId,
-  plan,
+  isMember,
   sessionsUsed,
   trialExpired,
   children,
@@ -27,7 +26,8 @@ export function DashboardClientWrapper({
 
   useEffect(() => {
     if (tracked.current) return
-    if (plan !== 'free' || trialExpired) return
+    // Members and users whose trial has already expired don't consume trial sessions
+    if (isMember || trialExpired) return
 
     const today = new Date().toISOString().split('T')[0]
     const sessionKey = `dynasty_session_${today}`
@@ -47,11 +47,11 @@ export function DashboardClientWrapper({
       .then(() => {
         if (isExpired) router.refresh()
       })
-  }, [landlordId, plan, sessionsUsed, trialExpired, router])
+  }, [landlordId, isMember, sessionsUsed, trialExpired, router])
 
   return (
     <>
-      <TrialBanner plan={plan} sessionsUsed={sessionsUsed} trialExpired={trialExpired} />
+      <TrialBanner isMember={isMember} sessionsUsed={sessionsUsed} trialExpired={trialExpired} />
       {children}
     </>
   )

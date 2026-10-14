@@ -2,41 +2,28 @@
 
 import { ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
-import { PlanFeatures, PlanId, PLAN_FEATURES } from '@/lib/plans'
 import { useAppTheme } from '@/lib/theme-context'
 
 interface FeatureGateProps {
-  feature: keyof PlanFeatures
-  plan: PlanId
-  trialExpired: boolean
+  /** When true, the feature is accessible (landlord has an active membership). */
+  isMember: boolean
   children: ReactNode
   fallback?: ReactNode
+  featureLabel?: string
 }
 
-export function FeatureGate({ feature, plan, trialExpired, children, fallback }: FeatureGateProps) {
-  if (plan === 'free' && !trialExpired) return <>{children}</>
-  if (plan === 'free' && trialExpired) return <>{fallback ?? <UpgradePrompt feature={feature} />}</>
-
-  const val = PLAN_FEATURES[plan][feature]
-  const hasAccess = val === true || (typeof val === 'number' && val > 0)
-  if (hasAccess) return <>{children}</>
-
-  return <>{fallback ?? <UpgradePrompt feature={feature} />}</>
+/**
+ * Renders `children` when the landlord is an active member.
+ * Non-members see `fallback`, or the default upgrade prompt.
+ *
+ * Single membership = no tiers to check; the only gate is member vs. non-member.
+ */
+export function FeatureGate({ isMember, children, fallback, featureLabel }: FeatureGateProps) {
+  if (isMember) return <>{children}</>
+  return <>{fallback ?? <UpgradePrompt featureLabel={featureLabel} />}</>
 }
 
-const FEATURE_NAMES: Record<string, string> = {
-  receiptScanner:   'Receipt Scanner',
-  roiCalculator:    'ROI Calculator',
-  exportPDF:        'PDF Export',
-  aiInsights:       'AI Insights',
-  listingsSync:     'Listings Sync',
-  apiAccess:        'API Access',
-  prioritySupport:  'Priority Support',
-  reports:          'Reports',
-  recurringPayments:'Recurring Payments',
-}
-
-function UpgradePrompt({ feature }: { feature: string }) {
+function UpgradePrompt({ featureLabel }: { featureLabel?: string }) {
   const router = useRouter()
   const { theme } = useAppTheme()
 
@@ -62,7 +49,7 @@ function UpgradePrompt({ feature }: { feature: string }) {
         marginBottom: '8px',
         letterSpacing: '0.02em',
       }}>
-        {FEATURE_NAMES[feature] ?? feature} requires an upgrade
+        {featureLabel ? `${featureLabel} — Members Only` : 'Dynasty Membership required'}
       </h3>
       <p style={{
         fontFamily: "'Jost', sans-serif",
@@ -72,7 +59,7 @@ function UpgradePrompt({ feature }: { feature: string }) {
         marginBottom: '24px',
         letterSpacing: '0.04em',
       }}>
-        Unlock this feature by upgrading your Dynasty plan
+        Become a member to unlock every feature — unlimited properties, reports, AI scanner, and more.
       </p>
       <button
         onClick={() => router.push('/upgrade')}
@@ -91,7 +78,7 @@ function UpgradePrompt({ feature }: { feature: string }) {
           boxShadow: `0 4px 16px ${theme.accent}33`,
         }}
       >
-        View Plans
+        Become a Member
       </button>
     </div>
   )

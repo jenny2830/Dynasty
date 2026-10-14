@@ -20,18 +20,22 @@ const TEXT_SIZES: { value: TextSize; label: string; hint: string }[] = [
 ]
 
 const PLAN_LABELS: Record<string, { label: string; price: string }> = {
-  free:      { label: 'Free Trial', price: 'Free' },
-  starter:   { label: 'Starter',   price: '$29 CAD/mo' },
-  landlord:  { label: 'Landlord',  price: '$79 CAD/mo' },
-  portfolio: { label: 'Portfolio', price: '$149 CAD/mo' },
+  free:      { label: 'Free Trial',        price: 'Free' },
+  member:    { label: 'Dynasty Membership', price: 'CAD $16.90/mo or $149/yr' },
+  // Legacy tiers (existing subscribers stay active members)
+  starter:   { label: 'Dynasty Membership (Legacy)', price: '—' },
+  landlord:  { label: 'Dynasty Membership (Legacy)', price: '—' },
+  portfolio: { label: 'Dynasty Membership (Legacy)', price: '—' },
 }
 
 interface SettingsPanelProps {
-  currentPlan?: 'free' | 'starter' | 'landlord' | 'portfolio'
+  isMember?: boolean
+  // Legacy prop kept for backward compatibility — prefer isMember
+  currentPlan?: string
   hasSubscription?: boolean
 }
 
-export function SettingsPanel({ currentPlan = 'free', hasSubscription = false }: SettingsPanelProps) {
+export function SettingsPanel({ isMember = false, currentPlan = 'free', hasSubscription }: SettingsPanelProps) {
   const { themeId, theme, setThemeId, textThickness, setTextThickness } = useAppTheme()
   const [mounted, setMounted] = useState(false)
   const [textSize, setTextSize] = useState<TextSize>('md')
@@ -103,7 +107,12 @@ export function SettingsPanel({ currentPlan = 'free', hasSubscription = false }:
     }
   }
 
-  const planInfo = PLAN_LABELS[currentPlan] ?? PLAN_LABELS.starter
+  // Derive membership from either the new prop or the legacy plan/hasSubscription props
+  const activeMember = isMember || hasSubscription || (currentPlan && currentPlan !== 'free')
+
+  const planInfo = activeMember
+    ? PLAN_LABELS.member
+    : PLAN_LABELS.free
 
   return (
     <div className="space-y-6">
@@ -535,7 +544,7 @@ export function SettingsPanel({ currentPlan = 'free', hasSubscription = false }:
             </div>
 
             <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-              {hasSubscription && (
+              {activeMember && (
                 <button
                   type="button"
                   onClick={handleManageBilling}
@@ -583,7 +592,7 @@ export function SettingsPanel({ currentPlan = 'free', hasSubscription = false }:
                 }}
               >
                 <Crown style={{ width: '12px', height: '12px' }} strokeWidth={1.8} />
-                Upgrade Plan
+                {activeMember ? 'Manage Membership' : 'Become a Member'}
               </Link>
             </div>
           </div>
@@ -596,9 +605,9 @@ export function SettingsPanel({ currentPlan = 'free', hasSubscription = false }:
             color: theme.textMuted,
             margin: 0,
           }}>
-            {hasSubscription
+            {activeMember
               ? 'Manage your payment method, download invoices, or cancel via the billing portal.'
-              : 'Subscribe to unlock more properties and advanced features.'}
+              : 'Become a member to unlock every feature — unlimited properties, reports, AI scanner, and more.'}
           </p>
         </div>
       </Section>

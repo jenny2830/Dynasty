@@ -6,8 +6,7 @@ import { PreferencesInit } from '@/components/dashboard/PreferencesInit'
 import { DashboardClientWrapper } from '@/components/dashboard/DashboardClientWrapper'
 import { DashboardThemeShell } from '@/components/dashboard/DashboardThemeShell'
 import { toThemeId, THEMES } from '@/lib/themes'
-import type { PlanId } from '@/lib/plans'
-import { FREE_TRIAL_MAX_SESSIONS } from '@/lib/plans'
+import { FREE_TRIAL_MAX_SESSIONS, hasActiveMembership } from '@/lib/plans'
 
 export default async function DashboardLayout({
   children,
@@ -23,7 +22,7 @@ export default async function DashboardLayout({
 
   const { data: landlord } = await supabase
     .from('landlords')
-    .select('id, theme_preference, plan, sessions_used, free_trial_expired, is_blocked')
+    .select('id, theme_preference, plan, sessions_used, free_trial_expired, is_blocked, stripe_subscription_id')
     .eq('auth_user_id', user.id)
     .maybeSingle()
 
@@ -32,7 +31,7 @@ export default async function DashboardLayout({
     redirect('/login?error=Your+account+has+been+suspended.+Contact+support.')
   }
 
-  const plan = (landlord?.plan ?? 'free') as PlanId
+  const isMember = hasActiveMembership(landlord ?? {})
   const sessionsUsed = landlord?.sessions_used ?? 0
   const trialExpired = landlord?.free_trial_expired ?? false
 
@@ -77,7 +76,7 @@ export default async function DashboardLayout({
       <div style={{ position: 'relative', zIndex: 1 }}>
         <DashboardClientWrapper
           landlordId={landlord?.id ?? ''}
-          plan={plan}
+          isMember={isMember}
           sessionsUsed={sessionsUsed}
           trialExpired={trialExpired}
         >
@@ -86,7 +85,7 @@ export default async function DashboardLayout({
       </div>
 
       {/* Full-screen upgrade wall — rendered server-side so there's no flash */}
-      {plan === 'free' && trialExpired && (
+      {!isMember && trialExpired && (
         <div style={{
           position: 'fixed',
           inset: 0,
@@ -136,7 +135,7 @@ export default async function DashboardLayout({
               letterSpacing: '0.04em',
               lineHeight: 1.6,
             }}>
-              You used all {FREE_TRIAL_MAX_SESSIONS} free sessions. Choose a plan to continue building your property empire.
+              You used all {FREE_TRIAL_MAX_SESSIONS} free sessions. Become a member to continue building your property empire.
             </p>
             <Link
               href="/upgrade"
@@ -155,7 +154,7 @@ export default async function DashboardLayout({
                 boxShadow: `0 4px 20px var(--accent-c, rgba(201,168,76,0.25))`,
               }}
             >
-              Choose Your Plan
+              Become a Member
             </Link>
           </div>
         </div>
