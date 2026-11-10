@@ -19,23 +19,25 @@ import {
   X,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { LanguageSwitcher } from '@/components/LanguageSwitcher'
+import { useLocale } from '@/lib/locale-context'
 
 const NAV_PRIMARY = [
-  { href: '/overview',     label: 'Overview',      Icon: LayoutDashboard },
-  { href: '/properties',   label: 'Properties',    Icon: Building2 },
-  { href: '/transactions', label: 'Transactions',  Icon: ArrowLeftRight },
-  { href: '/recurring',    label: 'Recurring',     Icon: RefreshCw },
+  { href: '/overview',     labelKey: 'nav.overview',     Icon: LayoutDashboard },
+  { href: '/properties',   labelKey: 'nav.properties',   Icon: Building2 },
+  { href: '/transactions', labelKey: 'nav.transactions', Icon: ArrowLeftRight },
+  { href: '/recurring',    labelKey: 'nav.recurring',    Icon: RefreshCw },
 ] as const
 
 const NAV_INTELLIGENCE = [
-  { href: '/receipts',     label: 'Receipts',      Icon: ScanLine },
-  { href: '/reports',      label: 'Reports',       Icon: BarChart3 },
-  { href: '/roi',          label: 'ROI',           Icon: TrendingUp },
+  { href: '/receipts',     labelKey: 'nav.receipts', Icon: ScanLine },
+  { href: '/reports',      labelKey: 'nav.reports',  Icon: BarChart3 },
+  { href: '/roi',          labelKey: 'nav.roi',      Icon: TrendingUp },
 ] as const
 
 const NAV_ACCOUNT = [
-  { href: '/settings',     label: 'Settings',      Icon: Settings },
-  { href: '/upgrade',      label: 'Upgrade',       Icon: Crown,    gold: true },
+  { href: '/settings',     labelKey: 'nav.settings', Icon: Settings },
+  { href: '/upgrade',      labelKey: 'nav.upgrade',  Icon: Crown,    gold: true },
 ] as const
 
 interface NavItemProps {
@@ -138,6 +140,7 @@ export function Sidebar({ userId }: SidebarProps) {
   const pathname = usePathname()
   const router = useRouter()
   const { theme, fontWeights } = useAppTheme()
+  const { t } = useLocale()
   const [isMobile, setIsMobile] = useState(false)
   const [isPhoneLandscape, setIsPhoneLandscape] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
@@ -223,18 +226,20 @@ export function Sidebar({ userId }: SidebarProps) {
           textAlign: 'center',
           margin: '8px 0 0 0',
         }}>
-          Property Wealth Platform
+          {t('brand.platform')}
         </p>
       </div>
 
       {/* Navigation */}
       <nav style={{ display: 'flex', flex: 1, flexDirection: 'column', overflowY: 'auto', paddingTop: '8px', paddingBottom: '12px' }}>
-        <NavSectionLabel color={theme.sectionLabel}>Portfolio</NavSectionLabel>
+        <NavSectionLabel color={theme.sectionLabel}>{t('nav.portfolio')}</NavSectionLabel>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           {NAV_PRIMARY.map((item) => (
             <NavItem
               key={item.href}
-              {...item}
+              href={item.href}
+              label={t(item.labelKey)}
+              Icon={item.Icon}
               isActive={isActive(item.href)}
               onNavigate={closeDrawer}
               navText={theme.navText}
@@ -246,12 +251,14 @@ export function Sidebar({ userId }: SidebarProps) {
           ))}
         </div>
 
-        <NavSectionLabel color={theme.sectionLabel}>Intelligence</NavSectionLabel>
+        <NavSectionLabel color={theme.sectionLabel}>{t('nav.intelligence')}</NavSectionLabel>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           {NAV_INTELLIGENCE.map((item) => (
             <NavItem
               key={item.href}
-              {...item}
+              href={item.href}
+              label={t(item.labelKey)}
+              Icon={item.Icon}
               isActive={isActive(item.href)}
               onNavigate={closeDrawer}
               navText={theme.navText}
@@ -265,14 +272,16 @@ export function Sidebar({ userId }: SidebarProps) {
 
         <div style={{ margin: '12px 20px', height: '1px', background: theme.dividerColor }} />
 
-        <NavSectionLabel color={theme.sectionLabel}>Account</NavSectionLabel>
+        <NavSectionLabel color={theme.sectionLabel}>{t('nav.account')}</NavSectionLabel>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           {NAV_ACCOUNT.map((item) => (
             <NavItem
               key={item.href}
-              {...item}
-              isActive={isActive(item.href)}
+              href={item.href}
+              label={t(item.labelKey)}
+              Icon={item.Icon}
               gold={'gold' in item ? item.gold : false}
+              isActive={isActive(item.href)}
               onNavigate={closeDrawer}
               navText={theme.navText}
               navActive={theme.navActive}
@@ -305,10 +314,12 @@ export function Sidebar({ userId }: SidebarProps) {
             onMouseLeave={e => (e.currentTarget.style.color = theme.navText)}
           >
             <LogOut style={{ width: '15px', height: '15px', flexShrink: 0 }} strokeWidth={1.2} />
-            <span>Sign Out</span>
+            <span>{t('nav.signOut')}</span>
           </button>
         </div>
       </nav>
+
+      <LanguageSwitcher variant="sidebar" />
 
       {/* Footer mark */}
       <div style={{ padding: '16px 20px', borderTop: `1px solid ${theme.dividerColor}` }}>
@@ -323,7 +334,7 @@ export function Sidebar({ userId }: SidebarProps) {
           margin: 0,
         }}>
           <span style={{ display: 'inline-block', marginRight: '8px', color: theme.cornerMark }}>◆</span>
-          Legacy · Luxury · Timeless
+          {t('brand.tagline')}
           <span style={{ display: 'inline-block', marginLeft: '8px', color: theme.cornerMark }}>◆</span>
         </p>
       </div>
@@ -349,9 +360,10 @@ export function Sidebar({ userId }: SidebarProps) {
 
   return (
     <>
+      <LanguageSwitcher variant="floating" />
       <button
         type="button"
-        aria-label="Open navigation menu"
+        aria-label={t('nav.openMenu')}
         onClick={() => setIsOpen(true)}
         style={{
           position: 'fixed',
@@ -405,7 +417,7 @@ export function Sidebar({ userId }: SidebarProps) {
       }}>
         <button
           type="button"
-          aria-label="Close navigation menu"
+          aria-label={t('nav.closeMenu')}
           onClick={closeDrawer}
           style={{
             position: 'absolute',

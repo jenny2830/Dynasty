@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
   "amount": number or null,
   "receipt_date": "YYYY-MM-DD" or null,
   "category": one of [Maintenance, Taxes, Water, Garbage pickup, Cleaning, Management fee, Accounting, Insurance, Condo fee, Strata fee, Repairs, Utilities, Landscaping, Legal fees, Advertising, Other expense] or null,
-  "description": string (one sentence summary) or null,
+  "description": string (one sentence summary, in the same language as the receipt) or null,
   "confidence": number between 0 and 1
 }`,
           },

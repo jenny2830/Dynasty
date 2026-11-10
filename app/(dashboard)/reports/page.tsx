@@ -3,8 +3,12 @@ import { ReportBuilder } from './ReportBuilder'
 import { PageHeader } from '@/components/ui/page-header'
 import { FeatureGate } from '@/components/FeatureGate'
 import { hasActiveMembership } from '@/lib/plans'
+import { getI18n } from '@/lib/i18n/server'
 
-export const metadata = { title: 'Reports' }
+export async function generateMetadata() {
+  const { t } = await getI18n()
+  return { title: t('meta.reports') }
+}
 
 export default async function ReportsPage() {
   const supabase = await createClient()
@@ -28,13 +32,15 @@ export default async function ReportsPage() {
         .order('name')
     : { data: [] }
 
+  const { t } = await getI18n()
+
   return (
     <div className="space-y-7">
       <PageHeader
-        title="Reports"
-        subtitle="Profit &amp; loss · Cash flow · Tax summaries · Expense breakdowns"
+        title={t('reports.title')}
+        subtitle={t('reports.subtitle')}
       />
-      <FeatureGate isMember={isMember} featureLabel="Reports">
+      <FeatureGate isMember={isMember} featureLabel={t('reports.title')}>
         <ReportBuilder properties={properties ?? []} />
       </FeatureGate>
     </div>

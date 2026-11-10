@@ -11,6 +11,8 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { EXPENSE_CATEGORIES } from '@/lib/constants'
+import { useLocale } from '@/lib/locale-context'
+import { categoryLabel } from '@/lib/i18n/labels'
 
 interface Property {
   id: string
@@ -35,6 +37,7 @@ const LABEL_STYLE: React.CSSProperties = {
 }
 
 export function TransactionFilters({ properties }: TransactionFiltersProps) {
+  const { t } = useLocale()
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -76,7 +79,7 @@ export function TransactionFilters({ properties }: TransactionFiltersProps) {
         {/* Label */}
         <span style={LABEL_STYLE}>
           <span style={{ fontSize: '6px', color: 'var(--accent-c)', opacity: 0.6 }}>◆</span>
-          Filter
+          {t('common.filter')}
           {activeFilterCount > 0 && (
             <span style={{
               background: 'var(--accent-c)',
@@ -98,10 +101,10 @@ export function TransactionFilters({ properties }: TransactionFiltersProps) {
           onValueChange={(v) => setFilter('property_id', v)}
         >
           <SelectTrigger className="h-9 w-full sm:w-44">
-            <SelectValue placeholder="All properties" />
+            <SelectValue placeholder={t('tx.allProperties')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All properties</SelectItem>
+            <SelectItem value="all">{t('tx.allProperties')}</SelectItem>
             {properties.map((p) => (
               <SelectItem key={p.id} value={p.id}>
                 {p.name}
@@ -116,12 +119,12 @@ export function TransactionFilters({ properties }: TransactionFiltersProps) {
           onValueChange={(v) => setFilter('type', v)}
         >
           <SelectTrigger className="h-9 w-full sm:w-36">
-            <SelectValue placeholder="All types" />
+            <SelectValue placeholder={t('tx.allTypes')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All types</SelectItem>
-            <SelectItem value="income">Income</SelectItem>
-            <SelectItem value="expense">Expense</SelectItem>
+            <SelectItem value="all">{t('tx.allTypes')}</SelectItem>
+            <SelectItem value="income">{t('common.income')}</SelectItem>
+            <SelectItem value="expense">{t('common.expense')}</SelectItem>
           </SelectContent>
         </Select>
 
@@ -131,13 +134,13 @@ export function TransactionFilters({ properties }: TransactionFiltersProps) {
           onValueChange={(v) => setFilter('category', v)}
         >
           <SelectTrigger className="h-9 w-full sm:w-48">
-            <SelectValue placeholder="All categories" />
+            <SelectValue placeholder={t('tx.allCategories')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All categories</SelectItem>
+            <SelectItem value="all">{t('tx.allCategories')}</SelectItem>
             {EXPENSE_CATEGORIES.map((c) => (
               <SelectItem key={c} value={c}>
-                {c}
+                {categoryLabel(c, t)}
               </SelectItem>
             ))}
           </SelectContent>
@@ -149,14 +152,14 @@ export function TransactionFilters({ properties }: TransactionFiltersProps) {
           onValueChange={(v) => setFilter('period', v)}
         >
           <SelectTrigger className="h-9 w-full sm:w-36">
-            <SelectValue placeholder="All time" />
+            <SelectValue placeholder={t('tx.allTime')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All time</SelectItem>
-            <SelectItem value="this_month">This month</SelectItem>
-            <SelectItem value="last_month">Last month</SelectItem>
-            <SelectItem value="this_quarter">This quarter</SelectItem>
-            <SelectItem value="this_year">This year</SelectItem>
+            <SelectItem value="all">{t('tx.allTime')}</SelectItem>
+            <SelectItem value="this_month">{t('tx.thisMonth')}</SelectItem>
+            <SelectItem value="last_month">{t('tx.lastMonth')}</SelectItem>
+            <SelectItem value="this_quarter">{t('tx.thisQuarter')}</SelectItem>
+            <SelectItem value="this_year">{t('tx.thisYear')}</SelectItem>
           </SelectContent>
         </Select>
 
@@ -166,7 +169,7 @@ export function TransactionFilters({ properties }: TransactionFiltersProps) {
         {/* Group by */}
         <span style={LABEL_STYLE}>
           <SlidersHorizontal size={10} strokeWidth={1.5} style={{ color: 'var(--accent-c)', opacity: 0.7 }} />
-          Group
+          {t('common.group')}
         </span>
         <Select
           value={groupBy}
@@ -176,9 +179,9 @@ export function TransactionFilters({ properties }: TransactionFiltersProps) {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="property">By property</SelectItem>
-            <SelectItem value="category">By category</SelectItem>
-            <SelectItem value="none">By date</SelectItem>
+            <SelectItem value="property">{t('tx.byProperty')}</SelectItem>
+            <SelectItem value="category">{t('tx.byCategory')}</SelectItem>
+            <SelectItem value="none">{t('tx.byDate')}</SelectItem>
           </SelectContent>
         </Select>
 
@@ -205,7 +208,7 @@ export function TransactionFilters({ properties }: TransactionFiltersProps) {
             }}
           >
             <X size={11} strokeWidth={1.5} />
-            Clear
+            {t('common.clear')}
           </button>
         )}
       </div>

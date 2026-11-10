@@ -3,7 +3,9 @@
 import { useState, useTransition, useEffect, useRef } from 'react'
 import { Bell, CheckCircle2, MoreHorizontal, Power, Trash2, Edit, Clock, AlertTriangle, RotateCcw } from 'lucide-react'
 import Link from 'next/link'
-import { formatCurrency, formatDate } from '@/lib/utils'
+import { useFormatters, useLocale } from '@/lib/locale-context'
+import { categoryLabel, enumLabel } from '@/lib/i18n/labels'
+import type { MessageKey } from '@/lib/i18n/en'
 import { isRecurringPaymentPaidThisMonth, isRecurringPaymentPending } from '@/lib/recurring-utils'
 import { markAsPaid, markAsUnpaid, toggleRecurringActive, deleteRecurringPayment } from '@/app/actions/recurring'
 
@@ -23,14 +25,15 @@ interface RecurringPayment {
   properties: { name: string } | null
 }
 
-const frequencyLabels: Record<string, string> = {
-  weekly: 'Weekly',
-  monthly: 'Monthly',
-  quarterly: 'Quarterly',
-  annually: 'Annual',
-}
-
 type ReminderStatus = 'paid' | 'overdue' | 'due-today' | 'upcoming' | 'scheduled'
+
+const STATUS_LABEL: Record<ReminderStatus, MessageKey> = {
+  paid: 'recurring.paid',
+  overdue: 'recurring.overdue',
+  'due-today': 'recurring.dueToday',
+  upcoming: 'recurring.reminder',
+  scheduled: 'recurring.scheduled',
+}
 
 function getReminderStatus(payment: RecurringPayment): ReminderStatus {
   const today = new Date()
@@ -127,6 +130,8 @@ const MENU_ITEM_STYLE: React.CSSProperties = {
 }
 
 export function RecurringPaymentRow({ payment }: { payment: RecurringPayment }) {
+  const { t } = useLocale()
+  const { money, date } = useFormatters()
   const [isPending, startTransition] = useTransition()
   const [showMenu, setShowMenu] = useState(false)
   const [menuPos, setMenuPos] = useState({ top: 0, right: 0 })
@@ -180,7 +185,7 @@ export function RecurringPaymentRow({ payment }: { payment: RecurringPayment }) 
   }
 
   function handleDelete() {
-    if (!confirm('Delete this recurring payment? This cannot be undone.')) return
+    if (!confirm(t('recurring.deleteConfirm'))) return
     startTransition(async () => {
       await deleteRecurringPayment(payment.id)
     })
@@ -226,7 +231,7 @@ export function RecurringPaymentRow({ payment }: { payment: RecurringPayment }) 
             color: 'var(--text-muted-c)',
             border: '1px solid var(--badge-pos-border)',
           }}>
-            {payment.category}
+            {categoryLabel(payment.category, t)}
           </span>
           {payment.auto_log_transaction && (
             <span style={{
@@ -242,10 +247,12 @@ export function RecurringPaymentRow({ payment }: { payment: RecurringPayment }) 
         <div className="mt-1 flex items-center gap-3 font-sans text-[11px] font-light" style={{ color: 'var(--text-muted-c)' }}>
           <span>{(payment.properties as { name: string } | null)?.name ?? '—'}</span>
           <span style={{ color: 'var(--divider-c)' }}>·</span>
-          <span>{frequencyLabels[payment.frequency] ?? payment.frequency}</span>
+          <span>{enumLabel(payment.frequency, t)}</span>
           <span style={{ color: 'var(--divider-c)' }}>·</span>
           <span style={{ color: needsAttention ? statusConfig.color : 'var(--text-muted-c)' }}>
-            {isPaid ? `Paid — next due ${formatDate(payment.next_due_date)}` : `Due ${formatDate(payment.next_due_date)}`}
+            {isPaid
+              ? t('recurring.paidNext', { date: date(payment.next_due_date) })
+              : t('recurring.due', { date: date(payment.next_due_date) })}
           </span>
         </div>
       </div>
@@ -253,12 +260,12 @@ export function RecurringPaymentRow({ payment }: { payment: RecurringPayment }) 
       <div className="flex shrink-0 items-center gap-4">
         <div className="text-right">
           <p className="font-mono text-[14px] font-medium tracking-tight" style={{ color: 'var(--accent-c)' }}>
-            {formatCurrency(payment.amount)}
+            {money(payment.amount)}
           </p>
           <div className="mt-1">
             <span style={{ ...BADGE_STYLE, background: statusConfig.bg, color: statusConfig.color, border: statusConfig.border }}>
               <StatusIcon size={9} strokeWidth={1.8} />
-              {statusConfig.label}
+              {t(STATUS_LABEL[status])}
             </span>
           </div>
         </div>
@@ -269,7 +276,7 @@ export function RecurringPaymentRow({ payment }: { payment: RecurringPayment }) 
             <button
               onClick={handleMarkPaid}
               disabled={isPending || !payment.is_active}
-              title="Mark as paid"
+              title={t('recurring.markPaidTitle')}
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -290,7 +297,7 @@ export function RecurringPaymentRow({ payment }: { payment: RecurringPayment }) 
               }}
             >
               <CheckCircle2 size={12} strokeWidth={1.5} />
-              {isPending ? '…' : 'Mark Paid'}
+              {isPending ? '…' : t('recurring.markPaid')}
             </button>
           )}
 
@@ -334,11 +341,11 @@ export function RecurringPaymentRow({ payment }: { payment: RecurringPayment }) 
               >
                 {!isPaid ? (
                   <button onClick={handleMarkPaid} disabled={isPending} style={MENU_ITEM_STYLE}>
-                    <CheckCircle2 size={13} strokeWidth={1.2} /> Mark as Paid
+                    <CheckCircle2 size={13} strokeWidth={1.2} /> {t('recurring.markAsPaid')}
                   </button>
                 ) : (
                   <button onClick={handleMarkUnpaid} disabled={isPending} style={MENU_ITEM_STYLE}>
-                    <RotateCcw size={13} strokeWidth={1.2} /> Mark as Unpaid
+                    <RotateCcw size={13} strokeWidth={1.2} /> {t('recurring.markAsUnpaid')}
                   </button>
                 )}
                 <Link
@@ -346,11 +353,11 @@ export function RecurringPaymentRow({ payment }: { payment: RecurringPayment }) 
                   style={MENU_ITEM_STYLE}
                   onClick={() => setShowMenu(false)}
                 >
-                  <Edit size={13} strokeWidth={1.2} /> Edit
+                  <Edit size={13} strokeWidth={1.2} /> {t('common.edit')}
                 </Link>
                 <button onClick={handleToggleActive} disabled={isPending} style={MENU_ITEM_STYLE}>
                   <Power size={13} strokeWidth={1.2} />
-                  {payment.is_active ? 'Deactivate' : 'Activate'}
+                  {payment.is_active ? t('recurring.deactivate') : t('recurring.activate')}
                 </button>
                 <div style={{ height: '1px', background: 'var(--divider-c)', margin: '2px 0' }} />
                 <button
@@ -358,7 +365,7 @@ export function RecurringPaymentRow({ payment }: { payment: RecurringPayment }) 
                   disabled={isPending}
                   style={{ ...MENU_ITEM_STYLE, color: '#B76E79' }}
                 >
-                  <Trash2 size={13} strokeWidth={1.2} /> Delete
+                  <Trash2 size={13} strokeWidth={1.2} /> {t('common.delete')}
                 </button>
               </div>
             )}

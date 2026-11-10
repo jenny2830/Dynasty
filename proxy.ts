@@ -1,7 +1,28 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { detectLocale, LOCALE_COOKIE, LOCALE_MAX_AGE, parseLocale } from '@/lib/i18n/locale'
+
+function applyLocale(request: NextRequest): { locale: 'en' | 'es'; shouldSet: boolean } {
+  const existing = parseLocale(request.cookies.get(LOCALE_COOKIE)?.value)
+  if (existing) return { locale: existing, shouldSet: false }
+  const locale = detectLocale(request.headers.get('accept-language'))
+  request.cookies.set(LOCALE_COOKIE, locale)
+  return { locale, shouldSet: true }
+}
+
+function withLocaleCookie(response: NextResponse, locale: 'en' | 'es', shouldSet: boolean) {
+  if (shouldSet) {
+    response.cookies.set(LOCALE_COOKIE, locale, {
+      path: '/',
+      maxAge: LOCALE_MAX_AGE,
+      sameSite: 'lax',
+    })
+  }
+  return response
+}
 
 export async function proxy(request: NextRequest) {
+  const { locale, shouldSet } = applyLocale(request)
   let supabaseResponse = NextResponse.next({ request })
 
   const supabase = createServerClient(
@@ -53,17 +74,17 @@ export async function proxy(request: NextRequest) {
     const loginUrl = request.nextUrl.clone()
     loginUrl.pathname = '/login'
     loginUrl.searchParams.set('next', pathname)
-    return NextResponse.redirect(loginUrl)
+    return withLocaleCookie(NextResponse.redirect(loginUrl), locale, shouldSet)
   }
 
   // Redirect authenticated users away from auth pages
   if (user && isAuthPage) {
     const dashboardUrl = request.nextUrl.clone()
     dashboardUrl.pathname = '/'
-    return NextResponse.redirect(dashboardUrl)
+    return withLocaleCookie(NextResponse.redirect(dashboardUrl), locale, shouldSet)
   }
 
-  return supabaseResponse
+  return withLocaleCookie(supabaseResponse, locale, shouldSet)
 }
 
 export const config = {

@@ -1,5 +1,7 @@
 import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
+import { intlTag } from '@/lib/i18n/locale'
+import type { Locale } from '@/lib/i18n/types'
 
 export function cn(...inputs: ClassValue[]): string {
   return twMerge(clsx(inputs))
@@ -14,9 +16,15 @@ export function formatCurrency(
   amount: number | null | undefined,
   currency = 'CAD',
   decimals = 2,
+  locale: Locale = 'en',
 ): string {
-  if (amount == null) return '$0.00'
-  return new Intl.NumberFormat('en-CA', {
+  if (amount == null) return new Intl.NumberFormat(intlTag(locale), {
+    style: 'currency',
+    currency,
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  }).format(0)
+  return new Intl.NumberFormat(intlTag(locale), {
     style: 'currency',
     currency,
     minimumFractionDigits: decimals,
@@ -28,8 +36,9 @@ export function formatCurrency(
 export function formatPropertyCurrency(
   amount: number | null | undefined,
   currency = 'CAD',
+  locale: Locale = 'en',
 ): string {
-  return formatCurrency(amount, currency)
+  return formatCurrency(amount, currency, 2, locale)
 }
 
 /**
@@ -39,17 +48,18 @@ export function formatPropertyCurrency(
 export function formatNumber(
   value: number | null | undefined,
   decimals = 0,
+  locale: Locale = 'en',
 ): string {
   if (value == null) return '0'
-  return new Intl.NumberFormat('en-CA', {
+  return new Intl.NumberFormat(intlTag(locale), {
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,
   }).format(value)
 }
 
-export function formatDate(date: string | Date): string {
+export function formatDate(date: string | Date, locale: Locale = 'en'): string {
   const d = typeof date === 'string' ? new Date(date) : date
-  return new Intl.DateTimeFormat('en-CA', {
+  return new Intl.DateTimeFormat(intlTag(locale), {
     year: 'numeric',
     month: 'short',
     day: 'numeric',

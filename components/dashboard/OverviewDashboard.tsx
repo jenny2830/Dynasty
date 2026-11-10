@@ -5,7 +5,6 @@ import Link from 'next/link'
 import { Building2, Plus, ArrowRight, Bell } from 'lucide-react'
 import { StatsCards } from '@/components/dashboard/StatsCards'
 import { IncomeExpenseChart } from '@/components/dashboard/IncomeExpenseChart'
-import { formatCurrency, formatDate } from '@/lib/utils'
 import { convertAmount } from '@/lib/currency'
 import { COUNTRIES } from '@/lib/geo'
 import { updateDisplayCurrency } from '@/app/actions/landlord'
@@ -14,6 +13,8 @@ import { Badge } from '@/components/ui/badge'
 import { PageHeader } from '@/components/ui/page-header'
 import { Section, SectionHeader } from '@/components/ui/section'
 import { useAppTheme } from '@/lib/theme-context'
+import { useFormatters, useLocale } from '@/lib/locale-context'
+import { categoryLabel, countryLabel, enumLabel } from '@/lib/i18n/labels'
 
 type PropertyPreview = {
   id: string
@@ -73,6 +74,8 @@ export function OverviewDashboard({
   upcomingReminders,
 }: OverviewDashboardProps) {
   const { theme } = useAppTheme()
+  const { t } = useLocale()
+  const { money, date } = useFormatters()
   const [displayCurrency, setDisplayCurrency] = useState(initialDisplayCurrency)
   const [, startTransition] = useTransition()
 
@@ -99,7 +102,7 @@ export function OverviewDashboard({
           <select
             value={displayCurrency}
             onChange={(e) => handleCurrencyChange(e.target.value)}
-            aria-label="Display currency"
+            aria-label={t('overview.currency')}
             style={{
               background: theme.inputBg,
               border: `1px solid ${theme.inputBorder}`,
@@ -114,19 +117,19 @@ export function OverviewDashboard({
           >
             {COUNTRIES.map((c) => (
               <option key={c.currency} value={c.currency}>
-                {c.currency} — {c.name}
+                {c.currency} — {countryLabel(c.code, c.name, t)}
               </option>
             ))}
           </select>
         </div>
         <Button asChild variant="outline" size="sm">
           <Link href="/transactions/new">
-            <Plus /> Transaction
+            <Plus /> {t('overview.addTransaction')}
           </Link>
         </Button>
         <Button asChild size="sm">
           <Link href="/properties/new">
-            <Plus /> Property
+            <Plus /> {t('overview.addProperty')}
           </Link>
         </Button>
       </PageHeader>
@@ -141,7 +144,7 @@ export function OverviewDashboard({
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
         <Section className="lg:col-span-3">
-          <SectionHeader title="Income vs Expenses" description="Last six months" />
+          <SectionHeader title={t('overview.incomeVsExpenses')} description={t('overview.lastSixMonths')} />
           <div className="px-5 py-5">
             <IncomeExpenseChart data={convertedChartData} displayCurrency={displayCurrency} />
           </div>
@@ -149,13 +152,13 @@ export function OverviewDashboard({
 
         <Section className="lg:col-span-2">
           <SectionHeader
-            title="Recent Transactions"
+            title={t('overview.recentTransactions')}
             action={
               <Link
                 href="/transactions"
                 className="flex items-center gap-1.5 font-sans text-[12px] font-normal uppercase tracking-[0.18em] text-[var(--accent-c)] transition-colors hover:opacity-80"
               >
-                View All <ArrowRight className="h-3 w-3" strokeWidth={1.2} />
+                {t('common.viewAll')} <ArrowRight className="h-3 w-3" strokeWidth={1.2} />
               </Link>
             }
           />
@@ -166,13 +169,13 @@ export function OverviewDashboard({
                   ◆ ◇ ◆
                 </p>
                 <p className="font-serif text-[20px] font-medium text-dynasty-gray-400">
-                  No transactions yet
+                  {t('overview.noTransactions')}
                 </p>
                 <p className="mt-1 font-sans text-[14px] font-normal tracking-[0.06em] text-dynasty-gray-600">
-                  Your ledger awaits its first entry
+                  {t('overview.ledgerAwaits')}
                 </p>
                 <Button asChild variant="outline" size="sm" className="mt-4">
-                  <Link href="/transactions/new">Add First</Link>
+                  <Link href="/transactions/new">{t('overview.addFirst')}</Link>
                 </Button>
               </div>
             ) : (
@@ -185,10 +188,10 @@ export function OverviewDashboard({
                   >
                     <div className="min-w-0">
                       <p className="truncate font-sans text-[15px] font-normal text-dynasty-warm-white">
-                        {tx.description ?? tx.category}
+                        {tx.description ?? categoryLabel(tx.category, t)}
                       </p>
                       <p className="mt-0.5 font-sans text-[13px] font-normal text-dynasty-gray-500">
-                        {formatDate(tx.transaction_date)}
+                        {date(tx.transaction_date)}
                       </p>
                     </div>
                     <span
@@ -203,7 +206,7 @@ export function OverviewDashboard({
                       }}
                     >
                       {tx.type === 'income' ? '+' : '−'}
-                      {formatCurrency(converted, displayCurrency, 0)}
+                      {money(converted, displayCurrency, 0)}
                     </span>
                   </div>
                 )
@@ -216,13 +219,13 @@ export function OverviewDashboard({
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <Section>
           <SectionHeader
-            title="Properties"
+            title={t('overview.properties')}
             action={
               <Link
                 href="/properties"
                 className="flex items-center gap-1.5 font-sans text-[12px] font-normal uppercase tracking-[0.18em] text-[var(--accent-c)] transition-colors hover:opacity-80"
               >
-                View All <ArrowRight className="h-3 w-3" strokeWidth={1.2} />
+                {t('common.viewAll')} <ArrowRight className="h-3 w-3" strokeWidth={1.2} />
               </Link>
             }
           />
@@ -237,13 +240,13 @@ export function OverviewDashboard({
                   strokeWidth={1}
                 />
                 <p className="mt-3 font-serif text-[20px] font-medium text-dynasty-gray-400">
-                  No properties yet
+                  {t('overview.noProperties')}
                 </p>
                 <p className="mt-1 font-sans text-[14px] font-normal tracking-[0.06em] text-dynasty-gray-600">
-                  Begin building your portfolio
+                  {t('overview.beginPortfolio')}
                 </p>
                 <Button asChild variant="outline" size="sm" className="mt-4">
-                  <Link href="/properties/new">Add Property</Link>
+                  <Link href="/properties/new">{t('overview.addPropertyButton')}</Link>
                 </Button>
               </div>
             ) : (
@@ -261,7 +264,7 @@ export function OverviewDashboard({
                       {p.city}, {p.province}
                     </p>
                   </div>
-                  <Badge className="ml-4 shrink-0">{p.type}</Badge>
+                  <Badge className="ml-4 shrink-0">{enumLabel(p.type, t)}</Badge>
                 </Link>
               ))
             )}
@@ -270,13 +273,13 @@ export function OverviewDashboard({
 
         <Section>
           <SectionHeader
-            title="Upcoming Reminders"
+            title={t('overview.upcoming')}
             action={
               <Link
                 href="/recurring"
                 className="flex items-center gap-1.5 font-sans text-[12px] font-normal uppercase tracking-[0.18em] text-[var(--accent-c)] transition-colors hover:opacity-80"
               >
-                View All <ArrowRight className="h-3 w-3" strokeWidth={1.2} />
+                {t('common.viewAll')} <ArrowRight className="h-3 w-3" strokeWidth={1.2} />
               </Link>
             }
           />
@@ -285,7 +288,7 @@ export function OverviewDashboard({
               <div className="flex items-center gap-3 px-7 py-5">
                 <Bell className="h-4 w-4 shrink-0 text-dynasty-gold" strokeWidth={1.2} />
                 <p className="font-sans text-[14px] font-normal tracking-[0.04em] text-dynasty-gray-400">
-                  All clear — no pending reminders
+                  {t('overview.allClear')}
                 </p>
               </div>
             ) : (
@@ -299,7 +302,7 @@ export function OverviewDashboard({
                       {payment.name}
                     </p>
                     <p className="mt-0.5 font-sans text-[13px] font-normal text-dynasty-gray-500">
-                      Due {formatDate(payment.next_due_date)}
+                      {t('overview.due', { date: date(payment.next_due_date) })}
                     </p>
                   </div>
                   <span style={{
@@ -311,11 +314,7 @@ export function OverviewDashboard({
                     letterSpacing: '-0.025em',
                     color: 'var(--value-neg-c)',
                   }}>
-                    {formatCurrency(
-                      convertAmount(payment.amount, displayCurrency),
-                      displayCurrency,
-                      0,
-                    )}
+                    {money(convertAmount(payment.amount, displayCurrency), displayCurrency, 0)}
                   </span>
                 </div>
               ))

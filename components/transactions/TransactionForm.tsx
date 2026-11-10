@@ -17,14 +17,18 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { EXPENSE_ONLY_CATEGORIES, INCOME_CATEGORIES } from '@/lib/constants'
+import { useLocale } from '@/lib/locale-context'
+import { categoryLabel, enumLabel } from '@/lib/i18n/labels'
+import { translateKnownError } from '@/lib/i18n/translate'
 import type { Transaction } from '@/types/database.types'
 import { createClient } from '@/lib/supabase/client'
 
 function SubmitButton({ label, className }: { label: string; className?: string }) {
   const { pending } = useFormStatus()
+  const { t } = useLocale()
   return (
     <Button type="submit" disabled={pending} className={className}>
-      {pending ? 'Saving…' : label}
+      {pending ? t('common.saving') : label}
     </Button>
   )
 }
@@ -52,6 +56,7 @@ export function TransactionForm({
   properties,
   defaultPropertyId,
 }: TransactionFormProps) {
+  const { t } = useLocale()
   const [txType, setTxType] = useState<'income' | 'expense'>(
     transaction?.type ?? 'expense'
   )
@@ -109,30 +114,30 @@ export function TransactionForm({
       {state?.errors?._form && (
         <div className="rounded-[1px] border border-[rgba(183,110,121,0.3)] bg-[rgba(183,110,121,0.08)] px-4 py-3">
           <p className="font-sans text-[12px] font-light text-dynasty-rose-light">
-            {state.errors._form[0]}
+            {translateKnownError(state.errors._form[0], t)}
           </p>
         </div>
       )}
 
       {/* Type toggle — sharp art deco segmented control */}
       <div className="space-y-2">
-        <Label>Transaction Type *</Label>
+        <Label>{t('tx.typeLabel')} *</Label>
         <div className="tx-type-segment flex overflow-hidden rounded-[1px] border border-[var(--card-border-color)]">
-          {(['expense', 'income'] as const).map((t) => (
+          {(['expense', 'income'] as const).map((kind) => (
             <button
-              key={t}
+              key={kind}
               type="button"
-              aria-pressed={txType === t}
-              onClick={() => setTxType(t)}
+              aria-pressed={txType === kind}
+              onClick={() => setTxType(kind)}
               className={`flex-1 py-3 font-sans text-[10px] font-light uppercase tracking-[0.22em] transition-colors ${
-                txType === t
-                  ? t === 'income'
+                txType === kind
+                  ? kind === 'income'
                     ? 'bg-[var(--badge-pos-bg)] text-[var(--badge-pos-text)]'
                     : 'bg-[var(--badge-neg-bg)] text-[var(--badge-neg-text)]'
                   : 'text-dynasty-gray-500 hover:text-dynasty-gold hover:bg-[var(--table-row-hover-bg)]'
               }`}
             >
-              {t}
+              {enumLabel(kind, t)}
             </button>
           ))}
         </div>
@@ -141,7 +146,7 @@ export function TransactionForm({
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="amount">Amount (CAD) *</Label>
+          <Label htmlFor="amount">{t('tx.amountCad')} *</Label>
           <NumberInput
             id="amount"
             name="amount"
@@ -153,13 +158,13 @@ export function TransactionForm({
           />
           {state?.errors?.amount && (
             <p className="font-sans text-[11px] font-light text-dynasty-rose-light">
-              {state.errors.amount[0]}
+              {translateKnownError(state.errors.amount[0], t)}
             </p>
           )}
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="transaction_date">Date *</Label>
+          <Label htmlFor="transaction_date">{t('common.date')} *</Label>
           <Input
             id="transaction_date"
             name="transaction_date"
@@ -170,42 +175,42 @@ export function TransactionForm({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="category">Category *</Label>
+          <Label htmlFor="category">{t('common.category')} *</Label>
           <Select
             name="category"
             defaultValue={transaction?.category}
             key={txType}
           >
             <SelectTrigger id="category">
-              <SelectValue placeholder="Select category" />
+              <SelectValue placeholder={t('tx.selectCategory')} />
             </SelectTrigger>
             <SelectContent>
               {categories.map((c) => (
                 <SelectItem key={c} value={c}>
-                  {c}
+                  {categoryLabel(c, t)}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
           {state?.errors?.category && (
             <p className="font-sans text-[11px] font-light text-dynasty-rose-light">
-              {state.errors.category[0]}
+              {translateKnownError(state.errors.category[0], t)}
             </p>
           )}
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="property_id">Property</Label>
+          <Label htmlFor="property_id">{t('common.property')}</Label>
           <Select
             name="property_id"
             value={selectedProperty}
             onValueChange={setSelectedProperty}
           >
             <SelectTrigger id="property_id">
-              <SelectValue placeholder="Select property" />
+              <SelectValue placeholder={t('tx.selectProperty')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="none">No property</SelectItem>
+              <SelectItem value="none">{t('tx.noPropertyOption')}</SelectItem>
               {properties.map((p) => (
                 <SelectItem key={p.id} value={p.id}>
                   {p.name}
@@ -217,16 +222,16 @@ export function TransactionForm({
 
         {units.length > 0 && (
           <div className="space-y-2">
-            <Label htmlFor="unit_id">Unit</Label>
+            <Label htmlFor="unit_id">{t('common.unit')}</Label>
             <Select name="unit_id" defaultValue={transaction?.unit_id ?? 'none'}>
               <SelectTrigger id="unit_id">
-                <SelectValue placeholder="Select unit (optional)" />
+                <SelectValue placeholder={t('tx.selectUnit')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="none">No specific unit</SelectItem>
+                <SelectItem value="none">{t('tx.noUnit')}</SelectItem>
                 {units.map((u) => (
                   <SelectItem key={u.id} value={u.id}>
-                    Unit {u.unit_number}
+                    {t('units.label', { number: u.unit_number })}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -236,11 +241,11 @@ export function TransactionForm({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="description">Description</Label>
+        <Label htmlFor="description">{t('common.description')}</Label>
         <Textarea
           id="description"
           name="description"
-          placeholder="Optional description…"
+          placeholder={t('tx.descriptionPlaceholder')}
           defaultValue={transaction?.description ?? ''}
           rows={2}
         />
@@ -255,15 +260,15 @@ export function TransactionForm({
             onCheckedChange={(v) => setTaxDeductible(Boolean(v))}
           />
           <Label htmlFor="is_tax_deductible" className="cursor-pointer normal-case tracking-[0.06em] text-[12px] text-dynasty-gray-300">
-            Tax deductible expense
+            {t('tx.taxDeductible')}
           </Label>
         </div>
       )}
 
       <div className="flex flex-col sm:flex-row gap-3 pt-3 border-t border-[var(--divider-c)]">
-        <SubmitButton label={mode === 'create' ? 'Add Transaction' : 'Save Changes'} className="w-full sm:w-auto" />
+        <SubmitButton label={mode === 'create' ? t('tx.add') : t('tx.saveChanges')} className="w-full sm:w-auto" />
         <Button type="button" variant="outline" onClick={() => window.history.back()} className="w-full sm:w-auto">
-          Cancel
+          {t('common.cancel')}
         </Button>
       </div>
     </form>

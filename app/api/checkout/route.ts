@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { createClient } from '@/lib/supabase/server'
+import { getLocale } from '@/lib/i18n/server'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
@@ -58,9 +59,11 @@ export async function POST(request: Request) {
         .eq('id', landlord.id)
     }
 
+    const locale = await getLocale()
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       mode: 'subscription',
+      locale: locale === 'es' ? 'es' : 'en',
       payment_method_types: ['card'],
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${process.env.NEXT_PUBLIC_APP_URL}/upgrade?success=true`,

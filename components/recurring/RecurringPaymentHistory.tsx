@@ -1,8 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { formatCurrency, formatDate } from '@/lib/utils'
 import { useAppTheme } from '@/lib/theme-context'
+import { useFormatters, useLocale } from '@/lib/locale-context'
+import { categoryLabel } from '@/lib/i18n/labels'
 import { useThemeStyles } from '@/lib/useThemeStyles'
 import { Section, SectionHeader } from '@/components/ui/section'
 
@@ -29,6 +30,8 @@ interface RecurringPaymentHistoryProps {
 export function RecurringPaymentHistory({ history, properties }: RecurringPaymentHistoryProps) {
   const { theme } = useAppTheme()
   const styles = useThemeStyles()
+  const { t } = useLocale()
+  const { money, date } = useFormatters()
   const [historyFilter, setHistoryFilter] = useState('all')
 
   const filtered = history.filter(
@@ -38,8 +41,8 @@ export function RecurringPaymentHistory({ history, properties }: RecurringPaymen
   return (
     <Section className="relative overflow-hidden">
       <SectionHeader
-        title="Payment History"
-        description="All recurring payments made since account creation"
+        title={t('recurring.history')}
+        description={t('recurring.historyHelp')}
       />
 
       <div
@@ -49,7 +52,7 @@ export function RecurringPaymentHistory({ history, properties }: RecurringPaymen
         <select
           value={historyFilter}
           onChange={(e) => setHistoryFilter(e.target.value)}
-          aria-label="Filter by property"
+          aria-label={t('recurring.filterProperty')}
           style={{
             background: theme.inputBg,
             border: `1px solid ${theme.inputBorder}`,
@@ -63,7 +66,7 @@ export function RecurringPaymentHistory({ history, properties }: RecurringPaymen
             minWidth: '200px',
           }}
         >
-          <option value="all">All Properties</option>
+          <option value="all">{t('recurring.allProperties')}</option>
           {properties.map((p) => (
             <option key={p.id} value={p.id}>
               {p.name}
@@ -77,7 +80,7 @@ export function RecurringPaymentHistory({ history, properties }: RecurringPaymen
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ background: theme.tableHeaderBg }}>
-                {['Date', 'Description', 'Property', 'Category', 'Amount'].map((col, i) => (
+                {[t('common.date'), t('common.description'), t('common.property'), t('common.category'), t('common.amount')].map((col, i) => (
                   <th
                     key={col}
                     style={{
@@ -101,7 +104,7 @@ export function RecurringPaymentHistory({ history, properties }: RecurringPaymen
                   }}
                 >
                   <td style={{ ...styles.tableCell, padding: '14px 24px' }}>
-                    {formatDate(transaction.transaction_date)}
+                    {date(transaction.transaction_date)}
                   </td>
                   <td style={{ ...styles.tableCell, padding: '14px 24px' }}>
                     {transaction.description ?? '—'}
@@ -118,7 +121,7 @@ export function RecurringPaymentHistory({ history, properties }: RecurringPaymen
                         border: `1px solid ${theme.valueNegative}30`,
                       }}
                     >
-                      {transaction.category}
+                      {categoryLabel(transaction.category, t)}
                     </span>
                   </td>
                   <td
@@ -129,7 +132,7 @@ export function RecurringPaymentHistory({ history, properties }: RecurringPaymen
                       textAlign: 'right',
                     }}
                   >
-                    −{formatCurrency(transaction.amount)}
+                    −{money(transaction.amount)}
                   </td>
                 </tr>
               ))}
@@ -138,7 +141,7 @@ export function RecurringPaymentHistory({ history, properties }: RecurringPaymen
         </div>
       ) : (
         <div style={{ padding: '48px', textAlign: 'center' }}>
-          <p style={styles.mutedText}>No payment history yet.</p>
+          <p style={styles.mutedText}>{t('recurring.noHistory')}</p>
         </div>
       )}
     </Section>

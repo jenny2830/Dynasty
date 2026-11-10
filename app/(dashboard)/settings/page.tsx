@@ -2,8 +2,12 @@ import { createClient } from '@/lib/supabase/server'
 import { PageHeader } from '@/components/ui/page-header'
 import { SettingsPanel } from '@/components/settings/SettingsPanel'
 import { hasActiveMembership } from '@/lib/plans'
+import { getI18n } from '@/lib/i18n/server'
 
-export const metadata = { title: 'Settings' }
+export async function generateMetadata() {
+  const { t } = await getI18n()
+  return { title: t('meta.settings') }
+}
 
 export default async function SettingsPage() {
   const supabase = await createClient()
@@ -25,9 +29,11 @@ export default async function SettingsPage() {
     }
   }
 
+  const { t } = await getI18n()
+
   return (
     <div className="space-y-7">
-      <PageHeader title="Settings" subtitle="Appearance · Security · Billing" />
+      <PageHeader title={t('settings.title')} subtitle={t('settings.subtitle')} />
       <SettingsPanel isMember={isMember} />
     </div>
   )

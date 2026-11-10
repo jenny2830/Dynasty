@@ -5,7 +5,9 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Section, SectionHeader } from '@/components/ui/section'
 import { formatCurrency, formatPropertyCurrency, formatDate } from '@/lib/utils'
-import { ChevronLeft, Edit, MapPin, Building2 } from 'lucide-react'
+import { getI18n } from '@/lib/i18n/server'
+import { categoryLabel, enumLabel } from '@/lib/i18n/labels'
+import { ChevronLeft, Edit, MapPin } from 'lucide-react'
 import { DeletePropertyButton } from './DeletePropertyButton'
 import { UnitManager } from './UnitManager'
 
@@ -13,7 +15,8 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const { id } = await params
   const supabase = await createClient()
   const { data } = await supabase.from('properties').select('name').eq('id', id).single()
-  return { title: data?.name ?? 'Property' }
+  const { t } = await getI18n()
+  return { title: data?.name ?? t('properties.propertyFallback') }
 }
 
 export default async function PropertyDetailPage({
@@ -60,6 +63,7 @@ export default async function PropertyDetailPage({
       ? property.current_value - property.mortgage_balance
       : null
 
+  const { t, locale } = await getI18n()
   const propertyCurrency = property.currency ?? 'CAD'
 
   return (
@@ -69,7 +73,7 @@ export default async function PropertyDetailPage({
         href="/properties"
         className="inline-flex items-center gap-1.5 font-sans text-[10px] font-light uppercase tracking-[0.18em] text-dynasty-gray-400 transition-colors hover:text-dynasty-gold"
       >
-        <ChevronLeft className="h-3 w-3" strokeWidth={1.2} /> Back to Properties
+        <ChevronLeft className="h-3 w-3" strokeWidth={1.2} /> {t('properties.backTo')}
       </Link>
 
       {/* Header */}
@@ -82,7 +86,7 @@ export default async function PropertyDetailPage({
                 <span className="truncate">{property.name}</span>
               </h1>
               <Badge variant={property.status === 'active' ? 'success' : 'secondary'}>
-                {property.status}
+                {enumLabel(property.status, t)}
               </Badge>
             </div>
             <div className="mt-2 flex items-center gap-1.5 font-sans text-[11px] font-light tracking-[0.06em] text-dynasty-gray-400">
@@ -93,10 +97,12 @@ export default async function PropertyDetailPage({
               </span>
             </div>
             <div className="mt-3 flex flex-wrap gap-2">
-              <Badge variant="outline">{property.type}</Badge>
-              <Badge variant="outline">{property.property_subtype}</Badge>
+              <Badge variant="outline">{enumLabel(property.type, t)}</Badge>
+              <Badge variant="outline">{enumLabel(property.property_subtype, t)}</Badge>
               <Badge variant="outline">
-                {property.num_units} unit{property.num_units !== 1 ? 's' : ''}
+                {property.num_units === 1
+                  ? t('properties.unitCountOne', { count: property.num_units })
+                  : t('properties.unitCountMany', { count: property.num_units })}
               </Badge>
             </div>
             <div className="mt-3.5 h-px w-10 bg-[var(--accent-c)] opacity-50" aria-hidden />
@@ -104,7 +110,7 @@ export default async function PropertyDetailPage({
           <div className="flex shrink-0 gap-2">
             <Button asChild variant="outline" size="sm">
               <Link href={`/properties/${id}/edit`}>
-                <Edit /> Edit
+                <Edit /> {t('common.edit')}
               </Link>
             </Button>
             <DeletePropertyButton propertyId={id} />
@@ -115,10 +121,10 @@ export default async function PropertyDetailPage({
       {/* Financial stats */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         {[
-          { label: 'Purchase Price', value: property.purchase_price ? formatPropertyCurrency(property.purchase_price, propertyCurrency) : '—', accent: false },
-          { label: 'Current Value', value: property.current_value ? formatPropertyCurrency(property.current_value, propertyCurrency) : '—', accent: true },
-          { label: 'Mortgage Balance', value: property.mortgage_balance ? formatPropertyCurrency(property.mortgage_balance, propertyCurrency) : '—', accent: false },
-          { label: 'Equity', value: equity ? formatPropertyCurrency(equity, propertyCurrency) : '—', accent: true },
+          { label: t('properties.purchasePrice'), value: property.purchase_price ? formatPropertyCurrency(property.purchase_price, propertyCurrency, locale) : '—', accent: false },
+          { label: t('properties.currentValue'), value: property.current_value ? formatPropertyCurrency(property.current_value, propertyCurrency, locale) : '—', accent: true },
+          { label: t('properties.mortgageBalance'), value: property.mortgage_balance ? formatPropertyCurrency(property.mortgage_balance, propertyCurrency, locale) : '—', accent: false },
+          { label: t('properties.equity'), value: equity ? formatPropertyCurrency(equity, propertyCurrency, locale) : '—', accent: true },
         ].map((stat) => (
           <div
             key={stat.label}
@@ -155,39 +161,39 @@ export default async function PropertyDetailPage({
       {(property.monthly_mortgage || property.condo_fee || property.strata_fee) && (
         <Section variant="warm" className="px-6 py-5">
           <h2 className="mb-4 font-serif text-[18px] font-medium tracking-[0.02em] text-dynasty-warm-white">
-            Monthly Costs
+            {t('properties.monthlyCosts')}
           </h2>
           <div className="flex flex-wrap gap-8">
             {property.monthly_mortgage && (
               <div>
                 <p className="font-sans text-[9px] font-light uppercase tracking-[0.22em] text-dynasty-gray-500">
-                  Mortgage
+                  {t('properties.mortgage')}
                 </p>
                 <p className="mt-1 font-mono text-[14px] font-medium text-dynasty-cream">
-                  {formatPropertyCurrency(property.monthly_mortgage, propertyCurrency)}
-                  <span className="ml-1 text-dynasty-gray-500 font-light">/mo</span>
+                  {formatPropertyCurrency(property.monthly_mortgage, propertyCurrency, locale)}
+                  <span className="ml-1 text-dynasty-gray-500 font-light">{t('common.perMonth')}</span>
                 </p>
               </div>
             )}
             {property.condo_fee && (
               <div>
                 <p className="font-sans text-[9px] font-light uppercase tracking-[0.22em] text-dynasty-gray-500">
-                  Condo Fee
+                  {t('properties.condoFee')}
                 </p>
                 <p className="mt-1 font-mono text-[14px] font-medium text-dynasty-cream">
-                  {formatPropertyCurrency(property.condo_fee, propertyCurrency)}
-                  <span className="ml-1 text-dynasty-gray-500 font-light">/mo</span>
+                  {formatPropertyCurrency(property.condo_fee, propertyCurrency, locale)}
+                  <span className="ml-1 text-dynasty-gray-500 font-light">{t('common.perMonth')}</span>
                 </p>
               </div>
             )}
             {property.strata_fee && (
               <div>
                 <p className="font-sans text-[9px] font-light uppercase tracking-[0.22em] text-dynasty-gray-500">
-                  Strata Fee
+                  {t('properties.strataFee')}
                 </p>
                 <p className="mt-1 font-mono text-[14px] font-medium text-dynasty-cream">
-                  {formatPropertyCurrency(property.strata_fee, propertyCurrency)}
-                  <span className="ml-1 text-dynasty-gray-500 font-light">/mo</span>
+                  {formatPropertyCurrency(property.strata_fee, propertyCurrency, locale)}
+                  <span className="ml-1 text-dynasty-gray-500 font-light">{t('common.perMonth')}</span>
                 </p>
               </div>
             )}
@@ -204,42 +210,42 @@ export default async function PropertyDetailPage({
         {/* Recent transactions */}
         <Section>
           <SectionHeader
-            title="Transactions"
+            title={t('properties.transactions')}
             action={
               <Link
                 href={`/transactions?property_id=${id}`}
                 className="font-sans text-[10px] font-light uppercase tracking-[0.18em] text-[var(--accent-c)] transition-colors hover:opacity-80"
               >
-                View All
+                {t('common.viewAll')}
               </Link>
             }
           />
           <div className="flex gap-8 px-7 py-4 border-b border-[var(--divider-c)]">
             <div>
               <p className="font-sans text-[9px] font-light uppercase tracking-[0.22em] text-dynasty-gray-500">
-                Income
+                {t('common.income')}
               </p>
               <p className="mt-1 font-mono text-[14px] font-medium text-[var(--value-pos-c)]">
-                {formatCurrency(income)}
+                {formatCurrency(income, 'CAD', 2, locale)}
               </p>
             </div>
             <div>
               <p className="font-sans text-[9px] font-light uppercase tracking-[0.22em] text-dynasty-gray-500">
-                Expenses
+                {t('overview.chartExpenses')}
               </p>
               <p className="mt-1 font-mono text-[14px] font-medium text-[var(--value-neg-c)]">
-                {formatCurrency(expenses)}
+                {formatCurrency(expenses, 'CAD', 2, locale)}
               </p>
             </div>
             <div>
               <p className="font-sans text-[9px] font-light uppercase tracking-[0.22em] text-dynasty-gray-500">
-                Net
+                {t('properties.net')}
               </p>
               <p
                 className="mt-1 font-mono text-[14px] font-medium"
                 style={{ color: income - expenses >= 0 ? 'var(--value-pos-c)' : 'var(--value-neg-c)' }}
               >
-                {formatCurrency(income - expenses)}
+                {formatCurrency(income - expenses, 'CAD', 2, locale)}
               </p>
             </div>
           </div>
@@ -247,7 +253,7 @@ export default async function PropertyDetailPage({
             {transactions.length === 0 ? (
               <div className="flex items-center justify-center py-10">
                 <p className="font-sans text-[12px] font-light text-dynasty-gray-500">
-                  No transactions yet
+                  {t('properties.noTransactions')}
                 </p>
               </div>
             ) : (
@@ -255,10 +261,10 @@ export default async function PropertyDetailPage({
                 <div key={tx.id} className="flex items-center justify-between px-7 py-3.5">
                   <div className="min-w-0">
                     <p className="truncate font-sans text-[13px] text-dynasty-warm-white">
-                      {tx.description ?? tx.category}
+                      {tx.description ?? categoryLabel(tx.category, t)}
                     </p>
                     <p className="mt-0.5 font-sans text-[11px] font-light text-dynasty-gray-500">
-                      {formatDate(tx.transaction_date)}
+                      {formatDate(tx.transaction_date, locale)}
                     </p>
                   </div>
                   <span
@@ -266,7 +272,7 @@ export default async function PropertyDetailPage({
                     style={{ color: tx.type === 'income' ? 'var(--value-pos-c)' : 'var(--value-neg-c)' }}
                   >
                     {tx.type === 'income' ? '+' : '−'}
-                    {formatCurrency(tx.amount)}
+                    {formatCurrency(tx.amount, 'CAD', 2, locale)}
                   </span>
                 </div>
               ))
@@ -278,7 +284,7 @@ export default async function PropertyDetailPage({
       {property.notes && (
         <Section className="px-7 py-6">
           <h2 className="mb-3 font-serif text-[18px] font-medium tracking-[0.02em] text-dynasty-warm-white">
-            Notes
+            {t('common.notes')}
           </h2>
           <p className="whitespace-pre-wrap font-sans text-[13px] font-light leading-relaxed text-dynasty-gray-300">
             {property.notes}

@@ -1,7 +1,12 @@
 import { ConfirmForm } from './ConfirmForm'
+import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 import { defaultNextFor, isConfirmType, safeNextPath } from './shared'
+import { getI18n } from '@/lib/i18n/server'
 
-export const metadata = { title: 'Confirm' }
+export async function generateMetadata() {
+  const { t } = await getI18n()
+  return { title: t('meta.confirm') }
+}
 
 // Email security scanners prefetch links, so this page must never verify the
 // token on GET — verification only happens when the user submits the form.
@@ -29,6 +34,7 @@ export default async function ConfirmPage({
       padding: '48px 16px',
       position: 'relative',
     }}>
+      <LanguageSwitcher variant="auth" />
       <div style={{ position: 'fixed', top: 0, left: 0, right: 0, height: '1px', background: 'linear-gradient(90deg, transparent 0%, #C9A84C 50%, transparent 100%)' }} aria-hidden />
 
       <div style={{ width: '100%', maxWidth: '420px' }}>

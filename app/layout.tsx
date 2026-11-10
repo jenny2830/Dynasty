@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
 import { Cormorant_Garamond, Jost, Bebas_Neue, JetBrains_Mono } from 'next/font/google'
+import { LocaleProvider } from '@/lib/locale-context'
+import { getI18n } from '@/lib/i18n/server'
 import './globals.css'
 
 const cormorant = Cormorant_Garamond({
@@ -30,29 +32,33 @@ const jetbrains = JetBrains_Mono({
   display: 'swap',
 })
 
-export const metadata: Metadata = {
-  title: {
-    default: 'DYNASTY — Property Wealth Platform',
-    template: '%s | DYNASTY',
-  },
-  description: 'Legacy. Luxury. Timeless. Premium property wealth management for Canadian landlords.',
-  keywords: ['property management', 'landlord software', 'real estate', 'Canada', 'CAD'],
-  authors: [{ name: 'DYNASTY' }],
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getI18n()
+  return {
+    title: {
+      default: t('meta.title'),
+      template: '%s | DYNASTY',
+    },
+    description: t('meta.description'),
+    keywords: ['property management', 'landlord software', 'real estate', 'Canada', 'CAD', 'Colombia'],
+    authors: [{ name: 'DYNASTY' }],
+  }
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const { locale } = await getI18n()
   return (
     <html
-      lang="en"
+      lang={locale}
       className={`${cormorant.variable} ${jost.variable} ${bebas.variable} ${jetbrains.variable}`}
       suppressHydrationWarning
     >
       <body className="bg-dynasty-warm-white text-dynasty-black-warm antialiased">
-        {children}
+        <LocaleProvider initialLocale={locale}>{children}</LocaleProvider>
       </body>
     </html>
   )

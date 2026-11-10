@@ -10,7 +10,8 @@ import {
   ResponsiveContainer,
   Legend,
 } from 'recharts'
-import { formatCurrency } from '@/lib/utils'
+import { useFormatters, useLocale } from '@/lib/locale-context'
+import { chartLabel } from '@/lib/i18n/labels'
 import { useAppTheme } from '@/lib/theme-context'
 
 interface ChartDataPoint {
@@ -51,6 +52,8 @@ function CustomTooltip({
   textSecondary: string
   displayCurrency: string
 }) {
+  const { money } = useFormatters()
+  const { t } = useLocale()
   if (!active || !payload?.length) return null
 
   return (
@@ -82,10 +85,10 @@ function CustomTooltip({
             flexShrink: 0,
           }} />
           <span style={{ fontFamily: "'Jost', sans-serif", fontWeight: 400, color: textSecondary, textTransform: 'capitalize' }}>
-            {entry.name}:
+            {chartLabel(String(entry.name), t)}:
           </span>
           <span style={{ fontFamily: "'JetBrains Mono', monospace", fontWeight: 500, color: textPrimary }}>
-            {formatCurrency(entry.value, displayCurrency, 0)}
+            {money(entry.value, displayCurrency, 0)}
           </span>
         </div>
       ))}
@@ -95,6 +98,7 @@ function CustomTooltip({
 
 export function IncomeExpenseChart({ data, displayCurrency = 'CAD' }: IncomeExpenseChartProps) {
   const { theme } = useAppTheme()
+  const { t } = useLocale()
 
   if (data.length === 0) {
     return (
@@ -106,7 +110,7 @@ export function IncomeExpenseChart({ data, displayCurrency = 'CAD' }: IncomeExpe
           letterSpacing: '0.06em',
           color: theme.textMuted,
         }}>
-          No transaction data yet
+          {t('overview.noChartData')}
         </p>
       </div>
     )
@@ -167,7 +171,7 @@ export function IncomeExpenseChart({ data, displayCurrency = 'CAD' }: IncomeExpe
               letterSpacing: '0.18em',
               fontSize: 12,
             }}>
-              {value}
+              {chartLabel(value, t)}
             </span>
           )}
         />

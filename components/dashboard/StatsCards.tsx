@@ -1,9 +1,9 @@
 'use client'
 
 import { Building2, TrendingUp, DollarSign, Bell } from 'lucide-react'
-import { formatCurrency } from '@/lib/utils'
 import { useAppTheme } from '@/lib/theme-context'
 import { useThemeStyles } from '@/lib/useThemeStyles'
+import { useFormatters, useLocale } from '@/lib/locale-context'
 
 function getValueFontSize(value: string): string {
   const len = value.length
@@ -166,39 +166,41 @@ export function StatsCards({
   pendingReminders,
   displayCurrency = 'CAD',
 }: StatsCardsProps) {
-  const portfolioFormatted = formatCurrency(totalPortfolioValue, displayCurrency, 0)
-  const netFormatted = formatCurrency(monthlyNetIncome, displayCurrency, 0)
+  const { t } = useLocale()
+  const { money } = useFormatters()
+  const portfolioFormatted = money(totalPortfolioValue, displayCurrency, 0)
+  const netFormatted = money(monthlyNetIncome, displayCurrency, 0)
 
   return (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px' }}>
       <StatCard
-        label="Portfolio Value"
+        label={t('overview.portfolioValue')}
         value={portfolioFormatted}
-        subtext="Total current value"
+        subtext={t('overview.totalCurrentValue')}
         icon={<Building2 style={{ width: '16px', height: '16px' }} strokeWidth={1.2} />}
         highlight
         responsiveValue
       />
       <StatCard
-        label="Monthly Net Income"
+        label={t('overview.monthlyNet')}
         value={netFormatted}
-        subtext="This month · income minus expenses"
+        subtext={t('overview.thisMonthNet')}
         icon={<TrendingUp style={{ width: '16px', height: '16px' }} strokeWidth={1.2} />}
         highlight
         negative={monthlyNetIncome < 0}
         responsiveValue
       />
       <StatCard
-        label="Active Properties"
+        label={t('overview.activeProperties')}
         value={activeProperties.toString()}
-        subtext="Across all units"
+        subtext={t('overview.acrossUnits')}
         icon={<DollarSign style={{ width: '16px', height: '16px' }} strokeWidth={1.2} />}
         responsiveValue
       />
       <StatCard
-        label="Pending Reminders"
+        label={t('overview.pendingReminders')}
         value={pendingReminders.toString()}
-        subtext={pendingReminders === 0 ? 'All clear' : 'Action required'}
+        subtext={pendingReminders === 0 ? t('overview.allClearShort') : t('overview.actionRequired')}
         icon={<Bell style={{ width: '16px', height: '16px' }} strokeWidth={1.2} />}
         alert={pendingReminders > 0}
         responsiveValue

@@ -5,8 +5,13 @@ import { createClient } from '@/lib/supabase/server'
 import { TransactionForm } from '@/components/transactions/TransactionForm'
 import { DeleteTransactionButton } from './DeleteTransactionButton'
 import { PageHeader } from '@/components/ui/page-header'
+import { getI18n } from '@/lib/i18n/server'
+import { categoryLabel } from '@/lib/i18n/labels'
 
-export const metadata = { title: 'Edit Transaction' }
+export async function generateMetadata() {
+  const { t } = await getI18n()
+  return { title: t('tx.edit') }
+}
 
 export default async function EditTransactionPage({
   params,
@@ -33,6 +38,7 @@ export default async function EditTransactionPage({
   ])
 
   if (txResult.error || !txResult.data) notFound()
+  const { t } = await getI18n()
 
   return (
     <div className="mx-auto max-w-2xl space-y-7">
@@ -40,12 +46,12 @@ export default async function EditTransactionPage({
         href="/transactions"
         className="inline-flex items-center gap-1.5 font-sans text-[10px] font-light uppercase tracking-[0.18em] text-dynasty-gray-400 transition-colors hover:text-dynasty-gold"
       >
-        <ChevronLeft className="h-3 w-3" strokeWidth={1.2} /> Back to Transactions
+        <ChevronLeft className="h-3 w-3" strokeWidth={1.2} /> {t('tx.back')}
       </Link>
 
       <PageHeader
-        title="Edit Transaction"
-        subtitle={txResult.data.description ?? txResult.data.category}
+        title={t('tx.edit')}
+        subtitle={txResult.data.description ?? categoryLabel(txResult.data.category, t)}
       >
         <DeleteTransactionButton txId={id} />
       </PageHeader>

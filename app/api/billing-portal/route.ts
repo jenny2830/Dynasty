@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { createClient } from '@/lib/supabase/server'
+import { getLocale } from '@/lib/i18n/server'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
@@ -23,9 +24,11 @@ export async function POST() {
       return NextResponse.json({ error: 'No billing account' }, { status: 404 })
     }
 
+    const locale = await getLocale()
     const session = await stripe.billingPortal.sessions.create({
       customer: landlord.stripe_customer_id,
       return_url: `${process.env.NEXT_PUBLIC_APP_URL}/settings`,
+      locale: locale === 'es' ? 'es' : 'en',
     })
 
     return NextResponse.json({ url: session.url })
