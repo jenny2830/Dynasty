@@ -4,8 +4,12 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { RecurringForm } from '../../RecurringForm'
 import { PageHeader } from '@/components/ui/page-header'
+import { getI18n } from '@/lib/i18n/server'
 
-export const metadata = { title: 'Edit Recurring Payment' }
+export async function generateMetadata() {
+  const { t } = await getI18n()
+  return { title: t('recurring.editTitle') }
+}
 
 export default async function EditRecurringPage({
   params,
@@ -41,6 +45,7 @@ export default async function EditRecurringPage({
   ])
 
   if (paymentResult.error || !paymentResult.data) notFound()
+  const { t } = await getI18n()
 
   return (
     <div className="mx-auto max-w-2xl space-y-7">
@@ -48,11 +53,11 @@ export default async function EditRecurringPage({
         href="/recurring"
         className="inline-flex items-center gap-1.5 font-sans text-[10px] font-light uppercase tracking-[0.18em] text-dynasty-gray-400 transition-colors hover:text-dynasty-gold"
       >
-        <ChevronLeft className="h-3 w-3" strokeWidth={1.2} /> Back to Recurring
+        <ChevronLeft className="h-3 w-3" strokeWidth={1.2} /> {t('recurring.back')}
       </Link>
 
       <PageHeader
-        title="Edit Recurring Payment"
+        title={t('recurring.editTitle')}
         subtitle={paymentResult.data.name}
       />
 

@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import { Check, Crown } from 'lucide-react'
-import { MEMBERSHIP, MEMBERSHIP_FEATURES, FREE_TRIAL_MAX_SESSIONS, getSessionsRemaining } from '@/lib/plans'
+import { MEMBERSHIP, FREE_TRIAL_MAX_SESSIONS, getSessionsRemaining } from '@/lib/plans'
+import { useLocale } from '@/lib/locale-context'
+import { translateKnownError } from '@/lib/i18n/translate'
 import { useAppTheme } from '@/lib/theme-context'
 
 interface UpgradeClientProps {
@@ -21,15 +23,16 @@ export function UpgradeClient({
   canceled,
 }: UpgradeClientProps) {
   const { theme } = useAppTheme()
+  const { t } = useLocale()
   const [billing, setBilling] = useState<'monthly' | 'yearly'>('yearly')
   const [loading, setLoading] = useState(false)
   const [portalLoading, setPortalLoading] = useState(false)
   const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null)
 
   useEffect(() => {
-    if (success) setToast({ msg: 'Membership activated — welcome to Dynasty!', type: 'success' })
-    else if (canceled) setToast({ msg: 'Checkout canceled. No charge was made.', type: 'error' })
-  }, [success, canceled])
+    if (success) setToast({ msg: t('upgrade.activated'), type: 'success' })
+    else if (canceled) setToast({ msg: t('upgrade.canceled'), type: 'error' })
+  }, [success, canceled, t])
 
   useEffect(() => {
     if (!toast) return
@@ -49,11 +52,11 @@ export function UpgradeClient({
       if (data.url) {
         window.location.href = data.url
       } else {
-        setToast({ msg: data.error ?? 'Something went wrong', type: 'error' })
+        setToast({ msg: data.error ? translateKnownError(data.error, t) : t('errors.generic'), type: 'error' })
         setLoading(false)
       }
     } catch {
-      setToast({ msg: 'Network error — please try again', type: 'error' })
+      setToast({ msg: t('upgrade.network'), type: 'error' })
       setLoading(false)
     }
   }
@@ -66,11 +69,11 @@ export function UpgradeClient({
       if (data.url) {
         window.location.href = data.url
       } else {
-        setToast({ msg: data.error ?? 'Could not open billing portal', type: 'error' })
+        setToast({ msg: data.error ? translateKnownError(data.error, t) : t('errors.portalFailed'), type: 'error' })
         setPortalLoading(false)
       }
     } catch {
-      setToast({ msg: 'Network error — please try again', type: 'error' })
+      setToast({ msg: t('upgrade.network'), type: 'error' })
       setPortalLoading(false)
     }
   }
@@ -116,13 +119,13 @@ export function UpgradeClient({
                 letterSpacing: '0.12em', textTransform: 'uppercase',
                 color: theme.accent, margin: 0,
               }}>
-                Dynasty Membership — Active
+                {t('upgrade.active')}
               </p>
               <p style={{
                 fontFamily: "'Jost', sans-serif", fontSize: '14px',
                 fontWeight: 400, color: theme.textMuted, margin: '4px 0 0 0',
               }}>
-                Manage payment method, invoices, or cancel via the billing portal.
+                {t('upgrade.activeHelp')}
               </p>
             </div>
           </div>
@@ -138,7 +141,7 @@ export function UpgradeClient({
               opacity: portalLoading ? 0.6 : 1, whiteSpace: 'nowrap',
             }}
           >
-            {portalLoading ? 'Opening…' : 'Manage Billing'}
+            {portalLoading ? t('settings.opening') : t('settings.manageBilling')}
           </button>
         </div>
       )}
@@ -156,7 +159,7 @@ export function UpgradeClient({
               letterSpacing: '0.06em',
               color: remaining > 1 ? theme.accent : theme.valueNegative,
             }}>
-              ◆ Free trial — {remaining} of {FREE_TRIAL_MAX_SESSIONS} sessions remaining
+              ◆ {t('trial.sessions', { remaining, total: FREE_TRIAL_MAX_SESSIONS })}
             </span>
           </div>
           <div style={{ height: '2px', background: `${theme.accent}26`, borderRadius: '1px', overflow: 'hidden' }}>
@@ -202,14 +205,14 @@ export function UpgradeClient({
               letterSpacing: '0.26em', textTransform: 'uppercase',
               color: theme.textMuted, margin: 0,
             }}>
-              All Access
+              {t('upgrade.allAccess')}
             </p>
             <p style={{
               fontFamily: "'Cormorant Garamond', serif", fontSize: '22px',
               fontWeight: 500, letterSpacing: '0.04em',
               color: theme.textPrimary, margin: '2px 0 0 0',
             }}>
-              Dynasty Membership
+              {t('upgrade.title')}
             </p>
           </div>
         </div>
@@ -234,7 +237,7 @@ export function UpgradeClient({
                 fontWeight: billing === b ? 600 : 400,
               }}
             >
-              {b === 'monthly' ? 'Monthly' : 'Yearly'}
+              {b === 'monthly' ? t('upgrade.monthly') : t('upgrade.yearly')}
               {b === 'yearly' && (
                 <span style={{
                   marginLeft: '8px', padding: '2px 6px',
@@ -243,7 +246,7 @@ export function UpgradeClient({
                   background: billing === 'yearly' ? 'rgba(255,255,255,0.25)' : `${theme.accent}26`,
                   color: billing === 'yearly' ? theme.textOnAccent : theme.accent,
                 }}>
-                  {MEMBERSHIP.yearly.savingsLabel}
+                  {t('upgrade.save26')}
                 </span>
               )}
             </button>
@@ -262,7 +265,7 @@ export function UpgradeClient({
               fontFamily: "'Jost', sans-serif", fontSize: '15px',
               fontWeight: 400, color: theme.textMuted, marginLeft: '8px',
             }}>
-              {plan.intervalLabel}
+              {billing === 'monthly' ? t('upgrade.perMonth') : t('upgrade.perYear')}
             </span>
           </p>
           {billing === 'yearly' && (
@@ -271,7 +274,7 @@ export function UpgradeClient({
               fontWeight: 400, color: theme.textMuted,
               letterSpacing: '0.04em', margin: '8px 0 0 0',
             }}>
-              {MEMBERSHIP.yearly.monthlyEquivalent}
+              {t('upgrade.equivalent')}
             </p>
           )}
         </div>
@@ -282,7 +285,7 @@ export function UpgradeClient({
           display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
           gap: '10px',
         }}>
-          {MEMBERSHIP_FEATURES.map((f) => (
+          {(['upgrade.f1', 'upgrade.f2', 'upgrade.f3', 'upgrade.f4', 'upgrade.f5', 'upgrade.f6', 'upgrade.f7', 'upgrade.f8', 'upgrade.f9'] as const).map((f) => (
             <li key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: '9px' }}>
               <Check
                 style={{ width: '12px', height: '12px', color: theme.accent, flexShrink: 0, marginTop: '3px' }}
@@ -293,7 +296,7 @@ export function UpgradeClient({
                 fontWeight: 400, letterSpacing: '0.04em',
                 color: theme.textSecondary,
               }}>
-                {f}
+                {t(f)}
               </span>
             </li>
           ))}
@@ -308,7 +311,7 @@ export function UpgradeClient({
             letterSpacing: '0.22em', textTransform: 'uppercase',
             color: theme.accent, background: `${theme.accent}0F`,
           }}>
-            ◆ Membership Active
+            ◆ {t('upgrade.activeBadge')}
           </div>
         ) : (
           <button
@@ -325,7 +328,7 @@ export function UpgradeClient({
               transition: 'all 0.25s ease',
             }}
           >
-            {loading ? 'Redirecting…' : 'Become a Member'}
+            {loading ? t('upgrade.redirecting') : t('trial.become')}
           </button>
         )}
       </div>
@@ -335,7 +338,7 @@ export function UpgradeClient({
         fontWeight: 400, letterSpacing: '0.04em', color: theme.textMuted,
         textAlign: 'center',
       }}>
-        All prices in Canadian dollars. Cancel anytime via the billing portal.
+        {t('upgrade.pricesNote')}
       </p>
     </div>
   )

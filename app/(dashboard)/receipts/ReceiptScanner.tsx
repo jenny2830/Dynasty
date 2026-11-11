@@ -16,8 +16,10 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { EXPENSE_ONLY_CATEGORIES } from '@/lib/constants'
-import { formatCurrency, formatDate } from '@/lib/utils'
 import { confirmReceipt, rejectReceipt } from '@/app/actions/receipts'
+import { useFormatters, useLocale } from '@/lib/locale-context'
+import { categoryLabel, enumLabel } from '@/lib/i18n/labels'
+import { translateKnownError } from '@/lib/i18n/translate'
 import { useRouter } from 'next/navigation'
 import { useAppTheme } from '@/lib/theme-context'
 
@@ -55,6 +57,8 @@ interface ReceiptScannerProps {
 }
 
 export function ReceiptScanner({ properties, recentReceipts }: ReceiptScannerProps) {
+  const { t } = useLocale()
+  const { money, date } = useFormatters()
   const { theme } = useAppTheme()
   const [scanState, setScanState] = useState<ScanState>('idle')
   const [receiptId, setReceiptId] = useState<string | null>(null)
@@ -193,20 +197,20 @@ export function ReceiptScanner({ properties, recentReceipts }: ReceiptScannerPro
                 <>
                   <Loader2 className="h-8 w-8 animate-spin" strokeWidth={1.2} style={{ color: `${theme.accent}99` }} />
                   <p className="mt-4 font-serif text-[18px] font-medium tracking-[0.02em]" style={{ color: theme.textPrimary }}>
-                    Extracting Receipt Data
+                    {t('receipts.extracting')}
                   </p>
                   <p className="mt-2 font-sans text-[11px] font-light uppercase tracking-[0.18em]" style={{ color: theme.textMuted }}>
-                    Claude Vision · Image never stored
+                    {t('receipts.neverStored')}
                   </p>
                 </>
               ) : (
                 <>
                   <ScanLine className="h-8 w-8" strokeWidth={1} style={{ color: `${theme.accent}4D` }} />
                   <p className="mt-4 font-serif text-[18px] font-medium tracking-[0.02em]" style={{ color: theme.textPrimary }}>
-                    Drop Receipt Here
+                    {t('receipts.drop')}
                   </p>
                   <p className="mt-2 font-sans text-[11px] font-light uppercase tracking-[0.18em]" style={{ color: theme.textMuted }}>
-                    JPEG · PNG · WebP · Max 10MB
+                    {t('receipts.formats')}
                   </p>
                 </>
               )}
@@ -242,7 +246,7 @@ export function ReceiptScanner({ properties, recentReceipts }: ReceiptScannerPro
                   }}
                 >
                   <Upload size={14} strokeWidth={1.2} />
-                  Upload Image
+                  {t('receipts.upload')}
                 </button>
 
                 {/* Camera capture — triggers rear camera on mobile */}
@@ -274,7 +278,7 @@ export function ReceiptScanner({ properties, recentReceipts }: ReceiptScannerPro
                   }}
                 >
                   <Camera size={14} strokeWidth={1.2} />
-                  Scan Receipt
+                  {t('receipts.scan')}
                 </button>
               </div>
             )}
@@ -284,7 +288,7 @@ export function ReceiptScanner({ properties, recentReceipts }: ReceiptScannerPro
         {error && (
           <div className="rounded-[1px] border border-[rgba(183,110,121,0.3)] bg-[rgba(183,110,121,0.08)] px-4 py-3">
             <p className="font-sans text-[12px] font-light text-dynasty-rose-light">
-              {error}
+              {translateKnownError(error, t)}
             </p>
           </div>
         )}
@@ -293,10 +297,10 @@ export function ReceiptScanner({ properties, recentReceipts }: ReceiptScannerPro
           <div className="flex flex-col items-center justify-center rounded-[2px] border border-[rgba(201,168,76,0.25)] bg-[rgba(201,168,76,0.04)] py-12">
             <CheckCircle2 className="h-10 w-10 text-dynasty-gold" strokeWidth={1.2} />
             <p className="mt-4 font-serif text-[20px] font-medium tracking-[0.02em] text-dynasty-warm-white">
-              Receipt Confirmed
+              {t('receipts.confirmed')}
             </p>
             <p className="mt-1.5 font-sans text-[11px] font-light uppercase tracking-[0.18em] text-dynasty-gray-500">
-              Redirecting to transactions
+              {t('receipts.redirecting')}
             </p>
           </div>
         )}
@@ -307,15 +311,15 @@ export function ReceiptScanner({ properties, recentReceipts }: ReceiptScannerPro
             <div className="flex items-center justify-between px-7 py-5 border-b border-[rgba(201,168,76,0.08)]">
               <div>
                 <h2 className="font-serif text-[18px] font-medium tracking-[0.02em] text-dynasty-warm-white">
-                  Extracted Data
+                  {t('receipts.extracted')}
                 </h2>
                 <p className="mt-0.5 font-sans text-[11px] font-light uppercase tracking-[0.12em] text-dynasty-gray-500">
-                  Review and edit before confirming
+                  {t('receipts.review')}
                 </p>
               </div>
               <div className="text-right">
                 <p className="font-sans text-[9px] font-light uppercase tracking-[0.22em] text-dynasty-gray-500">
-                  AI Confidence
+                  {t('receipts.confidence')}
                 </p>
                 <div className="mt-1.5 flex items-center gap-2">
                   <div className="h-[2px] w-24 bg-dynasty-gray-700 overflow-hidden">
@@ -334,17 +338,17 @@ export function ReceiptScanner({ properties, recentReceipts }: ReceiptScannerPro
             <div className="px-7 py-6 space-y-5">
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="vendor">Vendor</Label>
+                  <Label htmlFor="vendor">{t('receipts.vendor')}</Label>
                   <Input
                     id="vendor"
                     value={editData.vendor_name ?? ''}
                     onChange={(e) => setEditData({ ...editData, vendor_name: e.target.value || null })}
-                    placeholder="Vendor name"
+                    placeholder={t('receipts.vendorPlaceholder')}
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="amount">Amount *</Label>
+                  <Label htmlFor="amount">{t('common.amount')} *</Label>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '8px', alignItems: 'end' }}>
                     <NumberInput
                       id="amount"
@@ -382,7 +386,7 @@ export function ReceiptScanner({ properties, recentReceipts }: ReceiptScannerPro
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="receipt_date">Due Date *</Label>
+                  <Label htmlFor="receipt_date">{t('receipts.dueDate')} *</Label>
                   <Input
                     id="receipt_date"
                     type="date"
@@ -393,40 +397,40 @@ export function ReceiptScanner({ properties, recentReceipts }: ReceiptScannerPro
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="category">Category *</Label>
+                  <Label htmlFor="category">{t('common.category')} *</Label>
                   <Select
                     value={editData.category ?? ''}
                     onValueChange={(v) => setEditData({ ...editData, category: v })}
                   >
                     <SelectTrigger id="category">
-                      <SelectValue placeholder="Select category" />
+                      <SelectValue placeholder={t('tx.selectCategory')} />
                     </SelectTrigger>
                     <SelectContent>
                       {EXPENSE_ONLY_CATEGORIES.map((c) => (
-                        <SelectItem key={c} value={c}>{c}</SelectItem>
+                        <SelectItem key={c} value={c}>{categoryLabel(c, t)}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="col-span-1 sm:col-span-2 space-y-2">
-                  <Label htmlFor="description">Description</Label>
+                  <Label htmlFor="description">{t('common.description')}</Label>
                   <Input
                     id="description"
                     value={editData.description ?? ''}
                     onChange={(e) => setEditData({ ...editData, description: e.target.value || null })}
-                    placeholder="Description"
+                    placeholder={t('common.description')}
                   />
                 </div>
 
                 <div className="col-span-1 sm:col-span-2 space-y-2">
-                  <Label htmlFor="property">Associate with Property</Label>
+                  <Label htmlFor="property">{t('receipts.associate')}</Label>
                   <Select value={selectedProperty} onValueChange={setSelectedProperty}>
                     <SelectTrigger id="property">
-                      <SelectValue placeholder="Select a property (optional)" />
+                      <SelectValue placeholder={t('receipts.selectProperty')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="none">Select a property (optional)</SelectItem>
+                      <SelectItem value="none">{t('receipts.selectProperty')}</SelectItem>
                       {properties.map((p) => (
                         <SelectItem key={p.id} value={p.id}>
                           {p.name}
@@ -440,17 +444,17 @@ export function ReceiptScanner({ properties, recentReceipts }: ReceiptScannerPro
 
               {error && (
                 <p className="font-sans text-[12px] font-light text-dynasty-rose-light">
-                  {error}
+                  {translateKnownError(error, t)}
                 </p>
               )}
 
               <div className="flex gap-3 pt-2">
                 <Button onClick={handleConfirm} disabled={isPending} className="flex-1">
                   <CheckCircle2 />
-                  {isPending ? 'Confirming…' : 'Confirm & Create'}
+                  {isPending ? t('receipts.confirming') : t('receipts.confirmCreate')}
                 </Button>
                 <Button variant="destructive" onClick={handleReject} disabled={isPending}>
-                  <XCircle /> Discard
+                  <XCircle /> {t('receipts.discard')}
                 </Button>
               </div>
             </div>
@@ -461,12 +465,12 @@ export function ReceiptScanner({ properties, recentReceipts }: ReceiptScannerPro
       {/* Recent scans — 2/5 */}
       <div className="lg:col-span-2">
         <Section>
-          <SectionHeader title="Recent Scans" />
+          <SectionHeader title={t('receipts.recent')} />
           <div className="divide-y divide-[rgba(255,255,255,0.025)]">
             {recentReceipts.length === 0 ? (
               <div className="flex items-center justify-center px-6 py-10">
                 <p className="font-sans text-[12px] font-light text-dynasty-gray-500">
-                  No receipts scanned yet
+                  {t('receipts.none')}
                 </p>
               </div>
             ) : (
@@ -475,17 +479,17 @@ export function ReceiptScanner({ properties, recentReceipts }: ReceiptScannerPro
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <p className="truncate font-sans text-[13px] text-dynasty-warm-white">
-                        {r.vendor_name ?? 'Unknown vendor'}
+                        {r.vendor_name ?? t('receipts.unknownVendor')}
                       </p>
                       <p className="mt-0.5 font-sans text-[11px] font-light text-dynasty-gray-500">
-                        {r.receipt_date ? formatDate(r.receipt_date) : '—'}
-                        {r.category ? ` · ${r.category}` : ''}
+                        {r.receipt_date ? date(r.receipt_date) : '—'}
+                        {r.category ? ` · ${categoryLabel(r.category, t)}` : ''}
                       </p>
                     </div>
                     <div className="shrink-0 text-right">
                       {r.amount && (
                         <p className="font-mono text-[13px] font-medium text-dynasty-gold">
-                          {formatCurrency(r.amount)}
+                          {money(r.amount)}
                         </p>
                       )}
                       <Badge
@@ -498,7 +502,7 @@ export function ReceiptScanner({ properties, recentReceipts }: ReceiptScannerPro
                         }
                         className="mt-1.5"
                       >
-                        {r.status}
+                        {enumLabel(r.status, t)}
                       </Badge>
                     </div>
                   </div>

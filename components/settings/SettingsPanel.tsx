@@ -9,7 +9,12 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { createClient } from '@/lib/supabase/client'
 import { useAppTheme, type TextThickness } from '@/lib/theme-context'
-import { type ThemeId, THEMES, THEME_META } from '@/lib/themes'
+import { type ThemeId, THEMES } from '@/lib/themes'
+import { useLocale } from '@/lib/locale-context'
+import { themeHelp, themeName } from '@/lib/i18n/labels'
+import { translateKnownError } from '@/lib/i18n/translate'
+import { LanguageSwitcher } from '@/components/LanguageSwitcher'
+import { formatCurrency } from '@/lib/utils'
 
 type TextSize = 'sm' | 'md' | 'lg'
 
@@ -18,15 +23,6 @@ const TEXT_SIZES: { value: TextSize; label: string; hint: string }[] = [
   { value: 'md', label: 'Standard', hint: 'Default' },
   { value: 'lg', label: 'Large', hint: 'Bigger' },
 ]
-
-const PLAN_LABELS: Record<string, { label: string; price: string }> = {
-  free:      { label: 'Free Trial',        price: 'Free' },
-  member:    { label: 'Dynasty Membership', price: 'CAD $16.90/mo or $149/yr' },
-  // Legacy tiers (existing subscribers stay active members)
-  starter:   { label: 'Dynasty Membership (Legacy)', price: '—' },
-  landlord:  { label: 'Dynasty Membership (Legacy)', price: '—' },
-  portfolio: { label: 'Dynasty Membership (Legacy)', price: '—' },
-}
 
 interface SettingsPanelProps {
   isMember?: boolean
@@ -37,6 +33,7 @@ interface SettingsPanelProps {
 
 export function SettingsPanel({ isMember = false, currentPlan = 'free', hasSubscription }: SettingsPanelProps) {
   const { themeId, theme, setThemeId, textThickness, setTextThickness } = useAppTheme()
+  const { t, locale } = useLocale()
   const [mounted, setMounted] = useState(false)
   const [textSize, setTextSize] = useState<TextSize>('md')
 
@@ -111,14 +108,21 @@ export function SettingsPanel({ isMember = false, currentPlan = 'free', hasSubsc
   const activeMember = isMember || hasSubscription || (currentPlan && currentPlan !== 'free')
 
   const planInfo = activeMember
-    ? PLAN_LABELS.member
-    : PLAN_LABELS.free
+    ? { label: t('settings.membership'), price: t('settings.membershipPrice') }
+    : { label: t('settings.freeTrial'), price: t('settings.free') }
 
   return (
     <div className="space-y-6">
+      <Section>
+        <SectionHeader title={t('settings.language')} description={t('settings.languageHelp')} />
+        <div className="px-7 py-7">
+          <LanguageSwitcher variant="sidebar" />
+        </div>
+      </Section>
+
       {/* ── Appearance ── */}
       <Section>
-        <SectionHeader title="Appearance" description="Color theme & text size" />
+        <SectionHeader title={t('settings.appearance')} description={t('settings.appearanceHelp')} />
         <div className="space-y-8 px-7 py-7">
 
           {/* Color Theme — 4-theme selector */}
@@ -135,13 +139,12 @@ export function SettingsPanel({ isMember = false, currentPlan = 'free', hasSubsc
               margin: '0 0 16px 0',
             }}>
               <Palette style={{ width: '13px', height: '13px' }} strokeWidth={1.4} />
-              Color Theme
+              {t('settings.colorTheme')}
             </p>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px' }}>
               {(Object.keys(THEMES) as ThemeId[]).map((id) => {
-                const meta = THEME_META[id]
-                const t = THEMES[id]
+                const swatch = THEMES[id]
                 const isSelected = mounted && id === themeId
 
                 return (
@@ -150,10 +153,10 @@ export function SettingsPanel({ isMember = false, currentPlan = 'free', hasSubsc
                     onClick={() => setThemeId(id)}
                     style={{
                       position: 'relative',
-                      background: t.cardBg,
+                      background: swatch.cardBg,
                       border: isSelected
-                        ? `2px solid ${t.accent}`
-                        : t.cardBorder,
+                        ? `2px solid ${swatch.accent}`
+                        : swatch.cardBorder,
                       borderRadius: '2px',
                       padding: '16px',
                       cursor: 'pointer',
@@ -169,35 +172,35 @@ export function SettingsPanel({ isMember = false, currentPlan = 'free', hasSubsc
                       left: '15%',
                       right: '15%',
                       height: isSelected ? '2px' : '1px',
-                      background: t.topLine,
+                      background: swatch.topLine,
                     }} />
 
                     {/* Color swatches */}
                     <div style={{ display: 'flex', gap: '6px', marginBottom: '10px' }}>
-                      <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: t.sidebarBg, border: '1px solid rgba(128,128,128,0.3)', flexShrink: 0 }} />
-                      <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: t.accent, border: '1px solid rgba(128,128,128,0.3)', flexShrink: 0 }} />
-                      <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: t.pageBg, border: '1px solid rgba(128,128,128,0.3)', flexShrink: 0 }} />
+                      <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: swatch.sidebarBg, border: '1px solid rgba(128,128,128,0.3)', flexShrink: 0 }} />
+                      <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: swatch.accent, border: '1px solid rgba(128,128,128,0.3)', flexShrink: 0 }} />
+                      <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: swatch.pageBg, border: '1px solid rgba(128,128,128,0.3)', flexShrink: 0 }} />
                     </div>
 
                     <p style={{
                       fontFamily: "'Jost', sans-serif",
                       fontSize: '15px',
                       fontWeight: 500,
-                      color: t.textPrimary,
+                      color: swatch.textPrimary,
                       letterSpacing: '0.08em',
                       margin: '0 0 3px 0',
                       textTransform: 'uppercase',
                     }}>
-                      {meta.name}
+                      {themeName(id, t)}
                     </p>
                     <p style={{
                       fontFamily: "'Jost', sans-serif",
                       fontSize: '14px',
-                      color: t.textMuted,
+                      color: swatch.textMuted,
                       letterSpacing: '0.04em',
                       margin: 0,
                     }}>
-                      {meta.description}
+                      {themeHelp(id, t)}
                     </p>
 
                     {isSelected && (
@@ -210,13 +213,13 @@ export function SettingsPanel({ isMember = false, currentPlan = 'free', hasSubsc
                         textTransform: 'uppercase',
                         padding: '3px 8px',
                         borderRadius: '1px',
-                        background: `${t.accent}20`,
-                        color: t.accent,
-                        border: `1px solid ${t.accent}40`,
+                        background: `${swatch.accent}20`,
+                        color: swatch.accent,
+                        border: `1px solid ${swatch.accent}40`,
                         fontFamily: "'Jost', sans-serif",
                         fontWeight: 500,
                       }}>
-                        Active
+                        {t('common.active')}
                       </div>
                     )}
                   </button>
@@ -232,7 +235,7 @@ export function SettingsPanel({ isMember = false, currentPlan = 'free', hasSubsc
               letterSpacing: '0.04em',
               color: theme.textMuted,
             }}>
-              Changes the entire interface — sidebar, cards, accents, and all text.
+              {t('settings.themeHelp')}
             </p>
           </div>
 
@@ -250,7 +253,7 @@ export function SettingsPanel({ isMember = false, currentPlan = 'free', hasSubsc
               margin: '0 0 8px 0',
             }}>
               <Type style={{ width: '13px', height: '13px' }} strokeWidth={1.4} />
-              Text Thickness
+              {t('settings.thickness')}
             </p>
             <p style={{
               fontFamily: "'Jost', sans-serif",
@@ -260,7 +263,7 @@ export function SettingsPanel({ isMember = false, currentPlan = 'free', hasSubsc
               color: theme.textMuted,
               margin: '0 0 14px 0',
             }}>
-              Adjust text weight across the entire platform for better visibility.
+              {t('settings.thicknessHelp')}
             </p>
 
             <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
@@ -317,7 +320,7 @@ export function SettingsPanel({ isMember = false, currentPlan = 'free', hasSubsc
                       margin: '0 0 8px 0',
                       letterSpacing: '0.02em',
                     }}>
-                      $12,450.00 monthly
+                      {t('settings.sampleAmount', { amount: formatCurrency(12450, 'CAD', 2, locale) })}
                     </p>
 
                     <p style={{
@@ -329,7 +332,7 @@ export function SettingsPanel({ isMember = false, currentPlan = 'free', hasSubsc
                       color: isSelected ? theme.accent : theme.textMuted,
                       margin: 0,
                     }}>
-                      {weight}
+                      {weight === 'light' ? t('settings.light') : weight === 'bold' ? t('settings.bold') : t('settings.regular')}
                     </p>
 
                     {isSelected && (
@@ -342,7 +345,7 @@ export function SettingsPanel({ isMember = false, currentPlan = 'free', hasSubsc
                         color: theme.accent,
                         fontFamily: "'Jost', sans-serif",
                       }}>
-                        Active
+                        {t('common.active')}
                       </div>
                     )}
                   </button>
@@ -358,7 +361,7 @@ export function SettingsPanel({ isMember = false, currentPlan = 'free', hasSubsc
               letterSpacing: '0.04em',
               color: theme.textMuted,
             }}>
-              Saved to your account — synced across all devices.
+              {t('settings.thicknessSaved')}
             </p>
           </div>
 
@@ -376,7 +379,7 @@ export function SettingsPanel({ isMember = false, currentPlan = 'free', hasSubsc
               margin: '0 0 12px 0',
             }}>
               <Type style={{ width: '13px', height: '13px' }} strokeWidth={1.4} />
-              Text Size
+              {t('settings.textSize')}
             </p>
             <div className="flex flex-col sm:flex-row gap-3">
               {TEXT_SIZES.map((s) => (
@@ -406,7 +409,7 @@ export function SettingsPanel({ isMember = false, currentPlan = 'free', hasSubsc
                     transition: 'all 0.2s ease',
                   }}
                 >
-                  {s.label}
+                  {t(s.value === 'sm' ? 'settings.compact' : s.value === 'lg' ? 'settings.large' : 'settings.standard')}
                 </button>
               ))}
             </div>
@@ -418,7 +421,7 @@ export function SettingsPanel({ isMember = false, currentPlan = 'free', hasSubsc
               letterSpacing: '0.04em',
               color: theme.textMuted,
             }}>
-              Scales the content area proportionally so the layout stays intact.
+              {t('settings.textSizeHelp')}
             </p>
           </div>
         </div>
@@ -426,15 +429,15 @@ export function SettingsPanel({ isMember = false, currentPlan = 'free', hasSubsc
 
       {/* ── Security ── */}
       <Section>
-        <SectionHeader title="Security" description="Change your password" />
+        <SectionHeader title={t('settings.security')} description={t('settings.securityHelp')} />
         <form onSubmit={handlePasswordChange} className="space-y-5 px-7 py-7">
           <div className="space-y-2">
-            <Label htmlFor="new_password">New Password</Label>
+            <Label htmlFor="new_password">{t('settings.newPassword')}</Label>
             <Input
               id="new_password"
               name="new_password"
               type="password"
-              placeholder="Minimum 8 characters"
+              placeholder={t('auth.passwordPlaceholder')}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               autoComplete="new-password"
@@ -444,12 +447,12 @@ export function SettingsPanel({ isMember = false, currentPlan = 'free', hasSubsc
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="confirm_password">Confirm Password</Label>
+            <Label htmlFor="confirm_password">{t('settings.confirmPassword')}</Label>
             <Input
               id="confirm_password"
               name="confirm_password"
               type="password"
-              placeholder="Re-enter new password"
+              placeholder={t('settings.reenter')}
               value={confirm}
               onChange={(e) => setConfirm(e.target.value)}
               autoComplete="new-password"
@@ -479,14 +482,14 @@ export function SettingsPanel({ isMember = false, currentPlan = 'free', hasSubsc
               }}
             >
               {pwStatus === 'success' && <Check style={{ width: '14px', height: '14px' }} strokeWidth={1.6} />}
-              {pwMessage}
+              {translateKnownError(pwMessage, t)}
             </div>
           )}
 
           <div className="flex flex-col sm:flex-row gap-3 pt-1">
             <Button type="submit" disabled={pwStatus === 'saving'} className="w-full sm:w-auto">
               <KeyRound />
-              {pwStatus === 'saving' ? 'Updating…' : 'Update Password'}
+              {pwStatus === 'saving' ? t('settings.updating') : t('settings.updatePassword')}
             </Button>
           </div>
         </form>
@@ -494,7 +497,7 @@ export function SettingsPanel({ isMember = false, currentPlan = 'free', hasSubsc
 
       {/* ── Billing ── */}
       <Section>
-        <SectionHeader title="Billing" description="Plan & subscription" />
+        <SectionHeader title={t('settings.billing')} description={t('settings.billingHelp')} />
         <div className="space-y-5 px-7 py-7">
           {/* Current plan display */}
           <div style={{
@@ -519,7 +522,7 @@ export function SettingsPanel({ isMember = false, currentPlan = 'free', hasSubsc
                   color: theme.textMuted,
                   margin: 0,
                 }}>
-                  Current Plan
+                  {t('settings.currentPlan')}
                 </p>
                 <p style={{
                   fontFamily: "'Cormorant Garamond', serif",
@@ -568,7 +571,7 @@ export function SettingsPanel({ isMember = false, currentPlan = 'free', hasSubsc
                   }}
                 >
                   <CreditCard style={{ width: '12px', height: '12px' }} strokeWidth={1.4} />
-                  {portalLoading ? 'Opening…' : 'Manage Billing'}
+                  {portalLoading ? t('settings.opening') : t('settings.manageBilling')}
                 </button>
               )}
               <Link
@@ -592,7 +595,7 @@ export function SettingsPanel({ isMember = false, currentPlan = 'free', hasSubsc
                 }}
               >
                 <Crown style={{ width: '12px', height: '12px' }} strokeWidth={1.8} />
-                {activeMember ? 'Manage Membership' : 'Become a Member'}
+                {activeMember ? t('settings.manageMembership') : t('trial.become')}
               </Link>
             </div>
           </div>
@@ -605,9 +608,7 @@ export function SettingsPanel({ isMember = false, currentPlan = 'free', hasSubsc
             color: theme.textMuted,
             margin: 0,
           }}>
-            {activeMember
-              ? 'Manage your payment method, download invoices, or cancel via the billing portal.'
-              : 'Become a member to unlock every feature — unlimited properties, reports, AI scanner, and more.'}
+            {activeMember ? t('settings.memberBillingHelp') : t('settings.freeBillingHelp')}
           </p>
         </div>
       </Section>

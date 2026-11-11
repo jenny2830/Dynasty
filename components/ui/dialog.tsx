@@ -4,11 +4,17 @@ import * as React from 'react'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
 import { X } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useLocale } from '@/lib/locale-context'
 
 const Dialog = DialogPrimitive.Root
 const DialogTrigger = DialogPrimitive.Trigger
 const DialogPortal = DialogPrimitive.Portal
 const DialogClose = DialogPrimitive.Close
+
+function DialogCloseLabel() {
+  const { t } = useLocale()
+  return <span className="sr-only">{t('common.close')}</span>
+}
 
 const DialogOverlay = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Overlay>,
@@ -65,7 +71,7 @@ const DialogContent = React.forwardRef<
       {children}
       <DialogClose className="absolute right-4 top-4 rounded-[1px] text-dynasty-gray-400 transition-colors hover:text-dynasty-gold focus:outline-none focus:ring-2 focus:ring-dynasty-gold/40 disabled:pointer-events-none">
         <X className="h-4 w-4" strokeWidth={1.2} />
-        <span className="sr-only">Close</span>
+        <DialogCloseLabel />
       </DialogClose>
     </DialogPrimitive.Content>
   </DialogPortal>

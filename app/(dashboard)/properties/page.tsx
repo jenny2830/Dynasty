@@ -5,13 +5,16 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useAppTheme } from '@/lib/theme-context'
 import { useThemeStyles } from '@/lib/useThemeStyles'
-import { formatPropertyCurrency } from '@/lib/utils'
+import { useFormatters, useLocale } from '@/lib/locale-context'
+import { enumLabel } from '@/lib/i18n/labels'
 import Link from 'next/link'
 import { Building2, MapPin, RefreshCw } from 'lucide-react'
 
 export default function PropertiesPage() {
   const { theme } = useAppTheme()
   const styles = useThemeStyles()
+  const { t } = useLocale()
+  const { propertyMoney } = useFormatters()
   const router = useRouter()
   const [properties, setProperties] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -97,7 +100,7 @@ export default function PropertiesPage() {
           borderRadius: '50%',
           animation: 'spin 0.6s linear infinite',
         }} />
-        <p style={styles.mutedText}>Loading your properties...</p>
+        <p style={styles.mutedText}>{t('properties.loading')}</p>
       </div>
     )
   }
@@ -106,7 +109,7 @@ export default function PropertiesPage() {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '300px', flexDirection: 'column', gap: '16px' }}>
         <p style={{ ...styles.bodyText, color: theme.valueNegative }}>
-          Failed to load your account. Please try again.
+          {t('properties.loadFailed')}
         </p>
         <button
           onClick={() => setRetryCount(c => c + 1)}
@@ -120,7 +123,7 @@ export default function PropertiesPage() {
           }}
         >
           <RefreshCw size={14} strokeWidth={1.5} />
-          Retry
+          {t('common.retry')}
         </button>
       </div>
     )
@@ -137,10 +140,12 @@ export default function PropertiesPage() {
         <div>
           <h1 style={styles.pageTitle}>
             <span style={{ color: theme.accent, fontSize: '8px', marginRight: '8px' }}>◆</span>
-            Properties
+            {t('properties.title')}
           </h1>
           <p style={{ ...styles.mutedText, marginTop: '6px', letterSpacing: '0.15em', textTransform: 'uppercase' }}>
-            {properties.length} {properties.length === 1 ? 'Estate' : 'Estates'} in Portfolio
+            {properties.length === 1
+              ? t('properties.countOne', { count: properties.length })
+              : t('properties.countMany', { count: properties.length })}
           </p>
           <div style={{ width: '32px', height: '1px', background: theme.accent, opacity: 0.5, marginTop: '12px' }} />
         </div>
@@ -155,7 +160,7 @@ export default function PropertiesPage() {
             display: 'flex', alignItems: 'center', gap: '8px',
           }}
         >
-          + ADD PROPERTY
+          + {t('properties.add')}
         </button>
       </div>
 
@@ -169,9 +174,9 @@ export default function PropertiesPage() {
           textAlign: 'center',
         }}>
           <Building2 size={36} strokeWidth={1} style={{ color: `${theme.accent}30`, margin: '0 auto 16px', display: 'block' }} />
-          <p style={{ ...styles.cardTitle, marginBottom: '8px' }}>No properties yet</p>
+          <p style={{ ...styles.cardTitle, marginBottom: '8px' }}>{t('properties.emptyTitle')}</p>
           <p style={{ ...styles.mutedText, marginBottom: '24px' }}>
-            Add your first property to start tracking income, expenses, and ROI.
+            {t('properties.emptyBody')}
           </p>
           <button
             onClick={() => router.push('/properties/new')}
@@ -185,7 +190,7 @@ export default function PropertiesPage() {
               cursor: 'pointer',
             }}
           >
-            + ADD YOUR FIRST PROPERTY
+            + {t('properties.addFirst')}
           </button>
         </div>
       ) : (
@@ -219,7 +224,7 @@ export default function PropertiesPage() {
                 {/* Type + status badges */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
                   <span style={{ ...styles.badge, background: `${theme.accent}12`, color: theme.accent, border: `1px solid ${theme.accent}30` }}>
-                    {property.type}
+                    {enumLabel(property.type, t)}
                   </span>
                   <span style={{
                     ...styles.badge,
@@ -227,7 +232,7 @@ export default function PropertiesPage() {
                     color: property.status === 'active' ? theme.accent : theme.valueNegative,
                     border: `1px solid ${property.status === 'active' ? theme.accent : theme.valueNegative}30`,
                   }}>
-                    {property.status}
+                    {enumLabel(property.status, t)}
                   </span>
                 </div>
 
@@ -247,27 +252,27 @@ export default function PropertiesPage() {
                 {/* Metrics */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', paddingTop: '16px', borderTop: `1px solid ${theme.dividerColor}` }}>
                   <div>
-                    <p style={{ ...styles.cardLabel, fontSize: '9px', marginBottom: '4px' }}>Current Value</p>
+                    <p style={{ ...styles.cardLabel, fontSize: '9px', marginBottom: '4px' }}>{t('properties.currentValue')}</p>
                     <p style={{ ...styles.financial, color: theme.accent, fontSize: '15px' }}>
-                      {property.current_value ? formatPropertyCurrency(property.current_value, property.currency ?? 'CAD') : '—'}
+                      {property.current_value ? propertyMoney(property.current_value, property.currency ?? 'CAD') : '—'}
                     </p>
                   </div>
                   <div>
-                    <p style={{ ...styles.cardLabel, fontSize: '9px', marginBottom: '4px' }}>Purchase Price</p>
+                    <p style={{ ...styles.cardLabel, fontSize: '9px', marginBottom: '4px' }}>{t('properties.purchasePrice')}</p>
                     <p style={{ ...styles.financial, color: theme.textPrimary, fontSize: '15px' }}>
-                      {property.purchase_price ? formatPropertyCurrency(property.purchase_price, property.currency ?? 'CAD') : '—'}
+                      {property.purchase_price ? propertyMoney(property.purchase_price, property.currency ?? 'CAD') : '—'}
                     </p>
                   </div>
                   {property.monthly_mortgage > 0 && (
                     <div>
-                      <p style={{ ...styles.cardLabel, fontSize: '9px', marginBottom: '4px' }}>Mortgage/mo</p>
+                      <p style={{ ...styles.cardLabel, fontSize: '9px', marginBottom: '4px' }}>{t('properties.mortgageMo')}</p>
                       <p style={{ ...styles.financial, color: theme.valueNegative, fontSize: '15px' }}>
-                        {formatPropertyCurrency(property.monthly_mortgage, property.currency ?? 'CAD')}
+                        {propertyMoney(property.monthly_mortgage, property.currency ?? 'CAD')}
                       </p>
                     </div>
                   )}
                   <div>
-                    <p style={{ ...styles.cardLabel, fontSize: '9px', marginBottom: '4px' }}>Units</p>
+                    <p style={{ ...styles.cardLabel, fontSize: '9px', marginBottom: '4px' }}>{t('properties.units')}</p>
                     <p style={{ ...styles.financial, color: theme.textPrimary, fontSize: '15px' }}>
                       {property.num_units || 1}
                     </p>

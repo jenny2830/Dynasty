@@ -3,6 +3,7 @@
 import { ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAppTheme } from '@/lib/theme-context'
+import { useLocale } from '@/lib/locale-context'
 
 interface FeatureGateProps {
   /** When true, the feature is accessible (landlord has an active membership). */
@@ -26,6 +27,7 @@ export function FeatureGate({ isMember, children, fallback, featureLabel }: Feat
 function UpgradePrompt({ featureLabel }: { featureLabel?: string }) {
   const router = useRouter()
   const { theme } = useAppTheme()
+  const { t } = useLocale()
 
   return (
     <div style={{
@@ -49,7 +51,7 @@ function UpgradePrompt({ featureLabel }: { featureLabel?: string }) {
         marginBottom: '8px',
         letterSpacing: '0.02em',
       }}>
-        {featureLabel ? `${featureLabel} — Members Only` : 'Dynasty Membership required'}
+        {featureLabel ? t('gate.membersOnly', { feature: featureLabel }) : t('gate.required')}
       </h3>
       <p style={{
         fontFamily: "'Jost', sans-serif",
@@ -59,7 +61,7 @@ function UpgradePrompt({ featureLabel }: { featureLabel?: string }) {
         marginBottom: '24px',
         letterSpacing: '0.04em',
       }}>
-        Become a member to unlock every feature — unlimited properties, reports, AI scanner, and more.
+        {t('gate.body')}
       </p>
       <button
         onClick={() => router.push('/upgrade')}
@@ -78,7 +80,7 @@ function UpgradePrompt({ featureLabel }: { featureLabel?: string }) {
           boxShadow: `0 4px 16px ${theme.accent}33`,
         }}
       >
-        Become a Member
+        {t('trial.become')}
       </button>
     </div>
   )

@@ -2,8 +2,13 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { LoginForm } from './LoginForm'
+import { LanguageSwitcher } from '@/components/LanguageSwitcher'
+import { getI18n } from '@/lib/i18n/server'
 
-export const metadata = { title: 'Sign in' }
+export async function generateMetadata() {
+  const { t } = await getI18n()
+  return { title: t('meta.signIn') }
+}
 
 export default async function LoginPage({
   searchParams,
@@ -11,6 +16,7 @@ export default async function LoginPage({
   searchParams: Promise<{ next?: string; error?: string }>
 }) {
   const { next, error } = await searchParams
+  const { t } = await getI18n()
 
   async function login(formData: FormData) {
     'use server'
@@ -46,6 +52,7 @@ export default async function LoginPage({
       padding: '48px 16px',
       position: 'relative',
     }}>
+      <LanguageSwitcher variant="auth" />
       <div style={{ position: 'fixed', top: 0, left: 0, right: 0, height: '1px', background: 'linear-gradient(90deg, transparent 0%, #C9A84C 50%, transparent 100%)' }} aria-hidden />
 
       <div style={{ width: '100%', maxWidth: '420px' }}>
@@ -54,7 +61,7 @@ export default async function LoginPage({
           <img src="/dynasty_logo.png" alt="Dynasty" style={{ width: '280px', height: 'auto', objectFit: 'contain', display: 'block', margin: '0 auto' }} />
           <p style={{ marginTop: '12px', textAlign: 'center', fontFamily: "'Jost', sans-serif", fontSize: '8px', fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.35em', color: 'rgba(201,168,76,0.4)' }}>
             <span style={{ display: 'inline-block', marginRight: '8px' }}>◆</span>
-            Legacy &middot; Luxury &middot; Timeless
+            {t('brand.tagline')}
             <span style={{ display: 'inline-block', marginLeft: '8px' }}>◆</span>
           </p>
         </div>
@@ -67,10 +74,10 @@ export default async function LoginPage({
 
           <div style={{ textAlign: 'center' }}>
             <h1 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '26px', fontWeight: 500, letterSpacing: '0.04em', color: '#FAF7F2', margin: 0 }}>
-              Welcome Back
+              {t('auth.welcomeBack')}
             </h1>
             <p style={{ marginTop: '6px', fontFamily: "'Jost', sans-serif", fontSize: '11px', fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.18em', color: '#6B6B65' }}>
-              Access your portfolio
+              {t('auth.accessPortfolio')}
             </p>
           </div>
 
@@ -84,9 +91,9 @@ export default async function LoginPage({
         </div>
 
         <p style={{ marginTop: '28px', textAlign: 'center', fontFamily: "'Jost', sans-serif", fontSize: '11px', fontWeight: 300, letterSpacing: '0.08em', color: '#6B6B65' }}>
-          Don&apos;t have an account?{' '}
+          {t('auth.noAccount')}{' '}
           <Link href="/signup" style={{ fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.18em', color: '#C9A84C', textDecoration: 'none' }}>
-            Create One
+            {t('auth.createOne')}
           </Link>
         </p>
       </div>

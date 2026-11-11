@@ -22,11 +22,14 @@ import {
 } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
 import { Section, SectionHeader } from '@/components/ui/section'
-import { formatCurrency, formatDate } from '@/lib/utils'
+import { formatCurrency } from '@/lib/utils'
 import { PUBLIC_BRAND_DOMAIN } from '@/lib/constants'
 import { createClient } from '@/lib/supabase/client'
 import { format, startOfMonth, endOfMonth, startOfQuarter, endOfQuarter, startOfYear, endOfYear, subMonths } from 'date-fns'
+import { es as esDate } from 'date-fns/locale'
 import { useAppTheme } from '@/lib/theme-context'
+import { useFormatters, useLocale } from '@/lib/locale-context'
+import { categoryLabel, enumLabel } from '@/lib/i18n/labels'
 
 interface Property {
   id: string
@@ -90,6 +93,8 @@ function downloadCSV(content: string, filename: string) {
 
 export function ReportBuilder({ properties }: ReportBuilderProps) {
   const { theme } = useAppTheme()
+  const { t, locale } = useLocale()
+  const { money, date } = useFormatters()
   const [downloading, setDownloading] = useState(false)
   const [reportType, setReportType] = useState<ReportType>('pl')
   const [propertyId, setPropertyId] = useState<string>('all')
@@ -160,15 +165,15 @@ export function ReportBuilder({ properties }: ReportBuilderProps) {
 
   const handleExportCSV = () => {
     const rows = [
-      ['Date', 'Type', 'Category', 'Description', 'Amount', 'Property', 'Tax Deductible'],
-      ...transactions.map((t) => [
-        t.transaction_date,
-        t.type,
-        t.category,
-        t.description ?? '',
-        t.amount.toString(),
-        (t.properties as { name: string } | null)?.name ?? '',
-        t.is_tax_deductible ? 'Yes' : 'No',
+      [t('reports.csvDate'), t('reports.csvType'), t('reports.csvCategory'), t('reports.csvDescription'), t('reports.csvAmount'), t('reports.csvProperty'), t('reports.csvTax')],
+      ...transactions.map((row) => [
+        row.transaction_date,
+        enumLabel(row.type, t),
+        categoryLabel(row.category, t),
+        row.description ?? '',
+        row.amount.toString(),
+        (row.properties as { name: string } | null)?.name ?? '',
+        row.is_tax_deductible ? t('common.yes') : t('common.no'),
       ]),
     ]
     const csv = rows.map((r) => r.map((c) => `"${c}"`).join(',')).join('\n')
@@ -194,7 +199,7 @@ export function ReportBuilder({ properties }: ReportBuilderProps) {
       pdf.text('DYNASTY', pageWidth / 2, 12, { align: 'center' })
       pdf.setFontSize(9)
       pdf.setFont('helvetica', 'normal')
-      pdf.text('Property Wealth Platform', pageWidth / 2, 18, { align: 'center' })
+      pdf.text(t('brand.platform'), pageWidth / 2, 18, { align: 'center' })
       pdf.setTextColor(138, 138, 130)
       pdf.setFontSize(8)
       pdf.text(PUBLIC_BRAND_DOMAIN, pageWidth / 2, 24, { align: 'center' })
@@ -206,12 +211,12 @@ export function ReportBuilder({ properties }: ReportBuilderProps) {
       pdf.setFontSize(18)
       pdf.setFont('helvetica', 'bold')
       const titles: Record<string, string> = {
-        pl: 'Profit & Loss Statement',
-        cash_flow: 'Cash Flow Report',
-        tax_summary: 'Tax Summary Report',
-        expense_breakdown: 'Expense Breakdown Report',
+        pl: t('reports.plStatement'),
+        cash_flow: t('reports.cashFlowReport'),
+        tax_summary: t('reports.taxReport'),
+        expense_breakdown: t('reports.expenseReport'),
       }
-      pdf.text(titles[reportType] || 'Financial Report', 14, yPos)
+      pdf.text(titles[reportType] || t('reports.financialReport'), 14, yPos)
       yPos += 8
 
       // ── REPORT META ──
@@ -220,13 +225,13 @@ export function ReportBuilder({ properties }: ReportBuilderProps) {
       pdf.setTextColor(100, 100, 100)
       const propertyLabel =
         propertyId === 'all'
-          ? 'All Properties'
-          : properties.find((p) => p.id === propertyId)?.name ?? 'Selected Property'
-      pdf.text(`Property: ${propertyLabel}`, 14, yPos)
+          ? t('reports.allPropertiesPdf')
+          : properties.find((p) => p.id === propertyId)?.name ?? t('reports.selectedProperty')
+      pdf.text(t('reports.propertyLine', { name: propertyLabel }), 14, yPos)
       yPos += 6
-      pdf.text(`Period: ${dateStart} to ${dateEnd}`, 14, yPos)
+      pdf.text(t('reports.periodLine', { start: dateStart, end: dateEnd }), 14, yPos)
       yPos += 6
-      pdf.text(`Generated: ${new Date().toLocaleDateString('en-CA')}`, 14, yPos)
+      pdf.text(t('reports.generatedLine', { date: new Date().toLocaleDateString(locale === 'es' ? 'es-CO' : 'en-CA') }), 14, yPos)
       yPos += 10
 
       // ── DIVIDER ──
@@ -244,21 +249,21 @@ export function ReportBuilder({ properties }: ReportBuilderProps) {
 
       pdf.setFontSize(7)
       pdf.setTextColor(100, 100, 100)
-      pdf.text('TOTAL INCOME', 16, yPos + 6)
-      pdf.text('TOTAL EXPENSES', 16 + colW + 4, yPos + 6)
-      pdf.text('NET INCOME', 16 + (colW + 4) * 2, yPos + 6)
+      pdf.text(t('reports.totalIncomePdf'), 16, yPos + 6)
+      pdf.text(t('reports.totalExpensesPdf'), 16 + colW + 4, yPos + 6)
+      pdf.text(t('reports.netIncomePdf'), 16 + (colW + 4) * 2, yPos + 6)
 
       pdf.setFontSize(11)
       pdf.setFont('helvetica', 'bold')
       pdf.setTextColor(10, 10, 10)
-      pdf.text(formatCurrency(totalIncome), 16, yPos + 16)
-      pdf.text(formatCurrency(totalExpenses), 16 + colW + 4, yPos + 16)
+      pdf.text(formatCurrency(totalIncome, 'CAD', 2, locale), 16, yPos + 16)
+      pdf.text(formatCurrency(totalExpenses, 'CAD', 2, locale), 16 + colW + 4, yPos + 16)
       if (netIncome >= 0) {
         pdf.setTextColor(0, 120, 60)
       } else {
         pdf.setTextColor(183, 110, 121)
       }
-      pdf.text(formatCurrency(netIncome), 16 + (colW + 4) * 2, yPos + 16)
+      pdf.text(formatCurrency(netIncome, 'CAD', 2, locale), 16 + (colW + 4) * 2, yPos + 16)
 
       yPos += 30
 
@@ -266,19 +271,19 @@ export function ReportBuilder({ properties }: ReportBuilderProps) {
       pdf.setFont('helvetica', 'normal')
       pdf.setTextColor(20, 20, 20)
       pdf.setFontSize(11)
-      pdf.text('Transactions', 14, yPos)
+      pdf.text(t('reports.transactions'), 14, yPos)
       yPos += 6
 
       autoTable(pdf, {
         startY: yPos,
-        head: [['Date', 'Description', 'Property', 'Category', 'Type', 'Amount']],
-        body: transactions.map((t) => [
-          new Date(t.transaction_date).toLocaleDateString('en-CA'),
-          t.description ?? '—',
-          (t.properties as { name: string } | null)?.name ?? '—',
-          t.category ?? '—',
-          t.type === 'income' ? 'Income' : 'Expense',
-          `${t.type === 'expense' ? '-' : '+'}${formatCurrency(t.amount)}`,
+        head: [[t('common.date'), t('common.description'), t('common.property'), t('common.category'), t('common.type'), t('common.amount')]],
+        body: transactions.map((row) => [
+          new Date(row.transaction_date).toLocaleDateString(locale === 'es' ? 'es-CO' : 'en-CA'),
+          row.description ?? '—',
+          (row.properties as { name: string } | null)?.name ?? '—',
+          row.category ? categoryLabel(row.category, t) : '—',
+          row.type === 'income' ? t('common.income') : t('common.expense'),
+          `${row.type === 'expense' ? '-' : '+'}${formatCurrency(row.amount, 'CAD', 2, locale)}`,
         ]),
         headStyles: {
           fillColor: [10, 10, 10],
@@ -305,7 +310,7 @@ export function ReportBuilder({ properties }: ReportBuilderProps) {
         pdf.setFontSize(11)
         pdf.setFont('helvetica', 'bold')
         pdf.setTextColor(20, 20, 20)
-        pdf.text('Tax Deductible Expenses by Category', 14, finalY + 12)
+        pdf.text(t('reports.taxByCategory'), 14, finalY + 12)
 
         const deductibleByCategory = expenses
           .filter((t) => t.is_tax_deductible)
@@ -316,11 +321,11 @@ export function ReportBuilder({ properties }: ReportBuilderProps) {
 
         autoTable(pdf, {
           startY: finalY + 18,
-          head: [['Expense Category', 'Total Amount', 'Tax Deductible']],
+          head: [[t('reports.expenseCategory'), t('reports.totalAmount'), t('reports.taxDeductibleCol')]],
           body: Object.entries(deductibleByCategory).map(([cat, amount]) => [
-            cat,
-            formatCurrency(amount),
-            'Yes',
+            categoryLabel(cat, t),
+            formatCurrency(amount, 'CAD', 2, locale),
+            t('common.yes'),
           ]),
           headStyles: { fillColor: [10, 10, 10], textColor: [201, 168, 76], fontSize: 8 },
           bodyStyles: { fontSize: 8 },
@@ -345,17 +350,17 @@ export function ReportBuilder({ properties }: ReportBuilderProps) {
       pdf.save(`dynasty-${reportType}-${dateStart}-${dateEnd}.pdf`)
     } catch (err) {
       console.error('PDF error:', err)
-      alert('PDF generation failed. Please try again.')
+      alert(t('reports.pdfFailed'))
     } finally {
       setDownloading(false)
     }
   }
 
   const reportTypeLabel = {
-    pl: 'Profit & Loss',
-    cash_flow: 'Cash Flow',
-    tax_summary: 'Tax Summary',
-    expense_breakdown: 'Expense Breakdown',
+    pl: t('reports.pl'),
+    cash_flow: t('reports.cashFlow'),
+    tax_summary: t('reports.taxSummary'),
+    expense_breakdown: t('reports.expenseBreakdown'),
   }[reportType]
 
   return (
@@ -364,24 +369,24 @@ export function ReportBuilder({ properties }: ReportBuilderProps) {
       <Section className="px-7 py-6">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div className="space-y-2">
-            <Label>Report Type</Label>
+            <Label>{t('reports.type')}</Label>
             <Select value={reportType} onValueChange={(v) => setReportType(v as ReportType)}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="pl">Profit &amp; Loss</SelectItem>
-                <SelectItem value="cash_flow">Cash Flow</SelectItem>
-                <SelectItem value="tax_summary">Tax Summary</SelectItem>
-                <SelectItem value="expense_breakdown">Expense Breakdown</SelectItem>
+                <SelectItem value="pl">{t('reports.pl')}</SelectItem>
+                <SelectItem value="cash_flow">{t('reports.cashFlow')}</SelectItem>
+                <SelectItem value="tax_summary">{t('reports.taxSummary')}</SelectItem>
+                <SelectItem value="expense_breakdown">{t('reports.expenseBreakdown')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div className="space-y-2">
-            <Label>Property</Label>
+            <Label>{t('common.property')}</Label>
             <Select value={propertyId} onValueChange={setPropertyId}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All properties</SelectItem>
+                <SelectItem value="all">{t('reports.allProperties')}</SelectItem>
                 {properties.map((p) => (
                   <SelectItem key={p.id} value={p.id}>
                     {p.name}{p.city ? ` — ${p.city}` : ''}
@@ -392,16 +397,16 @@ export function ReportBuilder({ properties }: ReportBuilderProps) {
           </div>
 
           <div className="space-y-2">
-            <Label>Period</Label>
+            <Label>{t('reports.period')}</Label>
             <Select value={preset} onValueChange={setPreset}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="this_month">This month</SelectItem>
-                <SelectItem value="last_month">Last month</SelectItem>
-                <SelectItem value="this_quarter">This quarter</SelectItem>
-                <SelectItem value="this_year">This year</SelectItem>
-                <SelectItem value="last_year">Last year</SelectItem>
-                <SelectItem value="custom">Custom range</SelectItem>
+                <SelectItem value="this_month">{t('tx.thisMonth')}</SelectItem>
+                <SelectItem value="last_month">{t('tx.lastMonth')}</SelectItem>
+                <SelectItem value="this_quarter">{t('tx.thisQuarter')}</SelectItem>
+                <SelectItem value="this_year">{t('tx.thisYear')}</SelectItem>
+                <SelectItem value="last_year">{t('tx.lastYear')}</SelectItem>
+                <SelectItem value="custom">{t('tx.customRange')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -409,7 +414,7 @@ export function ReportBuilder({ properties }: ReportBuilderProps) {
           <div className="flex items-end">
             <Button onClick={handleGenerate} disabled={isPending} className="w-full">
               <BarChart3 />
-              {isPending ? 'Generating…' : 'Generate'}
+              {isPending ? t('common.generating') : t('common.generate')}
             </Button>
           </div>
         </div>
@@ -417,11 +422,11 @@ export function ReportBuilder({ properties }: ReportBuilderProps) {
         {preset === 'custom' && (
           <div className="mt-5 grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Start Date</Label>
+              <Label>{t('reports.startDate')}</Label>
               <Input type="date" value={customStart} onChange={(e) => setCustomStart(e.target.value)} />
             </div>
             <div className="space-y-2">
-              <Label>End Date</Label>
+              <Label>{t('reports.endDate')}</Label>
               <Input type="date" value={customEnd} onChange={(e) => setCustomEnd(e.target.value)} />
             </div>
           </div>
@@ -439,16 +444,16 @@ export function ReportBuilder({ properties }: ReportBuilderProps) {
               </h2>
               <p className="mt-1 font-sans text-[11px] font-light uppercase tracking-[0.14em] text-dynasty-gray-500">
                 {dateStart && dateEnd
-                  ? `${formatDate(dateStart)} — ${formatDate(dateEnd)}`
+                  ? `${date(dateStart)} — ${date(dateEnd)}`
                   : ''}
                 {propertyId !== 'all' && properties.find((p) => p.id === propertyId)
                   ? ` · ${properties.find((p) => p.id === propertyId)?.name}`
-                  : ' · All properties'}
+                  : ` · ${t('reports.allProperties')}`}
               </p>
             </div>
             <div className="flex gap-2">
               <Button variant="outline" size="sm" onClick={handleExportCSV}>
-                <FileDown /> CSV
+                <FileDown /> {t('reports.csv')}
               </Button>
               <Button
                 size="sm"
@@ -456,7 +461,7 @@ export function ReportBuilder({ properties }: ReportBuilderProps) {
                 disabled={downloading}
                 style={{ opacity: downloading ? 0.7 : 1 }}
               >
-                <FileDown /> {downloading ? 'Generating…' : 'Download PDF'}
+                <FileDown /> {downloading ? t('common.generating') : t('reports.downloadPdf')}
               </Button>
             </div>
           </div>
@@ -473,7 +478,7 @@ export function ReportBuilder({ properties }: ReportBuilderProps) {
               </h2>
               <p className="mt-1 font-sans text-[11px] font-light uppercase tracking-[0.14em] text-dynasty-gray-500">
                 {dateStart && dateEnd
-                  ? `${formatDate(dateStart)} — ${formatDate(dateEnd)}`
+                  ? `${date(dateStart)} — ${date(dateEnd)}`
                   : ''}
               </p>
             </div>
@@ -490,9 +495,9 @@ export function ReportBuilder({ properties }: ReportBuilderProps) {
                 <div className="space-y-5">
                   <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
                     {[
-                      { label: 'Total Income', value: totalIncome, isNeg: false, icon: TrendingUp },
-                      { label: 'Total Expenses', value: totalExpenses, isNeg: true, icon: TrendingDown },
-                      { label: 'Net Income', value: netIncome, isNeg: netIncome < 0, icon: Minus },
+                      { label: t('tx.totalIncome'), value: totalIncome, isNeg: false, icon: TrendingUp },
+                      { label: t('tx.totalExpenses'), value: totalExpenses, isNeg: true, icon: TrendingDown },
+                      { label: t('tx.netIncome'), value: netIncome, isNeg: netIncome < 0, icon: Minus },
                     ].map(({ label, value, isNeg, icon: Icon }) => (
                       <div
                         key={label}
@@ -515,27 +520,27 @@ export function ReportBuilder({ properties }: ReportBuilderProps) {
                           <Icon className="h-4 w-4" strokeWidth={1.2} style={{ color: isNeg ? theme.valueNegative : theme.accent }} />
                         </div>
                         <p className="mt-3 font-display text-[36px] leading-none tracking-[0.04em]" style={{ color: isNeg ? theme.valueNegative : theme.accent }}>
-                          {formatCurrency(value)}
+                          {money(value)}
                         </p>
                       </div>
                     ))}
                   </div>
 
                   <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-                    <CategoryTable title="Income by Category" data={incomeByCategory} total={totalIncome} color="gold" />
-                    <CategoryTable title="Expenses by Category" data={expenseByCategory} total={totalExpenses} color="rose" />
+                    <CategoryTable title={t('reports.incomeByCategory')} data={incomeByCategory} total={totalIncome} color="gold" />
+                    <CategoryTable title={t('reports.expensesByCategory')} data={expenseByCategory} total={totalExpenses} color="rose" />
                   </div>
                 </div>
               )}
 
               {reportType === 'cash_flow' && (
                 <Section>
-                  <SectionHeader title="Monthly Cash Flow" />
+                  <SectionHeader title={t('reports.monthlyCashFlow')} />
                   <div className="overflow-x-auto">
                     <table className="w-full">
                       <thead style={{ background: theme.tableHeaderBg, borderBottom: `1px solid ${theme.dividerColor}` }}>
                         <tr>
-                          {['Month', 'Income', 'Expenses', 'Net Cash Flow'].map((h) => (
+                          {[t('reports.month'), t('common.income'), t('overview.chartExpenses'), t('reports.netCashFlow')].map((h) => (
                             <th
                               key={h}
                               className="px-6 py-3.5 text-left font-sans text-[9px] font-light uppercase tracking-[0.2em]"
@@ -554,16 +559,16 @@ export function ReportBuilder({ properties }: ReportBuilderProps) {
                             return (
                               <tr key={month} className="transition-colors" style={{ borderBottom: `1px solid ${theme.tableRowBorder}` }}>
                                 <td className="px-6 py-3.5 font-sans text-[13px]" style={{ color: theme.textPrimary }}>
-                                  {format(new Date(month + '-01'), 'MMMM yyyy')}
+                                  {format(new Date(month + '-01'), 'MMMM yyyy', { locale: locale === 'es' ? esDate : undefined })}
                                 </td>
                                 <td className="px-6 py-3.5 font-mono text-[13px] font-medium" style={{ color: theme.accent }}>
-                                  {formatCurrency(data.income)}
+                                  {money(data.income)}
                                 </td>
                                 <td className="px-6 py-3.5 font-mono text-[13px] font-medium" style={{ color: theme.valueNegative }}>
-                                  {formatCurrency(data.expenses)}
+                                  {money(data.expenses)}
                                 </td>
                                 <td className="px-6 py-3.5 font-mono text-[13px] font-medium" style={{ color: net >= 0 ? theme.accent : theme.valueNegative }}>
-                                  {formatCurrency(net)}
+                                  {money(net)}
                                 </td>
                               </tr>
                             )
@@ -586,22 +591,22 @@ export function ReportBuilder({ properties }: ReportBuilderProps) {
                     />
                     <p className="flex items-center gap-2 font-sans text-[9px] font-light uppercase tracking-[0.22em]" style={{ color: theme.textMuted }}>
                       <span className="text-[6px] leading-none" style={{ color: theme.cornerMark }}>◆</span>
-                      Total Tax-Deductible Expenses
+                      {t('reports.totalDeductible')}
                     </p>
                     <p className="mt-3 font-display text-[48px] leading-none tracking-[0.04em]" style={{ color: theme.accent }}>
-                      {formatCurrency(totalDeductible)}
+                      {money(totalDeductible)}
                     </p>
                     <p className="mt-2 font-sans text-[11px] font-light tracking-[0.06em]" style={{ color: theme.textMuted }}>
                       {taxDeductible.length} deductible transaction{taxDeductible.length !== 1 ? 's' : ''}
                     </p>
                   </div>
-                  <TransactionTable transactions={taxDeductible} title="Deductible Transactions" />
+                  <TransactionTable transactions={taxDeductible} title={t('reports.deductible')} />
                 </div>
               )}
 
               {reportType === 'expense_breakdown' && (
                 <CategoryTable
-                  title="Expense Breakdown"
+                  title={t('reports.expenseBreakdown')}
                   data={expenseByCategory}
                   total={totalExpenses}
                   color="rose"
@@ -631,6 +636,8 @@ function CategoryTable({
   showBar?: boolean
 }) {
   const { theme } = useAppTheme()
+  const { t } = useLocale()
+  const { money } = useFormatters()
   const sorted = Object.entries(data).sort(([, a], [, b]) => b - a)
   const valueColor = color === 'gold' ? theme.accent : theme.valueNegative
   const barBg = color === 'gold' ? theme.accent : theme.valueNegative
@@ -646,10 +653,10 @@ function CategoryTable({
               <div className="min-w-0 flex-1">
                 <div className="mb-1 flex items-center justify-between">
                   <span className="font-sans text-[13px]" style={{ color: theme.textPrimary }}>
-                    {category}
+                    {categoryLabel(category, t)}
                   </span>
                   <span className="font-mono text-[13px] font-medium" style={{ color: valueColor }}>
-                    {formatCurrency(amount)}
+                    {money(amount)}
                   </span>
                 </div>
                 {showBar && (
@@ -669,10 +676,10 @@ function CategoryTable({
           style={{ background: `${theme.accent}0A` }}
         >
           <span className="font-sans text-[12px] font-light uppercase tracking-[0.18em]" style={{ color: theme.textPrimary }}>
-            Total
+            {t('common.total')}
           </span>
           <span className="font-mono text-[14px] font-medium" style={{ color: valueColor }}>
-            {formatCurrency(total)}
+            {money(total)}
           </span>
         </div>
       </div>
@@ -688,6 +695,8 @@ function TransactionTable({
   title: string
 }) {
   const { theme } = useAppTheme()
+  const { t } = useLocale()
+  const { money, date } = useFormatters()
   return (
     <Section>
       <SectionHeader title={title} />
@@ -695,7 +704,7 @@ function TransactionTable({
         <table className="w-full">
           <thead style={{ background: theme.tableHeaderBg, borderBottom: `1px solid ${theme.dividerColor}` }}>
             <tr>
-              {['Date', 'Category', 'Description', 'Amount'].map((h) => (
+              {[t('common.date'), t('common.category'), t('common.description'), t('common.amount')].map((h) => (
                 <th
                   key={h}
                   className="px-6 py-3.5 text-left font-sans text-[9px] font-light uppercase tracking-[0.2em]"
@@ -707,19 +716,19 @@ function TransactionTable({
             </tr>
           </thead>
           <tbody>
-            {transactions.map((t) => (
-              <tr key={t.id} className="transition-colors" style={{ borderBottom: `1px solid ${theme.tableRowBorder}` }}>
+            {transactions.map((row) => (
+              <tr key={row.id} className="transition-colors" style={{ borderBottom: `1px solid ${theme.tableRowBorder}` }}>
                 <td className="whitespace-nowrap px-6 py-3 font-sans text-[12px] font-light" style={{ color: theme.textSecondary }}>
-                  {formatDate(t.transaction_date)}
+                  {date(row.transaction_date)}
                 </td>
                 <td className="px-6 py-3">
-                  <Badge>{t.category}</Badge>
+                  <Badge>{categoryLabel(row.category, t)}</Badge>
                 </td>
                 <td className="px-6 py-3 font-sans text-[13px]" style={{ color: theme.textPrimary }}>
-                  {t.description ?? '—'}
+                  {row.description ?? '—'}
                 </td>
                 <td className="px-6 py-3 font-mono text-[13px] font-medium" style={{ color: theme.accent }}>
-                  {formatCurrency(t.amount)}
+                  {money(row.amount)}
                 </td>
               </tr>
             ))}

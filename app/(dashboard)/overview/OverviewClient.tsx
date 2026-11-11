@@ -6,9 +6,13 @@ import { createClient } from '@/lib/supabase/client'
 import { OverviewDashboard } from '@/components/dashboard/OverviewDashboard'
 import { isRecurringPaymentPending } from '@/lib/recurring-utils'
 import { useAppTheme } from '@/lib/theme-context'
-import { subMonths, format, startOfMonth, endOfMonth } from 'date-fns'
+import { subMonths, format, startOfMonth, endOfMonth, parse } from 'date-fns'
+import { es as esDate } from 'date-fns/locale'
+import { useLocale } from '@/lib/locale-context'
+import { intlTag } from '@/lib/i18n/locale'
+import type { Locale } from '@/lib/i18n/types'
 
-type ChartPoint = { month: string; income: number; expenses: number }
+type ChartPoint = { month: string; monthKey: string; income: number; expenses: number }
 
 type PropertyPreview = {
   id: string
@@ -35,8 +39,7 @@ type UpcomingPayment = {
 }
 
 interface OverviewData {
-  greeting: string
-  dateSubtitle: string
+  displayName: string
   displayCurrency: string
   portfolioValue: number
   monthlyNetIncome: number
@@ -59,6 +62,7 @@ function buildChartData(
     )
     return {
       month: format(monthDate, 'MMM'),
+      monthKey: format(monthDate, 'yyyy-MM'),
       income: monthTxs
         .filter((t) => t.type === 'income')
         .reduce((s, t) => s + (t.amount || 0), 0),
@@ -69,26 +73,11 @@ function buildChartData(
   })
 }
 
-function greetingFor(now: Date): string {
-  const hour = now.getHours()
-  return hour < 12 ? 'Good Morning' : hour < 18 ? 'Good Afternoon' : 'Good Evening'
-}
-
-function dateSubtitleFor(now: Date): string {
-  return now.toLocaleDateString('en-CA', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  })
-}
-
 function emptyData(): OverviewData {
   const now = new Date()
   const months = Array.from({ length: 6 }, (_, i) => subMonths(now, 5 - i))
   return {
-    greeting: `${greetingFor(now)}, there`,
-    dateSubtitle: dateSubtitleFor(now),
+    displayName: '',
     displayCurrency: 'CAD',
     portfolioValue: 0,
     monthlyNetIncome: 0,
@@ -101,8 +90,17 @@ function emptyData(): OverviewData {
   }
 }
 
+function localizedChart(points: ChartPoint[], locale: Locale): ChartPoint[] {
+  const dateLocale = locale === 'es' ? esDate : undefined
+  return points.map((point) => ({
+    ...point,
+    month: format(parse(`${point.monthKey}-01`, 'yyyy-MM-dd', new Date()), 'MMM', { locale: dateLocale }),
+  }))
+}
+
 export function OverviewClient() {
   const { theme } = useAppTheme()
+  const { t, locale } = useLocale()
   const router = useRouter()
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState(false)
@@ -229,11 +227,10 @@ export function OverviewClient() {
         const displayName =
           (landlord.full_name ?? '').trim().split(' ')[0] ||
           (landlord.email ?? '').split('@')[0] ||
-          'there'
+          ''
 
         setData({
-          greeting: `${greetingFor(now)}, ${displayName}`,
-          dateSubtitle: dateSubtitleFor(now),
+          displayName,
           displayCurrency: landlord.currency ?? 'CAD',
           portfolioValue,
           monthlyNetIncome: income - expenses,
@@ -289,7 +286,7 @@ export function OverviewClient() {
           letterSpacing: '0.06em',
           color: theme.valueNegative,
         }}>
-          Failed to load your overview. Please refresh the page.
+          {t('overview.loadFailed')}
         </p>
         <button
           onClick={() => window.location.reload()}
@@ -306,22 +303,35 @@ export function OverviewClient() {
             cursor: 'pointer',
           }}
         >
-          Refresh
+          {t('common.refresh')}
         </button>
       </div>
     )
   }
 
+  const now = new Date()
+  const hour = now.getHours()
+  const hello = hour < 12 ? t('overview.goodMorning') : hour < 18 ? t('overview.goodAfternoon') : t('overview.goodEvening')
+  const greeting = data.displayName
+    ? t('overview.greeting', { greeting: hello, name: data.displayName })
+    : hello
+  const dateSubtitle = now.toLocaleDateString(intlTag(locale), {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })
+
   return (
     <OverviewDashboard
-      greeting={data.greeting}
-      dateSubtitle={data.dateSubtitle}
+      greeting={greeting}
+      dateSubtitle={dateSubtitle}
+      chartData={localizedChart(data.chartData, locale)}
       initialDisplayCurrency={data.displayCurrency}
       totalPortfolioValue={data.portfolioValue}
       monthlyNetIncome={data.monthlyNetIncome}
       activeProperties={data.activeProperties}
       pendingReminders={data.pendingReminders}
-      chartData={data.chartData}
       recentTx={data.recentTransactions}
       properties={data.properties}
       upcomingReminders={data.upcomingReminders}

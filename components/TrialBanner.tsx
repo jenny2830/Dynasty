@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { getSessionsRemaining, FREE_TRIAL_MAX_SESSIONS } from '@/lib/plans'
 import { useAppTheme } from '@/lib/theme-context'
+import { useLocale } from '@/lib/locale-context'
 
 interface TrialBannerProps {
   isMember: boolean
@@ -13,6 +14,7 @@ interface TrialBannerProps {
 export function TrialBanner({ isMember, sessionsUsed, trialExpired }: TrialBannerProps) {
   const router = useRouter()
   const { theme } = useAppTheme()
+  const { t } = useLocale()
 
   // Members see no trial banner
   if (isMember) return null
@@ -35,10 +37,10 @@ export function TrialBanner({ isMember, sessionsUsed, trialExpired }: TrialBanne
       }}>
         <div>
           <span style={{ fontFamily: "'Jost', sans-serif", fontSize: '15px', color: theme.valueNegative, fontWeight: 500 }}>
-            Your free trial has ended.
+            {t('trial.endedShort')}
           </span>
           <span style={{ fontFamily: "'Jost', sans-serif", fontSize: '15px', color: theme.textMuted, marginLeft: '8px' }}>
-            Become a member to continue using Dynasty.
+            {t('trial.becomeToContinue')}
           </span>
         </div>
         <button
@@ -58,7 +60,7 @@ export function TrialBanner({ isMember, sessionsUsed, trialExpired }: TrialBanne
             whiteSpace: 'nowrap',
           }}
         >
-          Become a Member
+          {t('trial.become')}
         </button>
       </div>
     )
@@ -83,7 +85,7 @@ export function TrialBanner({ isMember, sessionsUsed, trialExpired }: TrialBanne
         color: theme.accent,
         letterSpacing: '0.06em',
       }}>
-        ◆ Free trial — {remaining} of {FREE_TRIAL_MAX_SESSIONS} sessions remaining
+        ◆ {t('trial.sessions', { remaining, total: FREE_TRIAL_MAX_SESSIONS })}
       </span>
       <button
         onClick={() => router.push('/upgrade')}
@@ -101,7 +103,7 @@ export function TrialBanner({ isMember, sessionsUsed, trialExpired }: TrialBanne
           whiteSpace: 'nowrap',
         }}
       >
-        Become a Member
+        {t('trial.become')}
       </button>
     </div>
   )

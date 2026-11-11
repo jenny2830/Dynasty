@@ -21,13 +21,17 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { EXPENSE_ONLY_CATEGORIES, PAYMENT_FREQUENCIES } from '@/lib/constants'
+import { useLocale } from '@/lib/locale-context'
+import { categoryLabel, enumLabel } from '@/lib/i18n/labels'
+import { translateKnownError } from '@/lib/i18n/translate'
 import type { RecurringPayment } from '@/types/database.types'
 
 function SubmitButton({ label, className }: { label: string; className?: string }) {
   const { pending } = useFormStatus()
+  const { t } = useLocale()
   return (
     <Button type="submit" disabled={pending} className={className}>
-      {pending ? 'Saving…' : label}
+      {pending ? t('common.saving') : label}
     </Button>
   )
 }
@@ -44,6 +48,7 @@ interface RecurringFormProps {
 }
 
 export function RecurringForm({ mode, payment, properties }: RecurringFormProps) {
+  const { t } = useLocale()
   const action =
     mode === 'create'
       ? createRecurringPayment
@@ -58,33 +63,33 @@ export function RecurringForm({ mode, payment, properties }: RecurringFormProps)
       {state?.errors?._form && (
         <div className="rounded-[1px] border border-[rgba(183,110,121,0.3)] bg-[rgba(183,110,121,0.08)] px-4 py-3">
           <p className="font-sans text-[12px] font-light text-dynasty-rose-light">
-            {state.errors._form[0]}
+            {translateKnownError(state.errors._form[0], t)}
           </p>
         </div>
       )}
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="name">Payment Name *</Label>
+          <Label htmlFor="name">{t('recurring.paymentName')} *</Label>
           <Input
             id="name"
             name="name"
-            placeholder="e.g. Property Insurance"
+            placeholder={t('recurring.namePlaceholder')}
             defaultValue={payment?.name}
             required
           />
           {state?.errors?.name && (
             <p className="font-sans text-[11px] font-light text-dynasty-rose-light">
-              {state.errors.name[0]}
+              {translateKnownError(state.errors.name[0], t)}
             </p>
           )}
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="property_id">Property *</Label>
+          <Label htmlFor="property_id">{t('common.property')} *</Label>
           <Select name="property_id" defaultValue={payment?.property_id ?? ''}>
             <SelectTrigger id="property_id">
-              <SelectValue placeholder="Select property" />
+              <SelectValue placeholder={t('tx.selectProperty')} />
             </SelectTrigger>
             <SelectContent>
               {properties.map((p) => (
@@ -96,21 +101,21 @@ export function RecurringForm({ mode, payment, properties }: RecurringFormProps)
           </Select>
           {state?.errors?.property_id && (
             <p className="font-sans text-[11px] font-light text-dynasty-rose-light">
-              {state.errors.property_id[0]}
+              {translateKnownError(state.errors.property_id[0], t)}
             </p>
           )}
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="category">Category *</Label>
+          <Label htmlFor="category">{t('common.category')} *</Label>
           <Select name="category" defaultValue={payment?.category}>
             <SelectTrigger id="category">
-              <SelectValue placeholder="Select category" />
+              <SelectValue placeholder={t('tx.selectCategory')} />
             </SelectTrigger>
             <SelectContent>
               {EXPENSE_ONLY_CATEGORIES.map((c) => (
                 <SelectItem key={c} value={c}>
-                  {c}
+                  {categoryLabel(c, t)}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -118,7 +123,7 @@ export function RecurringForm({ mode, payment, properties }: RecurringFormProps)
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="amount">Amount (CAD) *</Label>
+          <Label htmlFor="amount">{t('recurring.amountCad')} *</Label>
           <NumberInput
             id="amount"
             name="amount"
@@ -131,7 +136,7 @@ export function RecurringForm({ mode, payment, properties }: RecurringFormProps)
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="frequency">Frequency</Label>
+          <Label htmlFor="frequency">{t('recurring.frequency')}</Label>
           <Select name="frequency" defaultValue={payment?.frequency ?? 'monthly'}>
             <SelectTrigger id="frequency">
               <SelectValue />
@@ -139,7 +144,7 @@ export function RecurringForm({ mode, payment, properties }: RecurringFormProps)
             <SelectContent>
               {PAYMENT_FREQUENCIES.map((f) => (
                 <SelectItem key={f.value} value={f.value}>
-                  {f.label}
+                  {enumLabel(f.value, t)}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -147,7 +152,7 @@ export function RecurringForm({ mode, payment, properties }: RecurringFormProps)
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="next_due_date">Next Due Date *</Label>
+          <Label htmlFor="next_due_date">{t('recurring.nextDue')} *</Label>
           <Input
             id="next_due_date"
             name="next_due_date"
@@ -158,7 +163,7 @@ export function RecurringForm({ mode, payment, properties }: RecurringFormProps)
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="reminder_days_before">Remind Me (Days Before)</Label>
+          <Label htmlFor="reminder_days_before">{t('recurring.remindDays')}</Label>
           <Input
             id="reminder_days_before"
             name="reminder_days_before"
@@ -179,29 +184,29 @@ export function RecurringForm({ mode, payment, properties }: RecurringFormProps)
         />
         <div>
           <Label htmlFor="auto_log_transaction" className="cursor-pointer normal-case tracking-[0.06em] text-[12px] text-dynasty-gray-300">
-            Auto-log transaction when marked as paid
+            {t('recurring.autoLog')}
           </Label>
           <p className="mt-1 font-sans text-[11px] font-light tracking-[0.04em] text-dynasty-gray-500">
-            Automatically creates an expense transaction on the due date
+            {t('recurring.autoLogHelp')}
           </p>
         </div>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="notes">Notes</Label>
+        <Label htmlFor="notes">{t('common.notes')}</Label>
         <Textarea
           id="notes"
           name="notes"
-          placeholder="Optional notes…"
+          placeholder={t('recurring.notesPlaceholder')}
           defaultValue={payment?.notes ?? ''}
           rows={2}
         />
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3 pt-3 border-t border-[var(--divider-c)]">
-        <SubmitButton label={mode === 'create' ? 'Add Payment' : 'Save Changes'} className="w-full sm:w-auto" />
+        <SubmitButton label={mode === 'create' ? t('recurring.add') : t('recurring.saveChanges')} className="w-full sm:w-auto" />
         <Button type="button" variant="outline" onClick={() => window.history.back()} className="w-full sm:w-auto">
-          Cancel
+          {t('common.cancel')}
         </Button>
       </div>
     </form>

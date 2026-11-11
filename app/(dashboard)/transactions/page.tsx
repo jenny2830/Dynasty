@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { PageHeader } from '@/components/ui/page-header'
 import { formatCurrency, formatDate } from '@/lib/utils'
+import { getI18n } from '@/lib/i18n/server'
+import { categoryLabel } from '@/lib/i18n/labels'
 import { TransactionFilters } from '@/components/transactions/TransactionFilters'
 import {
   startOfMonth, endOfMonth,
@@ -13,7 +15,10 @@ import {
   subMonths, format,
 } from 'date-fns'
 
-export const metadata = { title: 'Transactions' }
+export async function generateMetadata() {
+  const { t } = await getI18n()
+  return { title: t('meta.transactions') }
+}
 
 type TxRow = {
   id: string
@@ -68,7 +73,7 @@ function groupTransactions(txList: TxRow[], groupBy: string): Group[] {
   if (groupBy === 'property') {
     const map = new Map<string, TxRow[]>()
     txList.forEach((tx) => {
-      const key = (tx.properties as { name: string } | null)?.name ?? 'No Property'
+      const key = (tx.properties as { name: string } | null)?.name ?? '__none__'
       if (!map.has(key)) map.set(key, [])
       map.get(key)!.push(tx)
     })
@@ -103,6 +108,7 @@ export default async function TransactionsPage({
     group_by?: string
   }>
 }) {
+  const { t, locale } = await getI18n()
   const filters = await searchParams
   const groupBy = filters.group_by ?? 'property'
 
@@ -148,12 +154,12 @@ export default async function TransactionsPage({
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Transactions"
-        subtitle={`${txList.length} ${txList.length === 1 ? 'transaction' : 'transactions'}`}
+        title={t('tx.title')}
+        subtitle={txList.length === 1 ? t('tx.countOne', { count: txList.length }) : t('tx.countMany', { count: txList.length })}
       >
         <Button asChild>
           <Link href="/transactions/new">
-            <Plus /> Add Transaction
+            <Plus /> {t('tx.add')}
           </Link>
         </Button>
       </PageHeader>
@@ -161,9 +167,9 @@ export default async function TransactionsPage({
       {/* ── Summary cards ── */}
       <div className="grid grid-cols-3 gap-3 sm:gap-5">
         {[
-          { label: 'Total Income', value: totalIncome, isNeg: false },
-          { label: 'Total Expenses', value: totalExpenses, isNeg: true },
-          { label: 'Net Income', value: netIncome, isNeg: netIncome < 0 },
+          { label: t('tx.totalIncome'), value: totalIncome, isNeg: false },
+          { label: t('tx.totalExpenses'), value: totalExpenses, isNeg: true },
+          { label: t('tx.netIncome'), value: netIncome, isNeg: netIncome < 0 },
         ].map((t) => (
           <div
             key={t.label}
@@ -190,7 +196,7 @@ export default async function TransactionsPage({
               className="mt-1.5 sm:mt-2.5 font-mono text-[15px] sm:text-[22px] font-medium tracking-tight"
               style={{ color: t.isNeg ? 'var(--value-neg-c)' : 'var(--accent-c)' }}
             >
-              {formatCurrency(t.value)}
+              {formatCurrency(t.value, 'CAD', 2, locale)}
             </p>
           </div>
         ))}
@@ -206,10 +212,10 @@ export default async function TransactionsPage({
           style={{ background: 'var(--section-bg)', border: '1px solid var(--card-border-color)' }}
         >
           <p className="font-sans text-[12px] font-light" style={{ color: 'var(--text-muted-c)' }}>
-            No transactions found
+            {t('tx.empty')}
           </p>
           <Button asChild variant="outline" size="sm" className="mt-4">
-            <Link href="/transactions/new"><Plus /> Add Transaction</Link>
+            <Link href="/transactions/new"><Plus /> {t('tx.add')}</Link>
           </Button>
         </div>
       ) : (
@@ -243,40 +249,44 @@ export default async function TransactionsPage({
                       className="font-serif text-[16px] sm:text-[18px] font-medium tracking-[0.02em] truncate"
                       style={{ color: 'var(--text-primary-c)' }}
                     >
-                      {group.label}
+                      {group.label === '__none__'
+                        ? t('tx.noProperty')
+                        : groupBy === 'category'
+                          ? categoryLabel(group.label, t)
+                          : group.label}
                     </span>
                     <span
                       className="font-sans text-[10px] font-light tracking-[0.1em]"
                       style={{ color: 'var(--text-muted-c)', flexShrink: 0 }}
                     >
-                      {group.txs.length} tx
+                      {group.txs.length === 1 ? t('tx.countOne', { count: group.txs.length }) : t('tx.countMany', { count: group.txs.length })}
                     </span>
                   </div>
                   <div className="flex items-center gap-4 sm:gap-6 text-right shrink-0">
                     {group.income > 0 && (
                       <div>
-                        <p className="font-sans text-[8px] uppercase tracking-[0.16em]" style={{ color: 'var(--text-muted-c)' }}>Income</p>
+                        <p className="font-sans text-[8px] uppercase tracking-[0.16em]" style={{ color: 'var(--text-muted-c)' }}>{t('tx.groupIncome')}</p>
                         <p className="font-mono text-[12px] sm:text-[13px] font-medium" style={{ color: 'var(--accent-c)' }}>
-                          +{formatCurrency(group.income)}
+                          +{formatCurrency(group.income, 'CAD', 2, locale)}
                         </p>
                       </div>
                     )}
                     {group.expenses > 0 && (
                       <div>
-                        <p className="font-sans text-[8px] uppercase tracking-[0.16em]" style={{ color: 'var(--text-muted-c)' }}>Expenses</p>
+                        <p className="font-sans text-[8px] uppercase tracking-[0.16em]" style={{ color: 'var(--text-muted-c)' }}>{t('tx.groupExpenses')}</p>
                         <p className="font-mono text-[12px] sm:text-[13px] font-medium" style={{ color: 'var(--value-neg-c)' }}>
-                          −{formatCurrency(group.expenses)}
+                          −{formatCurrency(group.expenses, 'CAD', 2, locale)}
                         </p>
                       </div>
                     )}
                     <div>
-                      <p className="font-sans text-[8px] uppercase tracking-[0.16em]" style={{ color: 'var(--text-muted-c)' }}>Net</p>
+                      <p className="font-sans text-[8px] uppercase tracking-[0.16em]" style={{ color: 'var(--text-muted-c)' }}>{t('tx.groupNet')}</p>
                       <p
                         className="font-mono text-[12px] sm:text-[13px] font-medium"
                         style={{ color: group.income - group.expenses >= 0 ? 'var(--accent-c)' : 'var(--value-neg-c)' }}
                       >
                         {group.income - group.expenses >= 0 ? '+' : '−'}
-                        {formatCurrency(Math.abs(group.income - group.expenses))}
+                        {formatCurrency(Math.abs(group.income - group.expenses), 'CAD', 2, locale)}
                       </p>
                     </div>
                   </div>
@@ -326,12 +336,12 @@ export default async function TransactionsPage({
                             className="shrink-0 font-mono text-[13px] font-medium tracking-tight"
                             style={{ color: tx.type === 'income' ? 'var(--accent-c)' : 'var(--value-neg-c)' }}
                           >
-                            {tx.type === 'income' ? '+' : '−'}{formatCurrency(tx.amount)}
+                            {tx.type === 'income' ? '+' : '−'}{formatCurrency(tx.amount, 'CAD', 2, locale)}
                           </span>
                         </div>
                         <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
                           <span className="font-sans text-[11px] font-light" style={{ color: 'var(--text-muted-c)' }}>
-                            {formatDate(tx.transaction_date)}
+                            {formatDate(tx.transaction_date, locale)}
                           </span>
                           {propName && !isGrouped && (
                             <>
@@ -342,7 +352,7 @@ export default async function TransactionsPage({
                             </>
                           )}
                           <span style={{ color: 'var(--divider-c)' }}>·</span>
-                          <Badge className="text-[10px] py-0">{tx.category}</Badge>
+                          <Badge className="text-[10px] py-0">{categoryLabel(tx.category, t)}</Badge>
                         </div>
                       </div>
                     </Link>
@@ -389,7 +399,7 @@ export default async function TransactionsPage({
                             className="whitespace-nowrap px-5 py-3.5 font-sans text-[12px] font-light"
                             style={{ color: 'var(--text-muted-c)' }}
                           >
-                            {formatDate(tx.transaction_date)}
+                            {formatDate(tx.transaction_date, locale)}
                           </td>
 
                           {/* Description */}
@@ -431,7 +441,7 @@ export default async function TransactionsPage({
                           {/* Category — hidden when grouped by category */}
                           {groupBy !== 'category' && (
                             <td className="px-5 py-3.5">
-                              <Badge>{tx.category}</Badge>
+                              <Badge>{categoryLabel(tx.category, t)}</Badge>
                             </td>
                           )}
 
@@ -441,7 +451,7 @@ export default async function TransactionsPage({
                               className="font-mono text-[13px] font-medium tracking-tight"
                               style={{ color: tx.type === 'income' ? 'var(--accent-c)' : 'var(--value-neg-c)' }}
                             >
-                              {tx.type === 'income' ? '+' : '−'}{formatCurrency(tx.amount)}
+                              {tx.type === 'income' ? '+' : '−'}{formatCurrency(tx.amount, 'CAD', 2, locale)}
                             </span>
                           </td>
 
@@ -452,7 +462,7 @@ export default async function TransactionsPage({
                               className="font-sans text-[10px] font-light uppercase tracking-[0.18em] opacity-0 transition-opacity group-hover:opacity-100"
                               style={{ color: 'var(--text-muted-c)' }}
                             >
-                              Edit
+                              {t('common.edit')}
                             </Link>
                           </td>
                         </tr>

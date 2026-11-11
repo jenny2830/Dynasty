@@ -3,8 +3,12 @@ import { ROICalculator } from './ROICalculator'
 import { PageHeader } from '@/components/ui/page-header'
 import { FeatureGate } from '@/components/FeatureGate'
 import { hasActiveMembership } from '@/lib/plans'
+import { getI18n } from '@/lib/i18n/server'
 
-export const metadata = { title: 'ROI Calculator' }
+export async function generateMetadata() {
+  const { t } = await getI18n()
+  return { title: t('meta.roi') }
+}
 
 export default async function ROIPage() {
   const supabase = await createClient()
@@ -27,13 +31,15 @@ export default async function ROIPage() {
         .order('name')
     : { data: [] }
 
+  const { t } = await getI18n()
+
   return (
     <div className="space-y-7">
       <PageHeader
-        title="ROI Calculator"
-        subtitle="Cap rate · Cash-on-cash · Yield · Equity analysis"
+        title={t('roi.title')}
+        subtitle={t('roi.subtitle')}
       />
-      <FeatureGate isMember={isMember} featureLabel="ROI Calculator">
+      <FeatureGate isMember={isMember} featureLabel={t('roi.title')}>
         <ROICalculator properties={properties ?? []} />
       </FeatureGate>
     </div>

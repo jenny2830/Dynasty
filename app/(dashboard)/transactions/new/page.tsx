@@ -3,8 +3,12 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { TransactionForm } from '@/components/transactions/TransactionForm'
 import { PageHeader } from '@/components/ui/page-header'
+import { getI18n } from '@/lib/i18n/server'
 
-export const metadata = { title: 'Add Transaction' }
+export async function generateMetadata() {
+  const { t } = await getI18n()
+  return { title: t('tx.add') }
+}
 
 export default async function NewTransactionPage({
   searchParams,
@@ -32,16 +36,18 @@ export default async function NewTransactionPage({
         .order('name')
     : { data: [] }
 
+  const { t } = await getI18n()
+
   return (
     <div className="mx-auto max-w-2xl space-y-7">
       <Link
         href="/transactions"
         className="inline-flex items-center gap-1.5 font-sans text-[10px] font-light uppercase tracking-[0.18em] text-dynasty-gray-400 transition-colors hover:text-dynasty-gold"
       >
-        <ChevronLeft className="h-3 w-3" strokeWidth={1.2} /> Back to Transactions
+        <ChevronLeft className="h-3 w-3" strokeWidth={1.2} /> {t('tx.back')}
       </Link>
 
-      <PageHeader title="Add Transaction" subtitle="Record income or expense" />
+      <PageHeader title={t('tx.add')} subtitle={t('tx.addSubtitle')} />
 
       <div className="rounded-[2px] border border-[var(--card-border-color)] px-9 py-9" style={{ background: 'var(--card-bg)', boxShadow: 'var(--card-shadow)' }}>
         <TransactionForm

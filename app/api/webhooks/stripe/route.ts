@@ -1,10 +1,9 @@
 import { NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { getStripeClient } from '@/lib/stripe/client'
 
 export const dynamic = 'force-dynamic'
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
 // Legacy price IDs — subscriptions on these prices are still valid memberships.
 // We never gate access by which price was used; any active subscription = full access.
@@ -18,6 +17,7 @@ const LEGACY_PRICE_IDS = new Set(
 void LEGACY_PRICE_IDS // referenced only for documentation; not used in logic below
 
 export async function POST(request: Request) {
+  const stripe = getStripeClient()
   const body = await request.text()
   const signature = request.headers.get('stripe-signature')!
 

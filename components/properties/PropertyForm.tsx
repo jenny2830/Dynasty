@@ -22,14 +22,18 @@ import {
   normalizeRegion,
 } from '@/lib/geo'
 import { PROPERTY_TYPES, PROPERTY_SUBTYPES, PROPERTY_STATUSES } from '@/lib/constants'
+import { useLocale } from '@/lib/locale-context'
+import { countryLabel, enumLabel, regionDisplay, regionKindLabel } from '@/lib/i18n/labels'
+import { translateKnownError } from '@/lib/i18n/translate'
 import { NumberInput } from '@/components/ui/NumberInput'
 import type { Property } from '@/types/database.types'
 
 function SubmitButton({ label, className }: { label: string; className?: string }) {
   const { pending } = useFormStatus()
+  const { t } = useLocale()
   return (
     <Button type="submit" disabled={pending} className={className}>
-      {pending ? 'Saving…' : label}
+      {pending ? t('common.saving') : label}
     </Button>
   )
 }
@@ -48,6 +52,7 @@ interface PropertyFormProps {
 }
 
 export function PropertyForm({ mode, property }: PropertyFormProps) {
+  const { t, locale } = useLocale()
   const initialCountry = property?.country ?? 'CA'
   const [type, setType] = useState<string>(property?.type ?? 'rental')
   const [country, setCountry] = useState<string>(initialCountry)
@@ -59,7 +64,7 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
     property?.property_subtype ?? 'residential',
   )
 
-  const regionLabel = getRegionLabel(country)
+  const regionLabel = regionKindLabel(getRegionLabel(country), t)
   const regions = getRegionOptions(country, province)
   const currencyLabel = getCurrencyForCountry(country)
 
@@ -81,40 +86,40 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
       {state?.errors?._form && (
         <div className="rounded-[1px] border border-[rgba(183,110,121,0.3)] bg-[rgba(183,110,121,0.08)] px-4 py-3">
           <p className="font-sans text-[12px] font-light text-dynasty-rose-light">
-            {state.errors._form[0]}
+            {translateKnownError(state.errors._form[0], t)}
           </p>
         </div>
       )}
 
       <section>
-        <FormSectionLabel>Basic Information</FormSectionLabel>
+        <FormSectionLabel>{t('properties.basic')}</FormSectionLabel>
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="name">Property Name *</Label>
+            <Label htmlFor="name">{t('properties.name')} *</Label>
             <Input
               id="name"
               name="name"
-              placeholder="e.g. 123 Main St Unit B"
+              placeholder={t('properties.namePlaceholder')}
               defaultValue={property?.name}
               required
             />
             {state?.errors?.name && (
               <p className="font-sans text-[11px] font-light text-dynasty-rose-light">
-                {state.errors.name[0]}
+                {translateKnownError(state.errors.name[0], t)}
               </p>
             )}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="status">Status</Label>
+            <Label htmlFor="status">{t('common.status')}</Label>
             <Select value={status} onValueChange={setStatus}>
               <SelectTrigger id="status">
-                <SelectValue placeholder="Select status" />
+                <SelectValue placeholder={t('properties.selectStatus')} />
               </SelectTrigger>
               <SelectContent>
                 {PROPERTY_STATUSES.map((s) => (
                   <SelectItem key={s.value} value={s.value}>
-                    {s.label}
+                    {enumLabel(s.value, t)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -122,15 +127,15 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="type">Property Type *</Label>
+            <Label htmlFor="type">{t('properties.propertyType')} *</Label>
             <Select value={type} onValueChange={setType}>
               <SelectTrigger id="type">
-                <SelectValue placeholder="Select type" />
+                <SelectValue placeholder={t('properties.selectType')} />
               </SelectTrigger>
               <SelectContent>
-                {PROPERTY_TYPES.map((t) => (
-                  <SelectItem key={t.value} value={t.value}>
-                    {t.label}
+                {PROPERTY_TYPES.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {enumLabel(option.value, t)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -138,15 +143,15 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="property_subtype">Subtype *</Label>
+            <Label htmlFor="property_subtype">{t('properties.subtype')} *</Label>
             <Select value={propertySubtype} onValueChange={setPropertySubtype}>
               <SelectTrigger id="property_subtype">
-                <SelectValue placeholder="Select subtype" />
+                <SelectValue placeholder={t('properties.selectSubtype')} />
               </SelectTrigger>
               <SelectContent>
                 {PROPERTY_SUBTYPES.map((s) => (
                   <SelectItem key={s.value} value={s.value}>
-                    {s.label}
+                    {enumLabel(s.value, t)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -154,7 +159,7 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="num_units">Number of Units</Label>
+            <Label htmlFor="num_units">{t('properties.numUnits')}</Label>
             <Input
               id="num_units"
               name="num_units"
@@ -167,25 +172,25 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
       </section>
 
       <section>
-        <FormSectionLabel>Address</FormSectionLabel>
+        <FormSectionLabel>{t('properties.addressSection')}</FormSectionLabel>
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <div className="sm:col-span-2 space-y-2">
-            <Label htmlFor="address">Street Address *</Label>
+            <Label htmlFor="address">{t('properties.street')} *</Label>
             <Input
               id="address"
               name="address"
-              placeholder="123 Main Street"
+              placeholder={t('properties.streetPlaceholder')}
               defaultValue={property?.address}
               required
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="city">City *</Label>
+            <Label htmlFor="city">{t('properties.city')} *</Label>
             <Input
               id="city"
               name="city"
-              placeholder="Toronto"
+              placeholder={t('properties.cityPlaceholder')}
               defaultValue={property?.city}
               required
             />
@@ -198,25 +203,25 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
               onValueChange={setProvince}
             >
               <SelectTrigger id="province">
-                <SelectValue placeholder={`Select ${regionLabel.toLowerCase()}`} />
+                <SelectValue placeholder={t('properties.selectRegion', { region: regionLabel.toLowerCase() })} />
               </SelectTrigger>
               <SelectContent>
                 {regions.map((r) => (
                   <SelectItem key={r} value={r}>
-                    {r}
+                    {regionDisplay(r, locale)}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
             {state?.errors?.province && (
               <p className="font-sans text-[11px] font-light text-dynasty-rose-light">
-                {state.errors.province[0]}
+                {translateKnownError(state.errors.province[0], t)}
               </p>
             )}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="postal_code">Postal Code</Label>
+            <Label htmlFor="postal_code">{t('properties.postal')}</Label>
             <Input
               id="postal_code"
               name="postal_code"
@@ -226,7 +231,7 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="country">Country</Label>
+            <Label htmlFor="country">{t('properties.country')}</Label>
             <Select
               value={country}
               onValueChange={(value) => {
@@ -235,12 +240,12 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
               }}
             >
               <SelectTrigger id="country">
-                <SelectValue placeholder="Select country" />
+                <SelectValue placeholder={t('properties.selectCountry')} />
               </SelectTrigger>
               <SelectContent>
                 {COUNTRIES.map((c) => (
                   <SelectItem key={c.code} value={c.code}>
-                    {c.name}
+                    {countryLabel(c.code, c.name, t)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -250,10 +255,10 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
       </section>
 
       <section>
-        <FormSectionLabel>Financial Details</FormSectionLabel>
+        <FormSectionLabel>{t('properties.financial')}</FormSectionLabel>
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="purchase_price">Purchase Price ({currencyLabel})</Label>
+            <Label htmlFor="purchase_price">{t('properties.purchaseWithCurrency', { currency: currencyLabel })}</Label>
             <NumberInput
               id="purchase_price"
               name="purchase_price"
@@ -265,7 +270,7 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="current_value">Current Value ({currencyLabel})</Label>
+            <Label htmlFor="current_value">{t('properties.currentWithCurrency', { currency: currencyLabel })}</Label>
             <NumberInput
               id="current_value"
               name="current_value"
@@ -277,7 +282,7 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="mortgage_balance">Mortgage Balance ({currencyLabel})</Label>
+            <Label htmlFor="mortgage_balance">{t('properties.mortgageBalanceWithCurrency', { currency: currencyLabel })}</Label>
             <NumberInput
               id="mortgage_balance"
               name="mortgage_balance"
@@ -289,7 +294,7 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="monthly_mortgage">Monthly Mortgage ({currencyLabel})</Label>
+            <Label htmlFor="monthly_mortgage">{t('properties.monthlyMortgageWithCurrency', { currency: currencyLabel })}</Label>
             <NumberInput
               id="monthly_mortgage"
               name="monthly_mortgage"
@@ -302,7 +307,7 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
 
           {type === 'condo' && (
             <div className="space-y-2">
-              <Label htmlFor="condo_fee">Monthly Condo Fee ({currencyLabel})</Label>
+              <Label htmlFor="condo_fee">{t('properties.condoFeeWithCurrency', { currency: currencyLabel })}</Label>
               <NumberInput
                 id="condo_fee"
                 name="condo_fee"
@@ -316,7 +321,7 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
 
           {type === 'strata' && (
             <div className="space-y-2">
-              <Label htmlFor="strata_fee">Monthly Strata Fee ({currencyLabel})</Label>
+              <Label htmlFor="strata_fee">{t('properties.strataFeeWithCurrency', { currency: currencyLabel })}</Label>
               <NumberInput
                 id="strata_fee"
                 name="strata_fee"
@@ -331,13 +336,13 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
       </section>
 
       <section>
-        <FormSectionLabel>Notes</FormSectionLabel>
+        <FormSectionLabel>{t('common.notes')}</FormSectionLabel>
         <div className="space-y-2">
-          <Label htmlFor="notes">Additional Notes</Label>
+          <Label htmlFor="notes">{t('properties.additionalNotes')}</Label>
           <Textarea
             id="notes"
             name="notes"
-            placeholder="Any additional notes about this property…"
+            placeholder={t('properties.notesPlaceholder')}
             defaultValue={property?.notes ?? ''}
             rows={3}
           />
@@ -345,14 +350,14 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
       </section>
 
       <div className="flex flex-col sm:flex-row gap-3 pt-2">
-        <SubmitButton label={mode === 'create' ? 'Add Property' : 'Save Changes'} className="w-full sm:w-auto" />
+        <SubmitButton label={mode === 'create' ? t('properties.add') : t('properties.saveChanges')} className="w-full sm:w-auto" />
         <Button
           type="button"
           variant="outline"
           onClick={() => window.history.back()}
           className="w-full sm:w-auto"
         >
-          Cancel
+          {t('common.cancel')}
         </Button>
       </div>
     </form>

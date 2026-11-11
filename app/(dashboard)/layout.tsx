@@ -7,6 +7,7 @@ import { DashboardClientWrapper } from '@/components/dashboard/DashboardClientWr
 import { DashboardThemeShell } from '@/components/dashboard/DashboardThemeShell'
 import { toThemeId, THEMES } from '@/lib/themes'
 import { FREE_TRIAL_MAX_SESSIONS, hasActiveMembership } from '@/lib/plans'
+import { getI18n } from '@/lib/i18n/server'
 
 export default async function DashboardLayout({
   children,
@@ -28,13 +29,14 @@ export default async function DashboardLayout({
 
   // Blocked accounts cannot access the dashboard
   if (landlord?.is_blocked) {
-    redirect('/login?error=Your+account+has+been+suspended.+Contact+support.')
+    redirect('/login?error=account_suspended')
   }
 
   const isMember = hasActiveMembership(landlord ?? {})
   const sessionsUsed = landlord?.sessions_used ?? 0
   const trialExpired = landlord?.free_trial_expired ?? false
 
+  const { t } = await getI18n()
   const initialThemeId = toThemeId(landlord?.theme_preference)
 
   // Build a { themeId: pageBg } map so the pre-paint script can resolve the
@@ -124,7 +126,7 @@ export default async function DashboardLayout({
               marginBottom: '10px',
               letterSpacing: '0.02em',
             }}>
-              Your free trial has ended
+              {t('trial.endedTitle')}
             </h2>
             <p style={{
               fontFamily: "'Jost', sans-serif",
@@ -135,7 +137,7 @@ export default async function DashboardLayout({
               letterSpacing: '0.04em',
               lineHeight: 1.6,
             }}>
-              You used all {FREE_TRIAL_MAX_SESSIONS} free sessions. Become a member to continue building your property empire.
+              {t('trial.endedBody', { count: FREE_TRIAL_MAX_SESSIONS })}
             </p>
             <Link
               href="/upgrade"
@@ -154,7 +156,7 @@ export default async function DashboardLayout({
                 boxShadow: `0 4px 20px var(--accent-c, rgba(201,168,76,0.25))`,
               }}
             >
-              Become a Member
+              {t('trial.become')}
             </Link>
           </div>
         </div>

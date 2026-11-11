@@ -2,8 +2,12 @@ import { createClient } from '@/lib/supabase/server'
 import { PageHeader } from '@/components/ui/page-header'
 import { UpgradeClient } from './UpgradeClient'
 import { hasActiveMembership } from '@/lib/plans'
+import { getI18n } from '@/lib/i18n/server'
 
-export const metadata = { title: 'Membership' }
+export async function generateMetadata() {
+  const { t } = await getI18n()
+  return { title: t('meta.upgrade') }
+}
 
 export default async function UpgradePage({
   searchParams,
@@ -34,11 +38,13 @@ export default async function UpgradePage({
     }
   }
 
+  const { t } = await getI18n()
+
   return (
     <div className="space-y-7">
       <PageHeader
-        title="Dynasty Membership"
-        subtitle="Unlock everything — one plan, all features, two billing options"
+        title={t('upgrade.title')}
+        subtitle={t('upgrade.subtitle')}
       />
       <UpgradeClient
         isMember={isMember}

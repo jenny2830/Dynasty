@@ -3,6 +3,9 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import { LanguageSwitcher } from '@/components/LanguageSwitcher'
+import { useLocale } from '@/lib/locale-context'
+import { translateKnownError } from '@/lib/i18n/translate'
 
 const labelStyle: React.CSSProperties = {
   color: '#8A8A82',
@@ -15,6 +18,7 @@ const labelStyle: React.CSSProperties = {
 }
 
 export default function ForgotPasswordPage() {
+  const { t } = useLocale()
   const [email, setEmail] = useState('')
   const [status, setStatus] = useState<'idle' | 'loading' | 'sent' | 'error'>('idle')
   const [message, setMessage] = useState('')
@@ -48,6 +52,7 @@ export default function ForgotPasswordPage() {
       justifyContent: 'center',
       padding: '48px 16px',
     }}>
+      <LanguageSwitcher variant="auth" />
       <div style={{ position: 'fixed', top: 0, left: 0, right: 0, height: '1px', background: 'linear-gradient(90deg, transparent 0%, #C9A84C 50%, transparent 100%)' }} aria-hidden />
 
       <div style={{ width: '100%', maxWidth: '420px' }}>
@@ -71,10 +76,10 @@ export default function ForgotPasswordPage() {
 
           <div style={{ textAlign: 'center', marginBottom: '28px' }}>
             <h1 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '26px', fontWeight: 500, letterSpacing: '0.04em', color: '#FAF7F2', margin: 0 }}>
-              Reset Password
+              {t('auth.resetPassword')}
             </h1>
             <p style={{ marginTop: '6px', fontFamily: "'Jost', sans-serif", fontSize: '11px', fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.18em', color: '#6B6B65' }}>
-              We&apos;ll send you a reset link
+              {t('auth.resetSubtitle')}
             </p>
           </div>
 
@@ -82,16 +87,16 @@ export default function ForgotPasswordPage() {
             <div style={{ textAlign: 'center' }}>
               <div style={{ fontSize: '28px', color: '#C9A84C', marginBottom: '16px' }}>◆</div>
               <p style={{ fontFamily: "'Jost', sans-serif", fontSize: '14px', color: '#FAF7F2', marginBottom: '8px' }}>
-                Check your inbox
+                {t('auth.checkInbox')}
               </p>
               <p style={{ fontFamily: "'Jost', sans-serif", fontSize: '12px', color: '#8A8A82', marginBottom: '24px', lineHeight: 1.6 }}>
-                If an account exists for <strong style={{ color: '#C9A84C' }}>{email}</strong>, you&apos;ll receive a password reset link shortly.
+                {t('auth.resetSent', { email })}
               </p>
               <Link
                 href="/login"
                 style={{ fontFamily: "'Jost', sans-serif", fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.18em', color: '#C9A84C', textDecoration: 'none' }}
               >
-                ← Back to Sign In
+                ← {t('auth.backToSignIn')}
               </Link>
             </div>
           ) : (
@@ -99,20 +104,20 @@ export default function ForgotPasswordPage() {
               {status === 'error' && message && (
                 <div style={{ marginBottom: '20px', borderRadius: '1px', border: '1px solid rgba(183,110,121,0.3)', background: 'rgba(183,110,121,0.08)', padding: '12px 16px' }}>
                   <p style={{ fontFamily: "'Jost', sans-serif", fontSize: '12px', fontWeight: 300, color: '#D4959E', margin: 0 }}>
-                    {message}
+                    {translateKnownError(message, t)}
                   </p>
                 </div>
               )}
 
               <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                 <div>
-                  <label htmlFor="email" style={labelStyle}>Email Address</label>
+                  <label htmlFor="email" style={labelStyle}>{t('auth.email')}</label>
                   <input
                     id="email"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="you@example.com"
+                    placeholder={t('auth.emailPlaceholder')}
                     autoComplete="email"
                     required
                     className="auth-input"
@@ -138,7 +143,7 @@ export default function ForgotPasswordPage() {
                     boxShadow: '0 4px 20px rgba(201,168,76,0.25)',
                   }}
                 >
-                  {status === 'loading' ? 'Sending…' : 'Send Reset Link'}
+                  {status === 'loading' ? t('auth.sending') : t('auth.sendReset')}
                 </button>
               </form>
             </>
@@ -147,7 +152,7 @@ export default function ForgotPasswordPage() {
 
         <p style={{ marginTop: '28px', textAlign: 'center', fontFamily: "'Jost', sans-serif", fontSize: '11px', fontWeight: 300, letterSpacing: '0.08em', color: '#6B6B65' }}>
           <Link href="/login" style={{ fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.18em', color: '#C9A84C', textDecoration: 'none' }}>
-            ← Back to Sign In
+            ← {t('auth.backToSignIn')}
           </Link>
         </p>
       </div>

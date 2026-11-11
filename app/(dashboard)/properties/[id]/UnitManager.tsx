@@ -7,6 +7,9 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useAppTheme } from '@/lib/theme-context'
+import { useFormatters, useLocale } from '@/lib/locale-context'
+import { enumLabel } from '@/lib/i18n/labels'
+import { translateKnownError } from '@/lib/i18n/translate'
 import {
   Select,
   SelectContent,
@@ -14,7 +17,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { formatCurrency } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { NumberInput } from '@/components/ui/NumberInput'
@@ -70,6 +72,7 @@ interface UnitFormProps {
 }
 
 function UnitForm({ form, setForm, onSave, onCancel, saving, error, title }: UnitFormProps) {
+  const { t } = useLocale()
   const set = (key: 'unit_number' | 'status') => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setForm({ ...form, [key]: e.target.value })
 
@@ -94,18 +97,18 @@ function UnitForm({ form, setForm, onSave, onCancel, saving, error, title }: Uni
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
         <div style={{ gridColumn: '1 / -1' }}>
-          <Label htmlFor="unit_number">Unit Number *</Label>
+          <Label htmlFor="unit_number">{t('units.number')} *</Label>
           <Input
             id="unit_number"
             value={form.unit_number}
             onChange={set('unit_number')}
-            placeholder="e.g. 1A, 202, B"
+            placeholder={t('units.numberPlaceholder')}
             style={{ marginTop: '6px' }}
           />
         </div>
 
         <div>
-          <Label htmlFor="bedrooms">Bedrooms</Label>
+          <Label htmlFor="bedrooms">{t('units.bedrooms')}</Label>
           <NumberInput
             id="bedrooms"
             value={form.bedrooms}
@@ -117,7 +120,7 @@ function UnitForm({ form, setForm, onSave, onCancel, saving, error, title }: Uni
         </div>
 
         <div>
-          <Label htmlFor="bathrooms">Bathrooms</Label>
+          <Label htmlFor="bathrooms">{t('units.bathrooms')}</Label>
           <NumberInput
             id="bathrooms"
             value={form.bathrooms}
@@ -129,7 +132,7 @@ function UnitForm({ form, setForm, onSave, onCancel, saving, error, title }: Uni
         </div>
 
         <div>
-          <Label htmlFor="sqft">Sq Ft</Label>
+          <Label htmlFor="sqft">{t('units.sqft')}</Label>
           <NumberInput
             id="sqft"
             value={form.sqft}
@@ -141,7 +144,7 @@ function UnitForm({ form, setForm, onSave, onCancel, saving, error, title }: Uni
         </div>
 
         <div>
-          <Label htmlFor="rent_amount">Monthly Rent (CAD)</Label>
+          <Label htmlFor="rent_amount">{t('units.rent')}</Label>
           <NumberInput
             id="rent_amount"
             value={form.rent_amount}
@@ -154,16 +157,16 @@ function UnitForm({ form, setForm, onSave, onCancel, saving, error, title }: Uni
         </div>
 
         <div style={{ gridColumn: '1 / -1' }}>
-          <Label htmlFor="unit_status">Status</Label>
+          <Label htmlFor="unit_status">{t('common.status')}</Label>
           <div style={{ marginTop: '6px' }}>
             <Select value={form.status} onValueChange={(v) => setForm({ ...form, status: v })}>
               <SelectTrigger id="unit_status">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="occupied">Occupied</SelectItem>
-                <SelectItem value="vacant">Vacant</SelectItem>
-                <SelectItem value="maintenance">Maintenance</SelectItem>
+                <SelectItem value="occupied">{t('enum.occupied')}</SelectItem>
+                <SelectItem value="vacant">{t('enum.vacant')}</SelectItem>
+                <SelectItem value="maintenance">{t('enum.maintenance')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -172,17 +175,17 @@ function UnitForm({ form, setForm, onSave, onCancel, saving, error, title }: Uni
 
       {error && (
         <p style={{ color: 'var(--value-neg-c, #D4959E)', fontFamily: "'Jost', sans-serif", fontSize: '14px', marginTop: '10px' }}>
-          {error}
+          {translateKnownError(error, t)}
         </p>
       )}
 
       <div style={{ display: 'flex', gap: '10px', marginTop: '16px' }}>
         <Button onClick={onSave} disabled={saving} size="sm">
           <Check />
-          {saving ? 'Saving…' : 'Save Unit'}
+          {saving ? t('common.saving') : t('units.save')}
         </Button>
         <Button variant="outline" size="sm" onClick={onCancel} disabled={saving}>
-          <X /> Cancel
+          <X /> {t('common.cancel')}
         </Button>
       </div>
     </div>
@@ -195,6 +198,8 @@ interface UnitManagerProps {
 }
 
 export function UnitManager({ propertyId, initialUnits }: UnitManagerProps) {
+  const { t } = useLocale()
+  const { money } = useFormatters()
   const { theme } = useAppTheme()
   const router = useRouter()
   const [units, setUnits] = useState<Unit[]>(initialUnits)
@@ -287,9 +292,9 @@ export function UnitManager({ propertyId, initialUnits }: UnitManagerProps) {
           gap: '8px',
         }}>
           <span style={{ fontSize: '8px', color: 'var(--accent-c)' }}>◆</span>
-          Units
+          {t('units.title')}
           <span style={{ fontFamily: "'Jost', sans-serif", fontSize: '15px', color: 'var(--text-muted-c)', fontWeight: 400 }}>
-            ({units.length} added)
+            ({t('units.added', { count: units.length })})
           </span>
         </h2>
         {!showAdd && (
@@ -312,7 +317,7 @@ export function UnitManager({ propertyId, initialUnits }: UnitManagerProps) {
               gap: '6px',
             }}
           >
-            <Plus size={13} strokeWidth={2} /> Add Unit
+            <Plus size={13} strokeWidth={2} /> {t('units.add')}
           </button>
         )}
       </div>
@@ -326,14 +331,14 @@ export function UnitManager({ propertyId, initialUnits }: UnitManagerProps) {
           onCancel={() => { setShowAdd(false); setError(null) }}
           saving={isPending}
           error={error}
-          title="New Unit"
+          title={t('units.new')}
         />
       )}
 
       {/* Units list */}
       {units.length === 0 && !showAdd ? (
         <p style={{ color: 'var(--text-muted-c)', fontFamily: "'Jost', sans-serif", fontSize: '15px', textAlign: 'center', padding: '24px 0' }}>
-          No units added yet. Click &ldquo;Add Unit&rdquo; to start.
+          {t('units.empty')}
         </p>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: units.length > 0 ? '8px' : '0' }}>
@@ -347,7 +352,7 @@ export function UnitManager({ propertyId, initialUnits }: UnitManagerProps) {
                   onCancel={() => { setEditingId(null); setError(null) }}
                   saving={isPending}
                   error={error}
-                  title={`Edit Unit ${unit.unit_number}`}
+                  title={t('units.edit', { number: unit.unit_number })}
                 />
               ) : (
                 <div style={{
@@ -362,13 +367,13 @@ export function UnitManager({ propertyId, initialUnits }: UnitManagerProps) {
                 }}>
                   <div style={{ minWidth: 0, flex: 1 }}>
                     <span style={{ fontFamily: "'Jost', sans-serif", fontSize: '15px', color: 'var(--text-primary-c)', fontWeight: 500 }}>
-                      Unit {unit.unit_number}
+                      {t('units.label', { number: unit.unit_number })}
                     </span>
                     <span style={{ fontFamily: "'Jost', sans-serif", fontSize: '15px', color: 'var(--text-muted-c)', marginLeft: '12px' }}>
                       {[
-                        unit.bedrooms != null && `${unit.bedrooms}BR`,
-                        unit.bathrooms != null && `${unit.bathrooms}BA`,
-                        unit.sqft != null && `${unit.sqft} sqft`,
+                        unit.bedrooms != null && t('units.bedShort', { count: unit.bedrooms }),
+                        unit.bathrooms != null && t('units.bathShort', { count: unit.bathrooms }),
+                        unit.sqft != null && t('units.sqftShort', { count: unit.sqft }),
                       ].filter(Boolean).join(' · ')}
                     </span>
                   </div>
@@ -380,7 +385,7 @@ export function UnitManager({ propertyId, initialUnits }: UnitManagerProps) {
                         fontSize: '15px',
                         color: unit.status === 'occupied' ? 'var(--value-pos-c)' : 'var(--value-neg-c)',
                       }}>
-                        {formatCurrency(unit.rent_amount)}/mo
+                        {money(unit.rent_amount)}{t('common.perMonth')}
                       </span>
                     )}
                     <Badge
@@ -390,13 +395,13 @@ export function UnitManager({ propertyId, initialUnits }: UnitManagerProps) {
                         : 'secondary'
                       }
                     >
-                      {unit.status}
+                      {enumLabel(unit.status, t)}
                     </Badge>
 
                     {/* Edit / Delete */}
                     {deleteId === unit.id ? (
                       <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-                        <span style={{ fontSize: '13px', color: 'var(--value-neg-c, #D4959E)', fontFamily: "'Jost', sans-serif", letterSpacing: '0.06em' }}>Delete unit?</span>
+                        <span style={{ fontSize: '13px', color: 'var(--value-neg-c, #D4959E)', fontFamily: "'Jost', sans-serif", letterSpacing: '0.06em' }}>{t('units.deleteAsk')}</span>
                         <button
                           onClick={() => handleDelete(unit.id)}
                           disabled={isPending}
@@ -416,14 +421,14 @@ export function UnitManager({ propertyId, initialUnits }: UnitManagerProps) {
                         <button
                           onClick={() => startEdit(unit)}
                           style={{ color: 'var(--text-muted-c)', background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}
-                          title="Edit unit"
+                          title={t('units.editTitle')}
                         >
                           <Pencil size={13} strokeWidth={1.4} />
                         </button>
                         <button
                           onClick={() => setDeleteId(unit.id)}
                           style={{ color: 'var(--text-muted-c)', background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}
-                          title="Delete unit"
+                          title={t('units.deleteTitle')}
                         >
                           <Trash2 size={13} strokeWidth={1.4} />
                         </button>

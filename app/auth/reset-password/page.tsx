@@ -4,6 +4,9 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { LanguageSwitcher } from '@/components/LanguageSwitcher'
+import { useLocale } from '@/lib/locale-context'
+import { translateKnownError } from '@/lib/i18n/translate'
 
 const inputStyle: React.CSSProperties = {
   width: '100%',
@@ -31,6 +34,7 @@ const labelStyle: React.CSSProperties = {
 
 export default function ResetPasswordPage() {
   const router = useRouter()
+  const { t } = useLocale()
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
@@ -97,6 +101,7 @@ export default function ResetPasswordPage() {
       justifyContent: 'center',
       padding: '48px 16px',
     }}>
+      <LanguageSwitcher variant="auth" />
       <div style={{ position: 'fixed', top: 0, left: 0, right: 0, height: '1px', background: 'linear-gradient(90deg, transparent 0%, #C9A84C 50%, transparent 100%)' }} aria-hidden />
 
       <div style={{ width: '100%', maxWidth: '420px' }}>
@@ -120,10 +125,10 @@ export default function ResetPasswordPage() {
 
           <div style={{ textAlign: 'center', marginBottom: '28px' }}>
             <h1 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '26px', fontWeight: 500, letterSpacing: '0.04em', color: '#FAF7F2', margin: 0 }}>
-              New Password
+              {t('auth.newPassword')}
             </h1>
             <p style={{ marginTop: '6px', fontFamily: "'Jost', sans-serif", fontSize: '11px', fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.18em', color: '#6B6B65' }}>
-              Choose a strong password
+              {t('auth.chooseStrong')}
             </p>
           </div>
 
@@ -131,49 +136,49 @@ export default function ResetPasswordPage() {
             <div style={{ textAlign: 'center' }}>
               <div style={{ fontSize: '28px', color: '#C9A84C', marginBottom: '16px' }}>◆</div>
               <p style={{ fontFamily: "'Jost', sans-serif", fontSize: '14px', color: '#FAF7F2', marginBottom: '8px' }}>
-                Password updated
+                {t('auth.passwordUpdated')}
               </p>
               <p style={{ fontFamily: "'Jost', sans-serif", fontSize: '12px', color: '#8A8A82' }}>
-                Redirecting you to the dashboard…
+                {t('auth.redirecting')}
               </p>
             </div>
           ) : session === 'missing' ? (
             <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '20px' }}>
               <div style={{ borderRadius: '1px', border: '1px solid rgba(183,110,121,0.3)', background: 'rgba(183,110,121,0.08)', padding: '12px 16px' }}>
                 <p style={{ fontFamily: "'Jost', sans-serif", fontSize: '12px', fontWeight: 300, color: '#D4959E', margin: 0 }}>
-                  This reset link has expired or was already used.
+                  {t('auth.linkExpired')}
                 </p>
               </div>
               <Link
                 href="/forgot-password"
                 style={{ display: 'block', width: '100%', padding: '14px', background: 'linear-gradient(135deg, #C9A84C, #9A7A2E)', color: '#080808', fontFamily: "'Jost', sans-serif", fontWeight: 600, fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', textAlign: 'center', textDecoration: 'none', borderRadius: '1px', boxShadow: '0 4px 20px rgba(201,168,76,0.25)', boxSizing: 'border-box' }}
               >
-                Request a new reset link
+                {t('auth.requestNewLink')}
               </Link>
             </div>
           ) : (
             <>
               {session === 'checking' && (
                 <p style={{ fontFamily: "'Jost', sans-serif", fontSize: '12px', color: '#8A8A82', textAlign: 'center', marginBottom: '20px' }}>
-                  Verifying reset link…
+                  {t('auth.verifyingLink')}
                 </p>
               )}
               {message && (
                 <div style={{ marginBottom: '20px', borderRadius: '1px', border: '1px solid rgba(183,110,121,0.3)', background: 'rgba(183,110,121,0.08)', padding: '12px 16px' }}>
                   <p style={{ fontFamily: "'Jost', sans-serif", fontSize: '12px', fontWeight: 300, color: '#D4959E', margin: 0 }}>
-                    {message}
+                    {translateKnownError(message, t)}
                   </p>
                 </div>
               )}
               <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                 <div>
-                  <label htmlFor="password" style={labelStyle}>New Password</label>
+                  <label htmlFor="password" style={labelStyle}>{t('auth.newPasswordLabel')}</label>
                   <input
                     id="password"
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Min. 8 characters"
+                    placeholder={t('auth.minChars')}
                     autoComplete="new-password"
                     required
                     disabled={!ready}
@@ -183,13 +188,13 @@ export default function ResetPasswordPage() {
                   />
                 </div>
                 <div>
-                  <label htmlFor="confirm" style={labelStyle}>Confirm Password</label>
+                  <label htmlFor="confirm" style={labelStyle}>{t('auth.confirmPassword')}</label>
                   <input
                     id="confirm"
                     type="password"
                     value={confirm}
                     onChange={(e) => setConfirm(e.target.value)}
-                    placeholder="Repeat password"
+                    placeholder={t('auth.repeatPassword')}
                     autoComplete="new-password"
                     required
                     disabled={!ready}
@@ -217,7 +222,7 @@ export default function ResetPasswordPage() {
                     boxShadow: '0 4px 20px rgba(201,168,76,0.25)',
                   }}
                 >
-                  {status === 'loading' ? 'Saving…' : 'Set New Password'}
+                  {status === 'loading' ? t('common.saving') : t('auth.setPassword')}
                 </button>
               </form>
             </>

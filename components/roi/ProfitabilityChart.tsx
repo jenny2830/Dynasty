@@ -17,7 +17,8 @@ import {
   ComposedChart,
   Line,
 } from 'recharts'
-import { formatCurrency } from '@/lib/utils'
+import { useFormatters, useLocale } from '@/lib/locale-context'
+import { chartLabel } from '@/lib/i18n/labels'
 
 export interface ProfitabilityResults {
   purchasePrice: number
@@ -40,6 +41,8 @@ export interface ProfitabilityResults {
 export function ProfitabilityChart({ results }: { results: ProfitabilityResults }) {
   const { theme } = useAppTheme()
   const styles = useThemeStyles()
+  const { t } = useLocale()
+  const { money } = useFormatters()
 
   const tooltipContentStyle = {
     background: theme.chartTooltipBg,
@@ -53,20 +56,20 @@ export function ProfitabilityChart({ results }: { results: ProfitabilityResults 
 
   // ── PIE CHART: Monthly cash distribution ──
   const pieData = [
-    { name: 'Net Cash Flow', value: Math.max(0, results.monthlyCashFlow) },
-    { name: 'Mortgage',      value: results.monthlyMortgage },
-    { name: 'Operating Exp', value: results.monthlyExpenses },
+    { name: t('roi.netCashFlow'), value: Math.max(0, results.monthlyCashFlow) },
+    { name: t('properties.mortgage'), value: results.monthlyMortgage },
+    { name: t('roi.operatingExp'), value: results.monthlyExpenses },
   ].filter(d => d.value > 0)
 
   const pieColors = [theme.accent, theme.valueNegative, theme.accentMuted]
 
   // ── BAR CHART: Annual income vs costs ──
   const barData = [{
-    name: 'Annual',
-    'Gross Rent':  results.monthlyRent * 12,
-    'Expenses':   -(results.monthlyExpenses * 12),
-    'Mortgage':   -(results.monthlyMortgage * 12),
-    'Net Income':  results.annualCashFlow,
+    name: t('roi.annual'),
+    grossRent: results.monthlyRent * 12,
+    expenses: -(results.monthlyExpenses * 12),
+    mortgage: -(results.monthlyMortgage * 12),
+    netIncome: results.annualCashFlow,
   }]
 
   // ── COMPOSED CHART: 10-year projection ──
@@ -79,19 +82,19 @@ export function ProfitabilityChart({ results }: { results: ProfitabilityResults 
     const equity = propertyValue - loanBalance
     const cumulativeCashFlow = results.annualCashFlow * year
     return {
-      year: `Y${year}`,
-      'Property Value':       Math.round(propertyValue),
-      'Equity':               Math.round(equity),
-      'Cumulative Cash Flow': Math.round(cumulativeCashFlow),
+      year: t('roi.yearLabel', { year }),
+      propertyValue: Math.round(propertyValue),
+      equity: Math.round(equity),
+      cumulativeCash: Math.round(cumulativeCashFlow),
     }
   })
 
   // ── KEY METRICS ──
   const metricsData = [
-    { name: 'Cap Rate',    value: results.capRate },
-    { name: 'Cash-on-Cash', value: results.cashOnCash },
-    { name: 'Gross Yield', value: results.grossYield },
-    { name: 'Net Yield',   value: results.netYield },
+    { name: t('roi.capRate'), value: results.capRate },
+    { name: t('roi.cashOnCash'), value: results.cashOnCash },
+    { name: t('roi.grossYield'), value: results.grossYield },
+    { name: t('roi.netYield'), value: results.netYield },
   ]
 
   const cardStyle: React.CSSProperties = {
@@ -142,10 +145,10 @@ export function ProfitabilityChart({ results }: { results: ProfitabilityResults 
 
         <h3 style={{ ...styles.cardTitle, marginBottom: '4px' }}>
           <span style={{ color: theme.accent, fontSize: '8px', marginRight: '8px' }}>◆</span>
-          Monthly Breakdown
+          {t('roi.monthlyBreakdown')}
         </h3>
         <p style={{ ...styles.mutedText, marginBottom: '20px' }}>
-          Where your rental income goes each month
+          {t('roi.monthlyBreakdownHelp')}
         </p>
 
         <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '24px' }}>
@@ -168,7 +171,7 @@ export function ProfitabilityChart({ results }: { results: ProfitabilityResults 
                 </Pie>
                 <Tooltip
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  formatter={(v: any) => formatCurrency(Number(v))}
+                  formatter={(v: any) => money(Number(v))}
                   contentStyle={tooltipContentStyle}
                 />
               </PieChart>
@@ -182,7 +185,7 @@ export function ProfitabilityChart({ results }: { results: ProfitabilityResults 
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <p style={{ ...styles.bodyText, marginBottom: '2px', fontSize: '14px' }}>{entry.name}</p>
                   <p style={{ ...styles.financial, color: i === 0 ? theme.accent : theme.valueNegative }}>
-                    {formatCurrency(entry.value)}/mo
+                    {money(entry.value)}{t('common.perMonth')}
                   </p>
                 </div>
               </div>
@@ -199,10 +202,10 @@ export function ProfitabilityChart({ results }: { results: ProfitabilityResults 
 
         <h3 style={{ ...styles.cardTitle, marginBottom: '4px' }}>
           <span style={{ color: theme.accent, fontSize: '8px', marginRight: '8px' }}>◆</span>
-          10-Year Projection
+          {t('roi.projection')}
         </h3>
         <p style={{ ...styles.mutedText, marginBottom: '20px' }}>
-          Estimated equity growth at 3% annual appreciation
+          {t('roi.projectionHelp')}
         </p>
 
         <ResponsiveContainer width="100%" height={300}>
@@ -222,7 +225,7 @@ export function ProfitabilityChart({ results }: { results: ProfitabilityResults 
             />
             <Tooltip
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              formatter={(v: any, name: any) => [formatCurrency(Number(v)), name]}
+              formatter={(v: any, name: any) => [money(Number(v)), chartLabel(String(name), t)]}
               contentStyle={tooltipContentStyle}
             />
             <Legend
@@ -232,21 +235,24 @@ export function ProfitabilityChart({ results }: { results: ProfitabilityResults 
             />
             <Area
               type="monotone"
-              dataKey="Property Value"
+              dataKey="propertyValue"
+              name={t('roi.propertyValue')}
               fill={`${theme.accent}15`}
               stroke={theme.accent}
               strokeWidth={2}
             />
             <Line
               type="monotone"
-              dataKey="Equity"
+              dataKey="equity"
+              name={t('roi.equity')}
               stroke={theme.accentLight}
               strokeWidth={2}
               strokeDasharray="5 5"
               dot={false}
             />
             <Bar
-              dataKey="Cumulative Cash Flow"
+              dataKey="cumulativeCash"
+              name={t('roi.cumulativeCash')}
               fill={`${theme.accent}40`}
               stroke={theme.accent}
               strokeWidth={1}
@@ -264,10 +270,10 @@ export function ProfitabilityChart({ results }: { results: ProfitabilityResults 
 
         <h3 style={{ ...styles.cardTitle, marginBottom: '4px' }}>
           <span style={{ color: theme.accent, fontSize: '8px', marginRight: '8px' }}>◆</span>
-          Annual Income vs Costs
+          {t('roi.annualCompare')}
         </h3>
         <p style={{ ...styles.mutedText, marginBottom: '20px' }}>
-          Yearly revenue against total expenses and mortgage
+          {t('roi.annualCompareHelp')}
         </p>
 
         <ResponsiveContainer width="100%" height={200}>
@@ -283,13 +289,13 @@ export function ProfitabilityChart({ results }: { results: ProfitabilityResults 
             <YAxis type="category" dataKey="name" hide />
             <Tooltip
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              formatter={(v: any, name: any) => [formatCurrency(Math.abs(Number(v))), name]}
+              formatter={(v: any, name: any) => [money(Math.abs(Number(v))), chartLabel(String(name), t)]}
               contentStyle={tooltipContentStyle}
             />
-            <Bar dataKey="Gross Rent"  fill={theme.accent}       radius={[0, 2, 2, 0]} />
-            <Bar dataKey="Expenses"    fill={theme.valueNegative} radius={[2, 0, 0, 2]} />
-            <Bar dataKey="Mortgage"    fill={theme.accentMuted}   radius={[2, 0, 0, 2]} />
-            <Bar dataKey="Net Income"  fill={theme.accentLight}   radius={[0, 2, 2, 0]} />
+            <Bar dataKey="grossRent" name={t('roi.grossRent')} fill={theme.accent} radius={[0, 2, 2, 0]} />
+            <Bar dataKey="expenses" name={t('overview.chartExpenses')} fill={theme.valueNegative} radius={[2, 0, 0, 2]} />
+            <Bar dataKey="mortgage" name={t('properties.mortgage')} fill={theme.accentMuted} radius={[2, 0, 0, 2]} />
+            <Bar dataKey="netIncome" name={t('tx.netIncome')} fill={theme.accentLight} radius={[0, 2, 2, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>

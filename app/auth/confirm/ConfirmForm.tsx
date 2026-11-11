@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { ResendConfirmation } from '@/components/auth/ResendConfirmation'
 import { confirmToken, type ConfirmState } from './actions'
 import { FORGOT_PASSWORD_PATH } from './shared'
+import { useLocale } from '@/lib/locale-context'
 
 interface ConfirmFormProps {
   tokenHash: string
@@ -75,20 +76,21 @@ function Divider() {
 }
 
 export function ConfirmForm({ tokenHash, type, next, isRecovery, initialError }: ConfirmFormProps) {
+  const { t } = useLocale()
   const [state, formAction, pending] = useActionState<ConfirmState, FormData>(confirmToken, { error: initialError })
 
   if (state.error) {
     if (isRecovery) {
       return (
         <div style={{ textAlign: 'center' }}>
-          <h1 style={headingStyle}>Reset your password</h1>
-          <p style={subheadingStyle}>Link unavailable</p>
+          <h1 style={headingStyle}>{t('auth.resetHeading')}</h1>
+          <p style={subheadingStyle}>{t('auth.linkUnavailable')}</p>
           <Divider />
           <div style={{ marginTop: '28px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            <ErrorBox>This reset link has expired or was already used.</ErrorBox>
-            <p style={bodyStyle}>Request a new link and we&apos;ll email it to you right away.</p>
+            <ErrorBox>{t('auth.linkExpired')}</ErrorBox>
+            <p style={bodyStyle}>{t('auth.requestNewHelp')}</p>
             <Link href={FORGOT_PASSWORD_PATH} style={primaryLinkStyle}>
-              Request a new reset link
+              {t('auth.requestNewLink')}
             </Link>
           </div>
         </div>
@@ -97,20 +99,19 @@ export function ConfirmForm({ tokenHash, type, next, isRecovery, initialError }:
 
     return (
       <div style={{ textAlign: 'center' }}>
-        <h1 style={headingStyle}>Confirm your email</h1>
-        <p style={subheadingStyle}>Link unavailable</p>
+        <h1 style={headingStyle}>{t('auth.confirmEmail')}</h1>
+        <p style={subheadingStyle}>{t('auth.linkUnavailable')}</p>
         <Divider />
         <div style={{ marginTop: '28px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
           <ErrorBox>
-            This confirmation link has expired or was already used. If you already confirmed your account, you can sign in.
-            Otherwise, enter your email below and we&apos;ll send a new link.
+            {t('auth.confirmExpired')}
           </ErrorBox>
           <ResendConfirmation />
           <Link
             href="/login"
             style={{ fontFamily: "'Jost', sans-serif", fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.18em', color: '#C9A84C', textDecoration: 'none' }}
           >
-            ← Back to Sign In
+            ← {t('auth.backToSignIn')}
           </Link>
         </div>
       </div>
@@ -119,13 +120,11 @@ export function ConfirmForm({ tokenHash, type, next, isRecovery, initialError }:
 
   return (
     <div style={{ textAlign: 'center' }}>
-      <h1 style={headingStyle}>{isRecovery ? 'Reset your password' : 'Confirm your email'}</h1>
-      <p style={subheadingStyle}>{isRecovery ? 'One more step' : 'Almost there'}</p>
+      <h1 style={headingStyle}>{isRecovery ? t('auth.resetHeading') : t('auth.confirmEmail')}</h1>
+      <p style={subheadingStyle}>{isRecovery ? t('auth.oneMoreStep') : t('auth.almostThere')}</p>
       <Divider />
       <p style={{ ...bodyStyle, marginTop: '28px' }}>
-        {isRecovery
-          ? 'Continue to choose a new password for your Dynasty account.'
-          : 'Click below to activate your Dynasty account and begin.'}
+        {isRecovery ? t('auth.continueReset') : t('auth.clickConfirm')}
       </p>
 
       <form action={formAction} style={{ marginTop: '28px' }}>
@@ -151,7 +150,7 @@ export function ConfirmForm({ tokenHash, type, next, isRecovery, initialError }:
             boxShadow: '0 4px 20px rgba(201,168,76,0.25)',
           }}
         >
-          {pending ? 'Verifying…' : isRecovery ? 'Continue to reset password' : 'Confirm my account'}
+          {pending ? t('auth.verifying') : isRecovery ? t('auth.continueResetButton') : t('auth.confirmAccount')}
         </button>
       </form>
     </div>

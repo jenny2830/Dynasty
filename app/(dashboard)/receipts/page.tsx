@@ -3,8 +3,12 @@ import { ReceiptScanner } from './ReceiptScanner'
 import { PageHeader } from '@/components/ui/page-header'
 import { FeatureGate } from '@/components/FeatureGate'
 import { hasActiveMembership } from '@/lib/plans'
+import { getI18n } from '@/lib/i18n/server'
 
-export const metadata = { title: 'Receipt Scanner' }
+export async function generateMetadata() {
+  const { t } = await getI18n()
+  return { title: t('meta.receipts') }
+}
 
 export default async function ReceiptsPage() {
   const supabase = await createClient()
@@ -37,13 +41,15 @@ export default async function ReceiptsPage() {
         .limit(10)
     : { data: [] }
 
+  const { t } = await getI18n()
+
   return (
     <div className="space-y-8">
       <PageHeader
-        title="Receipt Scanner"
-        subtitle="AI extraction · Images processed and immediately discarded"
+        title={t('receipts.title')}
+        subtitle={t('receipts.subtitle')}
       />
-      <FeatureGate isMember={isMember} featureLabel="Receipt Scanner">
+      <FeatureGate isMember={isMember} featureLabel={t('receipts.title')}>
         <ReceiptScanner
           properties={properties ?? []}
           recentReceipts={recentReceipts ?? []}

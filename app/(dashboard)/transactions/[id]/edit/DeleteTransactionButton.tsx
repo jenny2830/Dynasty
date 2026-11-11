@@ -13,12 +13,15 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import { deleteTransaction } from '@/app/actions/transactions'
+import { useLocale } from '@/lib/locale-context'
+import { translateKnownError } from '@/lib/i18n/translate'
 
 export function DeleteTransactionButton({ txId }: { txId: string }) {
   const [open, setOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
+  const { t } = useLocale()
 
   function handleDelete() {
     startTransition(async () => {
@@ -35,25 +38,25 @@ export function DeleteTransactionButton({ txId }: { txId: string }) {
   return (
     <>
       <Button variant="destructive" size="sm" onClick={() => setOpen(true)}>
-        <Trash2 /> Delete
+        <Trash2 /> {t('common.delete')}
       </Button>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete Transaction?</DialogTitle>
-            <DialogDescription>This action cannot be undone.</DialogDescription>
+            <DialogTitle>{t('tx.deleteTitle')}</DialogTitle>
+            <DialogDescription>{t('tx.deleteBody')}</DialogDescription>
           </DialogHeader>
           {error && (
             <p className="font-sans text-[12px] font-light text-dynasty-rose-light">
-              {error}
+              {translateKnownError(error, t)}
             </p>
           )}
           <DialogFooter className="gap-3">
             <Button variant="outline" onClick={() => setOpen(false)} disabled={isPending}>
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button variant="destructive" onClick={handleDelete} disabled={isPending}>
-              {isPending ? 'Deleting…' : 'Delete'}
+              {isPending ? t('common.deleting') : t('common.delete')}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -3,8 +3,12 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { RecurringForm } from '../RecurringForm'
 import { PageHeader } from '@/components/ui/page-header'
+import { getI18n } from '@/lib/i18n/server'
 
-export const metadata = { title: 'Add Recurring Payment' }
+export async function generateMetadata() {
+  const { t } = await getI18n()
+  return { title: t('recurring.addTitle') }
+}
 
 export default async function NewRecurringPage() {
   const supabase = await createClient()
@@ -27,18 +31,20 @@ export default async function NewRecurringPage() {
         .order('name')
     : { data: [] }
 
+  const { t } = await getI18n()
+
   return (
     <div className="mx-auto max-w-2xl space-y-7">
       <Link
         href="/recurring"
         className="inline-flex items-center gap-1.5 font-sans text-[10px] font-light uppercase tracking-[0.18em] text-dynasty-gray-400 transition-colors hover:text-dynasty-gold"
       >
-        <ChevronLeft className="h-3 w-3" strokeWidth={1.2} /> Back to Recurring
+        <ChevronLeft className="h-3 w-3" strokeWidth={1.2} /> {t('recurring.back')}
       </Link>
 
       <PageHeader
-        title="Add Recurring Payment"
-        subtitle="Automatic reminders for regular expenses"
+        title={t('recurring.addTitle')}
+        subtitle={t('recurring.addSubtitle')}
       />
 
       <div className="rounded-[2px] border border-[var(--card-border-color)] px-9 py-9" style={{ background: 'var(--card-bg)', boxShadow: 'var(--card-shadow)' }}>

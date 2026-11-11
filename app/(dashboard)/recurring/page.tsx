@@ -5,11 +5,15 @@ import { Button } from '@/components/ui/button'
 import { PageHeader } from '@/components/ui/page-header'
 import { Section, SectionHeader } from '@/components/ui/section'
 import { formatCurrency } from '@/lib/utils'
+import { getI18n } from '@/lib/i18n/server'
 import { isRecurringPaymentPending } from '@/lib/recurring-utils'
 import { RecurringPaymentRow } from './RecurringPaymentRow'
 import { RecurringPaymentHistory } from '@/components/recurring/RecurringPaymentHistory'
 
-export const metadata = { title: 'Recurring Payments' }
+export async function generateMetadata() {
+  const { t } = await getI18n()
+  return { title: t('meta.recurring') }
+}
 
 export default async function RecurringPage() {
   const supabase = await createClient()
@@ -66,15 +70,17 @@ export default async function RecurringPage() {
     return isRecurringPaymentPending(p, reminderDays)
   })
 
+  const { t, locale } = await getI18n()
+
   return (
     <div className="space-y-7">
       <PageHeader
-        title="Recurring Payments"
-        subtitle={`${active.length} active · ${formatCurrency(totalMonthly)}/mo committed`}
+        title={t('recurring.title')}
+        subtitle={t('recurring.subtitle', { active: active.length, amount: formatCurrency(totalMonthly, 'CAD', 2, locale) })}
       >
         <Button asChild>
           <Link href="/recurring/new">
-            <Plus /> Add Payment
+            <Plus /> {t('recurring.add')}
           </Link>
         </Button>
       </PageHeader>
@@ -103,8 +109,8 @@ export default async function RecurringPage() {
               margin: '0 0 4px',
             }}>
               {attentionPayments.length === 1
-                ? '1 Payment Reminder'
-                : `${attentionPayments.length} Payment Reminders`}
+                ? t('recurring.reminderOne')
+                : t('recurring.reminderMany', { count: attentionPayments.length })}
             </p>
             <p style={{
               fontFamily: "'Jost', sans-serif",
@@ -113,7 +119,7 @@ export default async function RecurringPage() {
               color: 'var(--text-secondary-c)',
               margin: 0,
             }}>
-              {attentionPayments.map((p) => p.name).join(', ')} — mark as paid once completed.
+              {t('recurring.markOnce', { names: attentionPayments.map((p) => p.name).join(', ') })}
             </p>
           </div>
         </div>
@@ -129,17 +135,17 @@ export default async function RecurringPage() {
             className="mt-5 font-serif text-[22px] font-medium tracking-[0.04em]"
             style={{ color: 'var(--text-primary-c)' }}
           >
-            No recurring payments
+            {t('recurring.emptyTitle')}
           </h2>
           <p
             className="mt-2 max-w-sm font-sans text-[12px] font-light tracking-[0.06em]"
             style={{ color: 'var(--text-muted-c)' }}
           >
-            Set up recurring payments for mortgage, insurance, taxes, and other regular expenses.
+            {t('recurring.emptyBody')}
           </p>
           <Button asChild variant="outline" className="mt-7">
             <Link href="/recurring/new">
-              <Plus /> Add First Payment
+              <Plus /> {t('recurring.addFirst')}
             </Link>
           </Button>
         </div>
@@ -147,7 +153,7 @@ export default async function RecurringPage() {
         <div className="space-y-7">
           {active.length > 0 && (
             <Section>
-              <SectionHeader title={`Active (${active.length})`} />
+              <SectionHeader title={t('recurring.activeCount', { count: active.length })} />
               <div className="divide-y" style={{ borderColor: 'var(--divider-c)' }}>
                 {active.map((p) => (
                   <RecurringPaymentRow key={p.id} payment={p} />
@@ -158,7 +164,7 @@ export default async function RecurringPage() {
 
           {inactive.length > 0 && (
             <Section className="opacity-60">
-              <SectionHeader title={`Inactive (${inactive.length})`} />
+              <SectionHeader title={t('recurring.inactiveCount', { count: inactive.length })} />
               <div className="divide-y" style={{ borderColor: 'var(--divider-c)' }}>
                 {inactive.map((p) => (
                   <RecurringPaymentRow key={p.id} payment={p} />

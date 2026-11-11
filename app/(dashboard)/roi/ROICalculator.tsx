@@ -12,9 +12,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { formatCurrency, formatPercent } from '@/lib/utils'
+import { formatPercent } from '@/lib/utils'
 import { NumberInput } from '@/components/ui/NumberInput'
 import { useAppTheme } from '@/lib/theme-context'
+import { useFormatters, useLocale } from '@/lib/locale-context'
 import { ProfitabilityChart } from '@/components/roi/ProfitabilityChart'
 
 interface Property {
@@ -96,6 +97,8 @@ interface ROICalculatorProps {
 
 export function ROICalculator({ properties }: ROICalculatorProps) {
   const { theme } = useAppTheme()
+  const { t } = useLocale()
+  const { money } = useFormatters()
   const [inputs, setInputs] = useState<ROIInputs>(EMPTY_INPUTS)
 
   const set = (key: keyof ROIInputs) => (val: number | null) =>
@@ -120,27 +123,27 @@ export function ROICalculator({ properties }: ROICalculatorProps) {
   const results = useMemo(() => calculate(inputs), [inputs])
 
   const inputFields: { key: keyof ROIInputs; label: string; help?: string }[] = [
-    { key: 'purchasePrice', label: 'Purchase Price (CAD)', help: 'Original acquisition price' },
-    { key: 'downPayment', label: 'Down Payment (CAD)', help: 'Cash paid upfront' },
-    { key: 'closingCosts', label: 'Closing Costs (CAD)', help: 'Legal, inspection, taxes' },
-    { key: 'monthlyRent', label: 'Monthly Rent (CAD)', help: 'Gross rental income' },
-    { key: 'monthlyExpenses', label: 'Monthly Operating Expenses (CAD)', help: 'Insurance, taxes, maintenance, fees' },
-    { key: 'monthlyMortgage', label: 'Monthly Mortgage Payment (CAD)', help: 'Principal + interest' },
-    { key: 'currentValue', label: 'Current Market Value (CAD)', help: 'For equity calculation' },
+    { key: 'purchasePrice', label: t('roi.purchase'), help: t('roi.purchaseHelp') },
+    { key: 'downPayment', label: t('roi.down'), help: t('roi.downHelp') },
+    { key: 'closingCosts', label: t('roi.closing'), help: t('roi.closingHelp') },
+    { key: 'monthlyRent', label: t('roi.rent'), help: t('roi.rentHelp') },
+    { key: 'monthlyExpenses', label: t('roi.opex'), help: t('roi.opexHelp') },
+    { key: 'monthlyMortgage', label: t('roi.mortgage'), help: t('roi.mortgageHelp') },
+    { key: 'currentValue', label: t('roi.marketValue'), help: t('roi.marketHelp') },
   ]
 
   const headlineMetrics = results
     ? [
         {
-          label: 'Cap Rate',
+          label: t('roi.capRate'),
           value: formatPercent(results.capRate),
-          help: 'NOI ÷ Purchase Price',
+          help: t('roi.capHelp'),
           positive: results.capRate > 0,
         },
         {
-          label: 'Cash-on-Cash',
+          label: t('roi.cashOnCash'),
           value: formatPercent(results.cashOnCash),
-          help: 'Annual cash flow ÷ Cash invested',
+          help: t('roi.cashHelp'),
           positive: results.cashOnCash > 0,
         },
       ]
@@ -148,12 +151,12 @@ export function ROICalculator({ properties }: ROICalculatorProps) {
 
   const subMetrics = results
     ? [
-        { label: 'Gross Yield', value: formatPercent(results.grossYield), positive: results.grossYield > 0 },
-        { label: 'Net Yield', value: formatPercent(results.netYield), positive: results.netYield > 0 },
-        { label: 'Monthly Cash Flow', value: formatCurrency(results.monthlyCashFlow), positive: results.monthlyCashFlow > 0 },
-        { label: 'Annual Cash Flow', value: formatCurrency(results.annualCashFlow), positive: results.annualCashFlow > 0 },
-        { label: 'Equity', value: formatCurrency(results.equity), positive: results.equity > 0 },
-        { label: 'Annual NOI', value: formatCurrency(results.annualNOI), positive: results.annualNOI > 0 },
+        { label: t('roi.grossYield'), value: formatPercent(results.grossYield), positive: results.grossYield > 0 },
+        { label: t('roi.netYield'), value: formatPercent(results.netYield), positive: results.netYield > 0 },
+        { label: t('roi.monthlyCashFlow'), value: money(results.monthlyCashFlow), positive: results.monthlyCashFlow > 0 },
+        { label: t('roi.annualCashFlow'), value: money(results.annualCashFlow), positive: results.annualCashFlow > 0 },
+        { label: t('roi.equity'), value: money(results.equity), positive: results.equity > 0 },
+        { label: t('roi.annualNoi'), value: money(results.annualNOI), positive: results.annualNOI > 0 },
       ]
     : []
 
@@ -170,12 +173,12 @@ export function ROICalculator({ properties }: ROICalculatorProps) {
             <div className="mb-3 flex items-center gap-2">
               <Building2 className="h-3.5 w-3.5" strokeWidth={1.2} style={{ color: theme.accent }} />
               <p className="font-sans text-[10px] font-light uppercase tracking-[0.2em]" style={{ color: theme.accent }}>
-                Load From Property
+                {t('roi.loadFrom')}
               </p>
             </div>
             <Select onValueChange={loadFromProperty}>
               <SelectTrigger>
-                <SelectValue placeholder="Select a property to auto-fill…" />
+                <SelectValue placeholder={t('roi.selectProperty')} />
               </SelectTrigger>
               <SelectContent>
                 {properties.map((p) => (
@@ -191,7 +194,7 @@ export function ROICalculator({ properties }: ROICalculatorProps) {
             className="pb-3 font-sans text-[9px] font-light uppercase tracking-[0.2em]"
             style={{ borderBottom: `1px solid ${theme.dividerColor}`, color: theme.textMuted }}
           >
-            Inputs
+            {t('roi.inputs')}
           </h2>
           {inputFields.map(({ key, label, help }) => (
             <div key={key} className="space-y-2">
@@ -217,7 +220,7 @@ export function ROICalculator({ properties }: ROICalculatorProps) {
             onClick={() => setInputs(EMPTY_INPUTS)}
             className="mt-2"
           >
-            Clear All
+            {t('common.clearAll')}
           </Button>
         </Section>
       </div>
@@ -229,17 +232,17 @@ export function ROICalculator({ properties }: ROICalculatorProps) {
             className="mb-5 pb-3 font-sans text-[9px] font-light uppercase tracking-[0.2em]"
             style={{ borderBottom: `1px solid ${theme.dividerColor}`, color: theme.textMuted }}
           >
-            Results
+            {t('roi.results')}
           </h2>
 
           {!results ? (
             <div className="flex flex-col items-center justify-center py-10 text-center">
               <TrendingUp className="h-8 w-8 text-dynasty-gold/15" strokeWidth={1} />
               <p className="mt-4 font-serif text-[16px] font-medium tracking-[0.02em] text-dynasty-gray-300">
-                Awaiting Inputs
+                {t('roi.awaiting')}
               </p>
               <p className="mt-1.5 font-sans text-[11px] font-light tracking-[0.06em] text-dynasty-gray-500">
-                Enter purchase price to begin calculations
+                {t('roi.awaitingHelp')}
               </p>
             </div>
           ) : (
@@ -298,15 +301,15 @@ export function ROICalculator({ properties }: ROICalculatorProps) {
           <Section className="px-6 py-5">
             <p className="mb-3 font-sans text-[9px] font-light uppercase tracking-[0.2em]" style={{ color: `${theme.accent}CC` }}>
               <span className="mr-2 text-[6px] leading-none" style={{ color: `${theme.accent}80` }}>◆</span>
-              Canadian Market Benchmarks
+              {t('roi.benchmarks')}
             </p>
             <ul className="space-y-1.5 font-sans text-[12px] font-light tracking-[0.02em]" style={{ color: theme.textSecondary }}>
-              <li>Cap Rate &gt; 5% is generally considered good for residential</li>
-              <li>Cash-on-Cash &gt; 8–10% indicates strong cash flow</li>
-              <li>Monthly cash flow should be positive after all expenses</li>
+              <li>{t('roi.benchCap')}</li>
+              <li>{t('roi.benchCoc')}</li>
+              <li>{t('roi.benchFlow')}</li>
             </ul>
             <p className="mt-3 font-sans text-[10px] font-light italic tracking-[0.04em]" style={{ color: theme.textMuted }}>
-              * Estimates for planning purposes only. Consult a financial advisor for investment decisions.
+              {t('roi.disclaimer')}
             </p>
           </Section>
         )}

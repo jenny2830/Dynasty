@@ -1,6 +1,8 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
 import { useAppTheme } from '@/lib/theme-context'
+import { useLocale } from '@/lib/locale-context'
+import { intlTag } from '@/lib/i18n/locale'
 
 interface NumberInputProps {
   /** Controlled mode: current numeric value */
@@ -22,6 +24,26 @@ interface NumberInputProps {
   required?: boolean
 }
 
+function normalizeNumericInput(input: string, locale: 'en' | 'es'): string {
+  let raw = input.replace(/[^0-9.,\-]/g, '')
+  const negative = raw.startsWith('-')
+  raw = raw.replace(/-/g, '')
+  if (locale === 'es') {
+    if (raw.includes(',')) {
+      raw = raw.replace(/\./g, '').replace(',', '.')
+    } else if (raw.includes('.')) {
+      const parts = raw.split('.')
+      const last = parts[parts.length - 1] ?? ''
+      raw = parts.length === 2 && last.length > 0 && last.length <= 2
+        ? `${parts[0]}.${last}`
+        : raw.replace(/\./g, '')
+    }
+  } else {
+    raw = raw.replace(/,/g, '')
+  }
+  return (negative ? '-' : '') + raw
+}
+
 export function NumberInput({
   value,
   onChange,
@@ -36,6 +58,7 @@ export function NumberInput({
   required,
 }: NumberInputProps) {
   const { theme } = useAppTheme()
+  const { locale } = useLocale()
   const isControlled = value !== undefined || onChange !== undefined
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -55,7 +78,7 @@ export function NumberInput({
   })
 
   function formatWithCommas(num: number, dec: number): string {
-    return num.toLocaleString('en-CA', {
+    return num.toLocaleString(intlTag(locale), {
       minimumFractionDigits: dec,
       maximumFractionDigits: dec,
     })
@@ -68,13 +91,10 @@ export function NumberInput({
     const n = value ?? null
     setRawValue(n)
     setDisplay(n == null ? '' : formatWithCommas(n, decimals))
-  }, [value, decimals, isControlled])
+  }, [value, decimals, isControlled, locale])
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    let raw = e.target.value
-
-    // Strip everything except digits, dot, minus
-    raw = raw.replace(/[^0-9.\-]/g, '')
+    let raw = normalizeNumericInput(e.target.value, locale)
 
     // Prevent multiple decimal points
     const dotIdx = raw.indexOf('.')
@@ -88,8 +108,11 @@ export function NumberInput({
     const dotI = absRaw.indexOf('.')
     const intPart = dotI >= 0 ? absRaw.slice(0, dotI) : absRaw
     const decPart = dotI >= 0 ? absRaw.slice(dotI) : ''
-    const formattedInt = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-    setDisplay((isNeg ? '-' : '') + formattedInt + decPart)
+    const thousands = locale === 'es' ? '.' : ','
+    const decimalMark = locale === 'es' ? ',' : '.'
+    const formattedInt = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, thousands)
+    const formattedDec = decPart ? decimalMark + decPart.slice(1) : ''
+    setDisplay((isNeg ? '-' : '') + formattedInt + formattedDec)
 
     const num = parseFloat(raw)
     const parsed = raw === '' || raw === '-' || raw === '.' ? null : isNaN(num) ? null : num
