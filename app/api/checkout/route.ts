@@ -1,12 +1,11 @@
 import { NextResponse } from 'next/server'
-import Stripe from 'stripe'
 import { createClient } from '@/lib/supabase/server'
 import { getLocale } from '@/lib/i18n/server'
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
+import { getStripeClient } from '@/lib/stripe/client'
 
 export async function POST(request: Request) {
   try {
+    const stripe = getStripeClient()
     const body = await request.json()
     const { billing } = body as { billing?: string }
 
